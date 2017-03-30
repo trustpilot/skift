@@ -1,0 +1,23 @@
+{
+  "name": "trustpilot-splittest",
+  "version": "1.0.0",
+  "description": "Split testing tool for web ",
+  "main": "dist/splittesting.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^2.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trustpilot/splittestingtool.git"
+  },
+  "author": "Trustpilot A/S",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trustpilot/splittestingtool/issues"
+  },
+  "homepage": "https://github.com/trustpilot/splittestingtool#readme"
+}

@@ -1,617 +1,615 @@
 import * as $ from "jquery";
 
-namespace TP.abTest {
-    export let tests: AbTest[] = [];
-    const cookieName = "trustpilotABTest",
-          userSessionDaysToLive = 3;
-    let isInitialized = false,
-        userSession: UserSession,
-        globalCondition: ConditionFunction,
-        trackingEventHandler: TrackingEventHandler;
+export let tests: AbTest[] = [];
+const cookieName = "trustpilotABTest",
+        userSessionDaysToLive = 3;
+let isInitialized = false,
+    userSession: UserSession,
+    globalCondition: ConditionFunction,
+    trackingEventHandler: TrackingEventHandler;
 
-    export interface ConditionFunction {
-        (userAgentInfo: UserAgentInfo): boolean;
-    }
+export interface ConditionFunction {
+    (userAgentInfo: UserAgentInfo): boolean;
+}
 
-    export interface TrackingData extends ObjectLiteral { }
+export interface TrackingData extends ObjectLiteral { }
+
+/**
+ * Describing a handler for A/B test events
+ */
+export interface TrackingEventHandler {
+    /**
+     * Records an action your user performs.
+     * @param event The name of the event you’re tracking.
+     * @param trackingData A dictionary of properties for the event
+     */
+    track(event: TrackEventType, trackingData: TrackingData): void;
 
     /**
-     * Describing a handler for A/B test events
+     * A helper method that attaches the track call as a handler to a link
+     * @param elements DOM element to be bound with track method
+     * @param event The name of the event, passed to the track method
+     * @param trackingData A dictionary of properties to pass with the track method. 
      */
-    export interface TrackingEventHandler {
-        /**
-         * Records an action your user performs.
-         * @param event The name of the event you’re tracking.
-         * @param trackingData A dictionary of properties for the event
-         */
-        track(event: TrackEventType, trackingData: TrackingData): void;
+    trackLink(elements: Element | JQuery, event: TrackEventType, trackingData: TrackingData): void;
+}
 
-        /**
-         * A helper method that attaches the track call as a handler to a link
-         * @param elements DOM element to be bound with track method
-         * @param event The name of the event, passed to the track method
-         * @param trackingData A dictionary of properties to pass with the track method. 
-         */
-        trackLink(elements: Element | JQuery, event: TrackEventType, trackingData: TrackingData): void;
+/**
+ * A function that extends a tracking data object with even more data
+ */
+export interface TrackingDataExtender {
+    (trackingData: TrackingData, event: string): TrackingData;
+}
+
+export declare type TrackEventType = "ExperimentViewed" | "ExperimentActionPerformed";
+export declare type TrackEventActionType = "Click";
+
+export interface ObjectLiteral {
+    [key: string]: any;
+}
+
+export interface UserAgentInfo {
+    name: string;
+    version: string;
+    isMobile: boolean;
+}
+
+export interface Variant {
+    /** A descriptive unique name of this variant */
+    name: string;
+    /** The percentage of users who should see this variant */
+    segment: number;
+    /** Function to be called when this variant has been chosen and should be setup. It's always called after DOMContentLoaded */
+    setup?: (userAgentInfo: UserAgentInfo, test: AbTest) => void;
+    /** Whether a track event should automatically be published once this variant has been setup. Default is true. */
+    trackEventAutoPublish?: boolean;
+}
+
+export interface TestVariantsMap {
+    [key: string]: string; 
+}
+
+/**
+ * Constructs a new TrackingDataExtender that extending the existing tracking data with the provided tracking data
+ * @param newTrackingData
+ */
+function trackingDataExtenderFactory(newTrackingData: TrackingData): TrackingDataExtender {
+    return (trackingData: TrackingData) => $.extend(trackingData, newTrackingData);
+}
+
+/**
+ * The base tracking data extender supplying general tracking data
+ */
+function baseTrackingDataExtenderFactory(): TrackingDataExtender { 
+    return trackingDataExtenderFactory({
+        "browser": userSession.userAgent.name,
+        "browserVersion": userSession.userAgent.version,
+        "isMobile": userSession.userAgent.isMobile
+    });
+} 
+
+/**
+ * Linear Congruential Generator
+ * https://en.wikipedia.org/wiki/Linear_congruential_generator
+ */
+class Rng {
+    // Using GCC's constants
+    static readonly m = 0x80000000; // 2**31;
+    static readonly a = 1103515245;
+    static readonly c = 12345;
+
+    private state: number;
+
+    constructor(seed: number) {
+        this.state = seed;
+    }
+
+    nextInt() {
+        this.state = (Rng.a * this.state + Rng.c) % Rng.m;
+        return this.state;
     }
 
     /**
-     * A function that extends a tracking data object with even more data
+     * Get a (integer) number in range [start, end): including start, excluding end.
+     * @param start Range start (included)
+     * @param end Range end (excluded)
      */
-    export interface TrackingDataExtender {
-        (trackingData: TrackingData, event: string): TrackingData;
+    nextRange(start: number, end: number) {
+        // can't modulu nextInt because of weak randomness in lower bits
+        const rangeSize = end - start;
+        const randomUnder1 = this.nextInt() / Rng.m;
+        return start + Math.floor(randomUnder1 * rangeSize);
+    }
+}
+
+class UserAgentHelper {
+
+    private static isMobile() {
+        var ua = navigator.userAgent || navigator.vendor;
+        return /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(ua)
+            || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(ua.substr(0, 4));
     }
 
-    export declare type TrackEventType = "ExperimentViewed" | "ExperimentActionPerformed";
-    export declare type TrackEventActionType = "Click";
-
-    interface ObjectLiteral {
-        [key: string]: any;
-    }
-
-    export interface UserAgentInfo {
-        name: string;
-        version: string;
-        isMobile: boolean;
-    }
-
-    interface Variant {
-        /** A descriptive unique name of this variant */
-        name: string;
-        /** The percentage of users who should see this variant */
-        segment: number;
-        /** Function to be called when this variant has been chosen and should be setup. It's always called after DOMContentLoaded */
-        setup?: (userAgentInfo: UserAgentInfo, test: AbTest) => void;
-        /** Whether a track event should automatically be published once this variant has been setup. Default is true. */
-        trackEventAutoPublish?: boolean;
-    }
-
-    interface TestVariantsMap {
-        [key: string]: string; 
-    }
-
-    /**
-     * Constructs a new TrackingDataExtender that extending the existing tracking data with the provided tracking data
-     * @param newTrackingData
-     */
-    function trackingDataExtenderFactory(newTrackingData: TrackingData): TrackingDataExtender {
-        return (trackingData: TrackingData) => $.extend(trackingData, newTrackingData);
-    }
-
-    /**
-     * The base tracking data extender supplying general tracking data
-     */
-    function baseTrackingDataExtenderFactory(): TrackingDataExtender { 
-        return trackingDataExtenderFactory({
-            "browser": userSession.userAgent.name,
-            "browserVersion": userSession.userAgent.version,
-            "isMobile": userSession.userAgent.isMobile
-        });
-    } 
-
-    /**
-     * Linear Congruential Generator
-     * https://en.wikipedia.org/wiki/Linear_congruential_generator
-     */
-    class Rng {
-        // Using GCC's constants
-        static readonly m = 0x80000000; // 2**31;
-        static readonly a = 1103515245;
-        static readonly c = 12345;
-
-        private state: number;
-
-        constructor(seed: number) {
-            this.state = seed;
+    private static getNameAndVersion() {
+        var ua = navigator.userAgent,
+            tem: RegExpMatchArray | null,
+            match : RegExpMatchArray = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+        if (/trident/i.test(match[1])) {
+            tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+            return {
+                name: 'IE',
+                version: (tem[1] || '')
+            };
         }
-
-        nextInt() {
-            this.state = (Rng.a * this.state + Rng.c) % Rng.m;
-            return this.state;
-        }
-
-        /**
-         * Get a (integer) number in range [start, end): including start, excluding end.
-         * @param start Range start (included)
-         * @param end Range end (excluded)
-         */
-        nextRange(start: number, end: number) {
-            // can't modulu nextInt because of weak randomness in lower bits
-            const rangeSize = end - start;
-            const randomUnder1 = this.nextInt() / Rng.m;
-            return start + Math.floor(randomUnder1 * rangeSize);
-        }
-    }
-
-    class UserAgentHelper {
-
-        private static isMobile() {
-            var ua = navigator.userAgent || navigator.vendor;
-            return /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(ua)
-                || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(ua.substr(0, 4));
-        }
-
-        private static getNameAndVersion() {
-            var ua = navigator.userAgent,
-                tem: RegExpMatchArray | null,
-                match : RegExpMatchArray = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-            if (/trident/i.test(match[1])) {
-                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+        if (match[1] === 'Chrome') {
+            tem = ua.match(/\bOPR\/(\d+)/);
+            if (tem != null) {
                 return {
-                    name: 'IE',
-                    version: (tem[1] || '')
+                    name: 'Opera',
+                    version: tem[1]
                 };
             }
-            if (match[1] === 'Chrome') {
-                tem = ua.match(/\bOPR\/(\d+)/);
-                if (tem != null) {
-                    return {
-                        name: 'Opera',
-                        version: tem[1]
-                    };
-                }
-            }
-            match = match[2] ? [match[1], match[2]] : [navigator.appName, navigator.appVersion, '-?'];
-            if ((tem = ua.match(/version\/(\d+)/i)) != null) {
-                match.splice(1, 1, tem[1]);
-            }
-            return {
-                name: match[0],
-                version: match[1]
-            };
         }
-
-        static getUserAgentInfo() : UserAgentInfo {
-            return $.extend(UserAgentHelper.getNameAndVersion(), {
-                isMobile: UserAgentHelper.isMobile()
-            });
+        match = match[2] ? [match[1], match[2]] : [navigator.appName, navigator.appVersion, '-?'];
+        if ((tem = ua.match(/version\/(\d+)/i)) != null) {
+            match.splice(1, 1, tem[1]);
         }
+        return {
+            name: match[0],
+            version: match[1]
+        };
     }
 
-    class CookieHelper {
-
-        static createCookie(name: string, value: string, days: number): void {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + value + expires + "; path=/";            
-        }
-
-        static readCookie(name: string): string | null {
-            var nameEq = name + "=";
-            var ca = document.cookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) === ' ') {
-                    c = c.substring(1, c.length); 
-                }
-                if (c.indexOf(nameEq) === 0) {
-                    return c.substring(nameEq.length, c.length);
-                }
-            }
-            return null;
-        }
-
-        static eraseCookie(name: string) {
-            CookieHelper.createCookie(name, "", -1);
-        }
-    }
-
-    class UserSession {
-        readonly userAgent: UserAgentInfo;
-
-        constructor(
-            private daysToLive: number,
-            public testSegment: number = Math.floor((Math.random() * 100) + 1),
-            private testVariants : TestVariantsMap = {}
-        ) {
-            this.userAgent = UserAgentHelper.getUserAgentInfo();
-        }
-
-        setTestVariant(testName: string, variantName: string): void {
-            this.testVariants[testName] = variantName;
-        }
-
-        getTestVariant(testName: string): string {
-            return this.testVariants[testName];
-        }
-
-        save(key: string): void {
-            var json = JSON.stringify({
-                testSegment: this.testSegment,
-                testVariants: this.testVariants
-            });
-            CookieHelper.createCookie(key, json, this.daysToLive);
-        }
-
-        static fromJson(json: string): UserSession {
-            var obj = JSON.parse(json);
-            return new UserSession(userSessionDaysToLive, obj.testSegment, obj.testVariants);
-        }
-    }
-
-    export class AbTest {
-
-        private trackingDataExtender: TrackingDataExtender = baseTrackingDataExtenderFactory();
-        private condition: ConditionFunction;
-        readonly variants: Variant[] = [];
-
-        constructor(public name: string) {
-            this.extendTrackingData(trackingDataExtenderFactory({
-                "experimentName": name
-            }));
-        }
-
-        /**
-         * Determines whether this test is able to run or not.
-         */
-        public canRun(userAgentInfo: UserAgentInfo): boolean {
-            return (typeof globalCondition !== "function" || globalCondition(userAgentInfo)) &&
-                    (typeof this.condition !== "function" || this.condition(userAgentInfo));
-        }
-
-        public setCondition(condition: ConditionFunction): AbTest {
-            this.condition = condition;
-            return this;
-        }
-
-        addVariant(variant: Variant): AbTest {
-            if (typeof variant.name !== "string" || variant.name === "" || this.getVariant(variant.name)) {
-                throw new Error(`A/B Test "${this.name}": Variant must have a unique name. Was "${variant.name}"`);
-            }
-            if (typeof variant.segment !== "number" || variant.segment < 0 || variant.segment > 100) {
-                throw new Error(`A/B Test "${this.name}", variant "${variant.name}": "segment" must be a number between 0-100. Was ${variant.segment}`);
-            }
-            this.variants.push(variant);
-            return this;
-        }
-
-        setup(userSession: UserSession): boolean {
-            // Step 1: Validate whether this test is correctly configured
-            const variantsSegmentationSum = Math.round(this.variants.reduce((sum, v) => sum + v.segment, 0));
-            if (variantsSegmentationSum !== 100) {
-                console.error(`A/B Test: IGNORING test "${this.name}", because variant segmentation does not add up to 100. Current value: ${variantsSegmentationSum}`);
-                return false;
-            }
-
-            // Step 2: Run condition function, if any
-            if (typeof this.condition === "function" && !this.condition(userSession.userAgent)) {
-                return false;
-            }
-
-            // Step 3: Select and setup variant
-            const variant = this.selectVariant(userSession);
-            userSession.setTestVariant(this.name, variant.name);
-            this.extendTrackingData(trackingDataExtenderFactory({
-                "variationName": variant.name
-            }));
-            if (typeof variant.setup === "function") {
-                variant.setup(userSession.userAgent, this);
-            }
-            
-            // Step 4: Publish track event
-            if (variant.trackEventAutoPublish !== false) {
-                this.trackViewed();
-            }
-            return true;
-        }
-
-        getVariant(name: string): Variant {
-            return this.variants.filter((v) => v.name === name)[0];
-        }
-
-        getVariantUrl(variantName: string | null): string {
-            const param = `${this.name}=${variantName}`,
-                query = deserializeQueryString(location.search);
-            try {
-                query["abtest"] = btoa(param);
-                return location.protocol + "//" + location.host + location.pathname +
-                    "?" + $.param(query) +
-                    location.hash;
-            } catch (e) {
-                return location.href;
-            }
-        }
-
-        /**
-         * The tracking data extenders are called just before any event is published to the event handler.
-         */
-        extendTrackingData(trackingDataExtender: TrackingDataExtender): AbTest {
-            if (typeof trackingDataExtender === "function") {
-                let currentExtender = this.trackingDataExtender;
-                this.trackingDataExtender = function(trackingData: TrackingData, eventName: string) {
-                    return trackingDataExtender(currentExtender(trackingData, eventName), eventName);
-                }
-            }
-            return this;
-        }
-
-        private trackEvent(event: TrackEventType, trackingData?: TrackingData): void {
-            if (trackingEventHandler) {
-                const allTrackingData = this.trackingDataExtender(trackingData || {}, event);
-                trackingEventHandler.track(event, allTrackingData);
-            }
-        }
-
-        /**
-         * Emits an "Experiment Viewed" tracking event 
-         */
-        trackViewed(): void {
-            this.trackEvent("ExperimentViewed");
-        }
-
-        /**
-         * Emits an "Experiment Action Performed" tracking event 
-         * @param action Specifies the action type that has been performed
-         * @param target Specifies a target the action has affected or originated from
-         */
-        trackActionPerformed(action: TrackEventActionType, target?: string): void {
-            this.trackEvent("ExperimentActionPerformed", {
-                "action": action,
-                "actionTarget": (target || "")
-            });
-        }
-
-        /**
-         * Attaches a <code>trackActionPerformed</code> call as a handler to a link.
-         * @param elements The DOM element to be bound with track method.
-         * @param name A human readable name of the link. If left out, the innerText of the element is used
-         */
-        trackLink(elements: Element | JQuery, name?: string): void {
-            if (trackingEventHandler) {
-                const event: TrackEventType = "ExperimentActionPerformed";
-                const trackingData = this.trackingDataExtender({
-                    "action": "Click",
-                    "actionTarget": name || $(elements).text()
-                }, event);
-                trackingEventHandler.trackLink(elements, event, trackingData);
-            }
-        }
-
-        /**
-         * Selects a variation based on a user session.
-         * If the user has already seen a specific variation, we select the same one again
-         */
-        private selectVariant(userSession: UserSession): Variant {
-            let selectedVariant = this.getVariant(userSession.getTestVariant(this.name) || "");
-            
-            if (!selectedVariant) { // Select a new variation
-                let testSegment = this.getTestSegment(userSession.testSegment);
-                for (let i = 0, variantLowerBound = 0; i < this.variants.length; i++) {
-                    let variant = this.variants[i],
-                        variantUpperBound = variantLowerBound + this.variants[i].segment;
-                    if (variantLowerBound < testSegment && testSegment <= variantUpperBound) {
-                        selectedVariant = variant;
-                        break;
-                    }
-                    variantLowerBound = variantUpperBound;
-                }
-            }
-            return selectedVariant;
-        }
-
-        /**
-         * Rotates the user segment number using the name of this test.
-         * @param userTestSegment The segment number chosen for this user (1-100)
-         * @returns {number} A number between 1-100 
-         */
-        private getTestSegment(userTestSegment: number): number {
-            const seed = this.name.split("")
-                                    .map(c => c.charCodeAt(0))
-                                    .reduce((a, b) => a + (b * userTestSegment), 0);
-            const rng = new Rng(seed);
-            return rng.nextRange(1,101);
-        }
-    }
-
-    function getOrCreateUserSession(): UserSession {
-        const existingSession = CookieHelper.readCookie(cookieName);
-        return existingSession != null
-            ? UserSession.fromJson(existingSession)
-            : new UserSession(userSessionDaysToLive);
-    }
-
-    function deserializeQueryString(queryString: string): ObjectLiteral {
-        if (queryString === "") 
-            return {};
-        const params = decodeURIComponent(queryString.replace('?', '')).split('&'),
-            queryObj : ObjectLiteral = {};
-        params.forEach((item) => {
-            const keyValue = item.split('=');
-            queryObj[keyValue[0]] = keyValue.length > 1 ? keyValue[1] : '';
+    static getUserAgentInfo() : UserAgentInfo {
+        return $.extend(UserAgentHelper.getNameAndVersion(), {
+            isMobile: UserAgentHelper.isMobile()
         });
-        return queryObj;
+    }
+}
+
+class CookieHelper {
+
+    static createCookie(name: string, value: string, days: number): void {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";            
     }
 
-    function initializeFromQueryString(userSession: UserSession): void {
-        const query = deserializeQueryString(location.search),
-              abtestParam = query["abtest"];
+    static readCookie(name: string): string | null {
+        var nameEq = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1, c.length); 
+            }
+            if (c.indexOf(nameEq) === 0) {
+                return c.substring(nameEq.length, c.length);
+            }
+        }
+        return null;
+    }
+
+    static eraseCookie(name: string) {
+        CookieHelper.createCookie(name, "", -1);
+    }
+}
+
+export class UserSession {
+    readonly userAgent: UserAgentInfo;
+
+    constructor(
+        private daysToLive: number,
+        public testSegment: number = Math.floor((Math.random() * 100) + 1),
+        private testVariants : TestVariantsMap = {}
+    ) {
+        this.userAgent = UserAgentHelper.getUserAgentInfo();
+    }
+
+    setTestVariant(testName: string, variantName: string): void {
+        this.testVariants[testName] = variantName;
+    }
+
+    getTestVariant(testName: string): string {
+        return this.testVariants[testName];
+    }
+
+    save(key: string): void {
+        var json = JSON.stringify({
+            testSegment: this.testSegment,
+            testVariants: this.testVariants
+        });
+        CookieHelper.createCookie(key, json, this.daysToLive);
+    }
+
+    static fromJson(json: string): UserSession {
+        var obj = JSON.parse(json);
+        return new UserSession(userSessionDaysToLive, obj.testSegment, obj.testVariants);
+    }
+}
+
+export class AbTest {
+
+    private trackingDataExtender: TrackingDataExtender = baseTrackingDataExtenderFactory();
+    private condition: ConditionFunction;
+    readonly variants: Variant[] = [];
+
+    constructor(public name: string) {
+        this.extendTrackingData(trackingDataExtenderFactory({
+            "experimentName": name
+        }));
+    }
+
+    /**
+     * Determines whether this test is able to run or not.
+     */
+    public canRun(userAgentInfo: UserAgentInfo): boolean {
+        return (typeof globalCondition !== "function" || globalCondition(userAgentInfo)) &&
+                (typeof this.condition !== "function" || this.condition(userAgentInfo));
+    }
+
+    public setCondition(condition: ConditionFunction): AbTest {
+        this.condition = condition;
+        return this;
+    }
+
+    addVariant(variant: Variant): AbTest {
+        if (typeof variant.name !== "string" || variant.name === "" || this.getVariant(variant.name)) {
+            throw new Error(`A/B Test "${this.name}": Variant must have a unique name. Was "${variant.name}"`);
+        }
+        if (typeof variant.segment !== "number" || variant.segment < 0 || variant.segment > 100) {
+            throw new Error(`A/B Test "${this.name}", variant "${variant.name}": "segment" must be a number between 0-100. Was ${variant.segment}`);
+        }
+        this.variants.push(variant);
+        return this;
+    }
+
+    setup(userSession: UserSession): boolean {
+        // Step 1: Validate whether this test is correctly configured
+        const variantsSegmentationSum = Math.round(this.variants.reduce((sum, v) => sum + v.segment, 0));
+        if (variantsSegmentationSum !== 100) {
+            console.error(`A/B Test: IGNORING test "${this.name}", because variant segmentation does not add up to 100. Current value: ${variantsSegmentationSum}`);
+            return false;
+        }
+
+        // Step 2: Run condition function, if any
+        if (typeof this.condition === "function" && !this.condition(userSession.userAgent)) {
+            return false;
+        }
+
+        // Step 3: Select and setup variant
+        const variant = this.selectVariant(userSession);
+        userSession.setTestVariant(this.name, variant.name);
+        this.extendTrackingData(trackingDataExtenderFactory({
+            "variationName": variant.name
+        }));
+        if (typeof variant.setup === "function") {
+            variant.setup(userSession.userAgent, this);
+        }
         
-        if (typeof abtestParam === "string") {
-            try {
-                let testAndVariant = atob(abtestParam).split("="),
-                    test = testAndVariant[0],
-                    variant = testAndVariant[1];
-                userSession.setTestVariant(test, variant);
-            } catch (e) { }
+        // Step 4: Publish track event
+        if (variant.trackEventAutoPublish !== false) {
+            this.trackViewed();
+        }
+        return true;
+    }
+
+    getVariant(name: string): Variant {
+        return this.variants.filter((v) => v.name === name)[0];
+    }
+
+    getVariantUrl(variantName: string | null): string {
+        const param = `${this.name}=${variantName}`,
+            query = deserializeQueryString(location.search);
+        try {
+            query["abtest"] = btoa(param);
+            return location.protocol + "//" + location.host + location.pathname +
+                "?" + $.param(query) +
+                location.hash;
+        } catch (e) {
+            return location.href;
         }
     }
 
-    (function initialize(): void {
-        userSession = getOrCreateUserSession();
-
-        // On DOMContentLoaded
-        $(() => {
-            if (typeof globalCondition !== "function" || globalCondition(userSession.userAgent)) {
-                initializeFromQueryString(userSession);
-
-                $(window).on("pagehide", () => {
-                    if (tests.length > 0) {
-                        userSession.save(cookieName);
-                    }
-                });
-
-                tests = tests.filter((test) => {
-                    return test.setup(userSession);
-                });
+    /**
+     * The tracking data extenders are called just before any event is published to the event handler.
+     */
+    extendTrackingData(trackingDataExtender: TrackingDataExtender): AbTest {
+        if (typeof trackingDataExtender === "function") {
+            let currentExtender = this.trackingDataExtender;
+            this.trackingDataExtender = function(trackingData: TrackingData, eventName: string) {
+                return trackingDataExtender(currentExtender(trackingData, eventName), eventName);
             }
-            isInitialized = true;
+        }
+        return this;
+    }
+
+    private trackEvent(event: TrackEventType, trackingData?: TrackingData): void {
+        if (trackingEventHandler) {
+            const allTrackingData = this.trackingDataExtender(trackingData || {}, event);
+            trackingEventHandler.track(event, allTrackingData);
+        }
+    }
+
+    /**
+     * Emits an "Experiment Viewed" tracking event 
+     */
+    trackViewed(): void {
+        this.trackEvent("ExperimentViewed");
+    }
+
+    /**
+     * Emits an "Experiment Action Performed" tracking event 
+     * @param action Specifies the action type that has been performed
+     * @param target Specifies a target the action has affected or originated from
+     */
+    trackActionPerformed(action: TrackEventActionType, target?: string): void {
+        this.trackEvent("ExperimentActionPerformed", {
+            "action": action,
+            "actionTarget": (target || "")
         });
-    })();
+    }
 
-
-    // Public API 
-
-    function validateInitialized() {
-        if (!isInitialized) {
-            throw new Error("A/B Test: Not ready yet! (wait for DOMContentLoaded)");
+    /**
+     * Attaches a <code>trackActionPerformed</code> call as a handler to a link.
+     * @param elements The DOM element to be bound with track method.
+     * @param name A human readable name of the link. If left out, the innerText of the element is used
+     */
+    trackLink(elements: Element | JQuery, name?: string): void {
+        if (trackingEventHandler) {
+            const event: TrackEventType = "ExperimentActionPerformed";
+            const trackingData = this.trackingDataExtender({
+                "action": "Click",
+                "actionTarget": name || $(elements).text()
+            }, event);
+            trackingEventHandler.trackLink(elements, event, trackingData);
         }
     }
-    function validateTestName(testName: string) {
-        if (!getTest(testName)) {
-            throw new Error(`A/B Test: Unknown test "${testName}"`);
-        }
-    }
 
-    function reloadWithoutAbTestParameter() {
-        const query = deserializeQueryString(location.search);
-        delete query["abtest"];
-        location.href = location.href.replace(location.search, "").replace(location.hash, "") +
-                            (Object.keys(query).length? "?" : "") +
-                            $.param(query) +
-                            location.hash;
-    }
-
-    export function getUserAgentInfo(): UserAgentInfo {
-        return userSession.userAgent;
-    }
-
-    export function getTest(name: string) {
-        return tests.filter(t => t.name === name)[0];
-    }
-
-    export function create(name: string) : AbTest {
-        const test = new AbTest(name);
-        if (isInitialized) {
-            if (globalCondition(userSession.userAgent)) {
-                // Setup "immediately" in the next cycle of the event loop.
-                // This will allow a condition and test variations to be added on beforehand.
-                setTimeout(function() {
-                    if (test.setup(userSession)) {
-                        tests.push(test);
-                    }
-                });
+    /**
+     * Selects a variation based on a user session.
+     * If the user has already seen a specific variation, we select the same one again
+     */
+    private selectVariant(userSession: UserSession): Variant {
+        let selectedVariant = this.getVariant(userSession.getTestVariant(this.name) || "");
+        
+        if (!selectedVariant) { // Select a new variation
+            let testSegment = this.getTestSegment(userSession.testSegment);
+            for (let i = 0, variantLowerBound = 0; i < this.variants.length; i++) {
+                let variant = this.variants[i],
+                    variantUpperBound = variantLowerBound + this.variants[i].segment;
+                if (variantLowerBound < testSegment && testSegment <= variantUpperBound) {
+                    selectedVariant = variant;
+                    break;
+                }
+                variantLowerBound = variantUpperBound;
             }
-        } else {
-            tests.push(test);
         }
-        return test;
+        return selectedVariant;
     }
 
-    export function getTestVariant(testName: string): string {
-        validateInitialized();
-        validateTestName(testName);
-        return userSession.getTestVariant(testName);
+    /**
+     * Rotates the user segment number using the name of this test.
+     * @param userTestSegment The segment number chosen for this user (1-100)
+     * @returns {number} A number between 1-100 
+     */
+    private getTestSegment(userTestSegment: number): number {
+        const seed = this.name.split("")
+                                .map(c => c.charCodeAt(0))
+                                .reduce((a, b) => a + (b * userTestSegment), 0);
+        const rng = new Rng(seed);
+        return rng.nextRange(1,101);
     }
+}
 
-    export function hasTestVariant(testName: string, variant: string): boolean {
-        if (!isInitialized) {
-            console.warn(`A/B Test: Not yet initialized`);
-        }
-        return isInitialized && userSession.getTestVariant(testName) === variant && getTest(testName) != null;
+function getOrCreateUserSession(): UserSession {
+    const existingSession = CookieHelper.readCookie(cookieName);
+    return existingSession != null
+        ? UserSession.fromJson(existingSession)
+        : new UserSession(userSessionDaysToLive);
+}
+
+function deserializeQueryString(queryString: string): ObjectLiteral {
+    if (queryString === "") 
+        return {};
+    const params = decodeURIComponent(queryString.replace('?', '')).split('&'),
+        queryObj : ObjectLiteral = {};
+    params.forEach((item) => {
+        const keyValue = item.split('=');
+        queryObj[keyValue[0]] = keyValue.length > 1 ? keyValue[1] : '';
+    });
+    return queryObj;
+}
+
+function initializeFromQueryString(userSession: UserSession): void {
+    const query = deserializeQueryString(location.search),
+            abtestParam = query["abtest"];
+    
+    if (typeof abtestParam === "string") {
+        try {
+            let testAndVariant = atob(abtestParam).split("="),
+                test = testAndVariant[0],
+                variant = testAndVariant[1];
+            userSession.setTestVariant(test, variant);
+        } catch (e) { }
     }
+}
 
-    export function setTestVariant(testName: string, variant: string): void {
-        validateInitialized();
-        validateTestName(testName);
-        userSession.setTestVariant(testName, variant);
-        reloadWithoutAbTestParameter();
-    }
+(function initialize(): void {
+    userSession = getOrCreateUserSession();
 
-    /** Set a global condition that must return true before initializing any tests */
-    export function setGlobalCondition(condition: ConditionFunction): void {
-        if (isInitialized) {
-            throw new Error(`A/B Test: Too late. Tests already running`);
-        }
-        globalCondition = condition;
-    }
+    // On DOMContentLoaded
+    $(() => {
+        if (typeof globalCondition !== "function" || globalCondition(userSession.userAgent)) {
+            initializeFromQueryString(userSession);
 
-    export function reset(): void {
-        userSession = new UserSession(userSessionDaysToLive);
-        reloadWithoutAbTestParameter();
-    }
-
-    export function setTrackingEventHandler(handler: TrackingEventHandler): void {
-        if (typeof handler === "object" && typeof handler.track === "function" && typeof handler.trackLink === "function") {
-            trackingEventHandler = handler;
-        }
-    }
-
-    export namespace ui {
-        const uiClass = "abtest-ui-container";
-        let condition : ConditionFunction = () => { return false; }
-        let isInitialized = false;
-
-        function showAbTestUi(test: AbTest) {
-            const variant = getTestVariant(test.name);
-            const $abTestContainer = $(`<div class="${uiClass} hideme"></div>`)
-                                        .appendTo('body')
-                                        .append(`<div class="abtest-header">A/B test. Viewing <span class="abtest-variant">${variant}</span></div>`);
-            const data: ObjectLiteral = {
-                "Test": test.name,
-                "Variation": `${variant} (${test.getVariant(variant).segment}%)`,
-                "A/B test segment": userSession.testSegment,
-                "Browser": userSession.userAgent.name + " " +  userSession.userAgent.version,
-                "Mobile device": userSession.userAgent.isMobile
-            };
-            Object.keys(data).forEach((key) => {
-                $abTestContainer.append(`<div><span class="abtest-data-label">${key}</span><span class="abtest-data-value">${data[key]}</span></div>`);
+            $(window).on("pagehide", () => {
+                if (tests.length > 0) {
+                    userSession.save(cookieName);
+                }
             });
 
-            const variantHtml = test.variants.map((variant) => {
-                return `<a href="${test.getVariantUrl(variant.name)}" title="Segment: ${variant.segment}%">${variant.name}</a>`;
+            tests = tests.filter((test) => {
+                return test.setup(userSession);
             });
-            $(variantHtml.join("&nbsp;&bull;&nbsp;")).appendTo($abTestContainer);
-
-            $(`<br><button type="button">Reset all</button>`)
-                .on("click", reset)
-                .appendTo($abTestContainer);
-
-            $('<div class="abtest-close">X</div>')
-                .on("click", hide)
-                .appendTo($abTestContainer);
-            
-            // Make UI fadein
-            $abTestContainer.removeClass('hideme');
-            isInitialized = true;
         }
+        isInitialized = true;
+    });
+})();
 
-        $(() => {
-            if (!condition(userSession.userAgent)) {
-                return;
-            }
 
-            setTimeout(show, 1000);
+// Public API 
+
+function validateInitialized() {
+    if (!isInitialized) {
+        throw new Error("A/B Test: Not ready yet! (wait for DOMContentLoaded)");
+    }
+}
+function validateTestName(testName: string) {
+    if (!getTest(testName)) {
+        throw new Error(`A/B Test: Unknown test "${testName}"`);
+    }
+}
+
+function reloadWithoutAbTestParameter() {
+    const query = deserializeQueryString(location.search);
+    delete query["abtest"];
+    location.href = location.href.replace(location.search, "").replace(location.hash, "") +
+                        (Object.keys(query).length? "?" : "") +
+                        $.param(query) +
+                        location.hash;
+}
+
+export function getUserAgentInfo(): UserAgentInfo {
+    return userSession.userAgent;
+}
+
+export function getTest(name: string) {
+    return tests.filter(t => t.name === name)[0];
+}
+
+export function create(name: string) : AbTest {
+    const test = new AbTest(name);
+    if (isInitialized) {
+        if (globalCondition(userSession.userAgent)) {
+            // Setup "immediately" in the next cycle of the event loop.
+            // This will allow a condition and test variations to be added on beforehand.
+            setTimeout(function() {
+                if (test.setup(userSession)) {
+                    tests.push(test);
+                }
+            });
+        }
+    } else {
+        tests.push(test);
+    }
+    return test;
+}
+
+export function getTestVariant(testName: string): string {
+    validateInitialized();
+    validateTestName(testName);
+    return userSession.getTestVariant(testName);
+}
+
+export function hasTestVariant(testName: string, variant: string): boolean {
+    if (!isInitialized) {
+        console.warn(`A/B Test: Not yet initialized`);
+    }
+    return isInitialized && userSession.getTestVariant(testName) === variant && getTest(testName) != null;
+}
+
+export function setTestVariant(testName: string, variant: string): void {
+    validateInitialized();
+    validateTestName(testName);
+    userSession.setTestVariant(testName, variant);
+    reloadWithoutAbTestParameter();
+}
+
+/** Set a global condition that must return true before initializing any tests */
+export function setGlobalCondition(condition: ConditionFunction): void {
+    if (isInitialized) {
+        throw new Error(`A/B Test: Too late. Tests already running`);
+    }
+    globalCondition = condition;
+}
+
+export function reset(): void {
+    userSession = new UserSession(userSessionDaysToLive);
+    reloadWithoutAbTestParameter();
+}
+
+export function setTrackingEventHandler(handler: TrackingEventHandler): void {
+    if (typeof handler === "object" && typeof handler.track === "function" && typeof handler.trackLink === "function") {
+        trackingEventHandler = handler;
+    }
+}
+
+export namespace ui {
+    const uiClass = "abtest-ui-container";
+    let condition : ConditionFunction = () => { return false; }
+    let isInitialized = false;
+
+    function showAbTestUi(test: AbTest) {
+        const variant = getTestVariant(test.name);
+        const $abTestContainer = $(`<div class="${uiClass} hideme"></div>`)
+                                    .appendTo('body')
+                                    .append(`<div class="abtest-header">A/B test. Viewing <span class="abtest-variant">${variant}</span></div>`);
+        const data: ObjectLiteral = {
+            "Test": test.name,
+            "Variation": `${variant} (${test.getVariant(variant).segment}%)`,
+            "A/B test segment": userSession.testSegment,
+            "Browser": userSession.userAgent.name + " " +  userSession.userAgent.version,
+            "Mobile device": userSession.userAgent.isMobile
+        };
+        Object.keys(data).forEach((key) => {
+            $abTestContainer.append(`<div><span class="abtest-data-label">${key}</span><span class="abtest-data-value">${data[key]}</span></div>`);
         });
 
-        // Public API
-        export function setCondition(newCondition: ConditionFunction) {
-            condition = newCondition;
+        const variantHtml = test.variants.map((variant) => {
+            return `<a href="${test.getVariantUrl(variant.name)}" title="Segment: ${variant.segment}%">${variant.name}</a>`;
+        });
+        $(variantHtml.join("&nbsp;&bull;&nbsp;")).appendTo($abTestContainer);
+
+        $(`<br><button type="button">Reset all</button>`)
+            .on("click", reset)
+            .appendTo($abTestContainer);
+
+        $('<div class="abtest-close">X</div>')
+            .on("click", hide)
+            .appendTo($abTestContainer);
+        
+        // Make UI fadein
+        $abTestContainer.removeClass('hideme');
+        isInitialized = true;
+    }
+
+    $(() => {
+        if (!condition(userSession.userAgent)) {
+            return;
         }
 
-        export function show() {
-            if (isInitialized) {
-                $(`.${uiClass}`).removeClass('hideme');
-            } else if (tests.length > 0) {
-                showAbTestUi(tests[0]);
-            }
-        }
+        setTimeout(show, 1000);
+    });
 
-        export function hide() {
-            $(`.${uiClass}`).addClass('hideme');
+    // Public API
+    export function setCondition(newCondition: ConditionFunction) {
+        condition = newCondition;
+    }
+
+    export function show() {
+        if (isInitialized) {
+            $(`.${uiClass}`).removeClass('hideme');
+        } else if (tests.length > 0) {
+            showAbTestUi(tests[0]);
         }
+    }
+
+    export function hide() {
+        $(`.${uiClass}`).addClass('hideme');
     }
 }

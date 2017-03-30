@@ -6,7 +6,7 @@
     "strictNullChecks": true,
     "target": "ES2015",
     "outDir": "./dist",
-    "module": "umd",
+    "module": "es2015",
     "declaration": true
   }
 }

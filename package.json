@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Split testing tool for web ",
   "main": "dist/splittest.js",
-  "dependencies": {},
-  "devDependencies": {
+  "types": "dist/splittest.d.ts",
+  "dependencies": {
     "@types/jquery": "^2.0.41",
     "typescript": "^2.2.2"
   },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

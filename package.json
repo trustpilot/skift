@@ -2,9 +2,10 @@
   "name": "trustpilot-splittest",
   "version": "1.0.0",
   "description": "Split testing tool for web ",
-  "main": "dist/splittesting.ts",
+  "main": "dist/splittest.js",
   "dependencies": {},
   "devDependencies": {
+    "@types/jquery": "^2.0.41",
     "typescript": "^2.2.2"
   },
   "scripts": {

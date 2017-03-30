@@ -4,7 +4,9 @@
     "noImplicitReturns": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "target": "ES5",
-    "outDir": "./dist"
+    "target": "ES2015",
+    "outDir": "./dist",
+    "module": "umd",
+    "declaration": true
   }
 }

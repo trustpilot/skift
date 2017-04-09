@@ -3,13 +3,22 @@
   "version": "1.0.0",
   "description": "Split testing tool for web ",
   "main": "dist/splittest.js",
-  "types": "dist/splittest.d.ts",
+  "types": "types/splittest.d.ts",
   "dependencies": {
     "@types/jquery": "^2.0.41",
+    "tslib": "^1.6.0",
     "typescript": "^2.2.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "rollup": "^0.41.6",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.4.0",
+    "rollup-watch": "^3.2.2"
+  },
   "scripts": {
+    "build": "tsc -p . && rollup -c",
+    "dev": "rollup -c -w",
+    "ts": "./node_modules/.bin/tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

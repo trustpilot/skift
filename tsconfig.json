@@ -4,9 +4,14 @@
     "noImplicitReturns": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "target": "ES2015",
-    "outDir": "./dist",
+    "target": "ES5",
+    "outDir": "./build",
     "module": "es2015",
-    "declaration": true
-  }
+    "declaration": true,
+    "declarationDir": "./types",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "./src/**/*.ts"
+  ]
 }

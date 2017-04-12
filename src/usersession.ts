@@ -1,41 +1,28 @@
-import {UserAgentInfo, UserAgentHelper} from "./useragenthelper";
-import CookieHelper from "./cookiehelper";
-
-const userSessionDaysToLive = 3;
-
-export interface TestVariantsMap {
+export interface TestVariationsMap {
     [key: string]: string; 
 }
 
 export default class UserSession {
-    readonly userAgent: UserAgentInfo;
-
     constructor(
-        private daysToLive: number,
-        public testSegment: number = Math.floor((Math.random() * 100) + 1),
-        private testVariants : TestVariantsMap = {}
-    ) {
-        this.userAgent = UserAgentHelper.getUserAgentInfo();
+        private testVariations : TestVariationsMap = {}
+    ) { }
+
+    setTestVariation(testName: string, variationName: string): void {
+        this.testVariations[testName] = variationName;
     }
 
-    setTestVariant(testName: string, variantName: string): void {
-        this.testVariants[testName] = variantName;
+    getTestVariation(testName: string): string {
+        return this.testVariations[testName];
     }
 
-    getTestVariant(testName: string): string {
-        return this.testVariants[testName];
-    }
-
-    save(key: string): void {
-        var json = JSON.stringify({
-            testSegment: this.testSegment,
-            testVariants: this.testVariants
+    toJson(): string {
+        return JSON.stringify({
+            testVariations: this.testVariations
         });
-        CookieHelper.createCookie(key, json, this.daysToLive);
     }
 
     static fromJson(json: string): UserSession {
-        var obj = JSON.parse(json);
-        return new UserSession(userSessionDaysToLive, obj.testSegment, obj.testVariants);
+        const obj = JSON.parse(json);
+        return new UserSession(obj.testVariations);
     }
 }

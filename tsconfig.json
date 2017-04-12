@@ -2,10 +2,10 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "strictNullChecks": true,
     "target": "ES5",
-    "outDir": "./build",
+    "outDir": "./temp",
     "module": "es2015",
     "declaration": true,
     "declarationDir": "./types",

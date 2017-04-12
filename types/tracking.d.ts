@@ -1,9 +1,6 @@
 /// <reference types="jquery" />
-export declare let trackingEventHandler: TrackingEventHandler;
-export interface ObjectLiteral {
+export interface TrackingData {
     [key: string]: any;
-}
-export interface TrackingData extends ObjectLiteral {
 }
 /**
  * Describing a handler for A/B test events
@@ -36,4 +33,3 @@ export declare type TrackEventActionType = "Click";
  * @param newTrackingData
  */
 export declare function trackingDataExtenderFactory(newTrackingData: TrackingData): TrackingDataExtender;
-export declare function setTrackingEventHandler(handler: TrackingEventHandler): void;

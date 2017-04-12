@@ -1,17 +1,16 @@
 
-export interface QueryString extends Array<string> {
+export interface SplitTestQueryString {
     [key: string]: any;
+    abtest?: string;
 }
 
-export function parseQueryString<T extends QueryString>(queryString?: string): T {
-    queryString = queryString || location.search;
-    const parameters = queryString.replace(/^\?/, "").split('&');
-    const vars: QueryString = [];
+export function parseQueryString(queryString: string = location.search): SplitTestQueryString {
+    const parameters = location.search.replace(/^\?/, "").split('&');
+    const vars:any = {};
 
     for (let i = 0; i < parameters.length && parameters[i] !== ""; i++) {
         const [key, value] = parameters[i].split('=');
-        vars.push(key);
         vars[key] = decodeURIComponent(value);
     }
-    return <T>vars;
+    return vars;
 }

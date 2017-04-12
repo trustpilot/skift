@@ -1,15 +1,11 @@
-import { UserAgentInfo } from "./useragenthelper";
-export interface TestVariantsMap {
+export interface TestVariationsMap {
     [key: string]: string;
 }
 export default class UserSession {
-    private daysToLive;
-    testSegment: number;
-    private testVariants;
-    readonly userAgent: UserAgentInfo;
-    constructor(daysToLive: number, testSegment?: number, testVariants?: TestVariantsMap);
-    setTestVariant(testName: string, variantName: string): void;
-    getTestVariant(testName: string): string;
-    save(key: string): void;
+    private testVariations;
+    constructor(testVariations?: TestVariationsMap);
+    setTestVariation(testName: string, variationName: string): void;
+    getTestVariation(testName: string): string;
+    toJson(): string;
     static fromJson(json: string): UserSession;
 }

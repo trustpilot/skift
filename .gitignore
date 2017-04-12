@@ -39,4 +39,4 @@ jspm_packages
 #Rollup.js
 .rpt2_cache
 
-build
+temp

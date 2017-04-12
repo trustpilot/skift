@@ -1,39 +1,42 @@
 /// <reference types="jquery" />
-import { UserAgentInfo } from "./useragenthelper";
+import { UserAgentInfo } from "./useragentinfo";
 import UserSession from "./UserSession";
 import { TrackingDataExtender, TrackEventActionType } from "./tracking";
-export interface Variant {
-    /** A descriptive unique name of this variant */
+import { ConditionFunction } from "./config";
+export interface Variation {
+    /** A descriptive unique name of this variation */
     name: string;
-    /** The percentage of users who should see this variant */
-    segment: number;
-    /** Function to be called when this variant has been chosen and should be setup. It's always called after DOMContentLoaded */
-    setup?: (this: AbTest, userAgentInfo: UserAgentInfo) => void;
-    /** Whether a track event should automatically be published once this variant has been setup. Default is true. */
+    /** A relative weight defining how many users should see this variation. Default value is 1 */
+    weight?: number;
+    /** Function to be called when this variation has been chosen and should be setup. It's always called after DOMContentLoaded */
+    setup?: (this: SplitTest, userAgentInfo: UserAgentInfo) => void;
+    /** Whether a track event should automatically be published once this variation has been setup. Default is true. */
     trackEventAutoPublish?: boolean;
 }
-export interface ConditionFunction {
-    (userAgentInfo: UserAgentInfo): boolean;
+export interface InternalVariation extends Variation {
+    normalizedWeight: number;
+    weight: number;
 }
-export declare class AbTest {
+export declare class SplitTest {
     name: string;
     private trackingDataExtender;
     private condition;
-    readonly variants: Variant[];
+    private readonly _variations;
+    readonly variations: Variation[];
     constructor(name: string, trackingDataExtender: TrackingDataExtender);
     /**
      * Determines whether this test is able to run or not.
      */
     canRun(userAgentInfo: UserAgentInfo): boolean;
-    setCondition(condition: ConditionFunction): AbTest;
-    addVariant(variant: Variant): AbTest;
-    setup(userSession: UserSession): boolean;
-    getVariant(name: string): Variant;
-    getVariantUrl(variantName: string | null): string;
+    setCondition(condition: ConditionFunction): SplitTest;
+    addVariation(variation: Variation): SplitTest;
+    setup(userSession: UserSession, userAgentInfo: UserAgentInfo): boolean;
+    getVariation(name: string): Variation;
+    getVariationUrl(variationName: string | null): string;
     /**
      * The tracking data extenders are called just before any event is published to the event handler.
      */
-    extendTrackingData(trackingDataExtender: TrackingDataExtender): AbTest;
+    extendTrackingData(trackingDataExtender: TrackingDataExtender): SplitTest;
     private trackEvent(event, trackingData?);
     /**
      * Emits an "Experiment Viewed" tracking event
@@ -51,15 +54,6 @@ export declare class AbTest {
      * @param name A human readable name of the link. If left out, the innerText of the element is used
      */
     trackLink(elements: Element | JQuery, name?: string): void;
-    /**
-     * Selects a variation based on a user session.
-     * If the user has already seen a specific variation, we select the same one again
-     */
-    private selectVariant(userSession);
-    /**
-     * Rotates the user segment number using the name of this test.
-     * @param userTestSegment The segment number chosen for this user (1-100)
-     * @returns {number} A number between 1-100
-     */
-    private getTestSegment(userTestSegment);
+    private normalizeVariationWeights();
+    private selectRandomVariation();
 }

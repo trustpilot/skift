@@ -1,9 +1,9 @@
 {
   "name": "trustpilot-splittest",
-  "version": "1.0.0",
-  "description": "Split testing tool for web ",
-  "main": "dist/splittest.js",
-  "types": "types/splittest.d.ts",
+  "version": "2.0.0",
+  "description": "Split testing tool for web",
+  "main": "dist/trustpilot-splittest.js",
+  "types": "types/main.d.ts",
   "dependencies": {
     "@types/jquery": "^2.0.41",
     "tslib": "^1.6.0",
@@ -12,12 +12,15 @@
   "devDependencies": {
     "rollup": "^0.41.6",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "@alexlur/rollup-plugin-typescript": "^1.0.4",
     "rollup-plugin-typescript2": "^0.4.0",
+    "rollup-plugin-uglify": "^1.0.1",
     "rollup-watch": "^3.2.2"
   },
   "scripts": {
-    "build": "tsc -p . && rollup -c",
-    "dev": "rollup -c -w",
+    "build": "./node_modules/.bin/tsc -p . && rollup --config build/rollup.config.debug.js",
+    "dev": "rollup --config build/rollup.config.debug.js -w",
+    "release": "npm run build && rollup --config build/rollup.config.release.js",
     "ts": "./node_modules/.bin/tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,10 +1,6 @@
-export let trackingEventHandler: TrackingEventHandler;
-
-export interface ObjectLiteral {
+export interface TrackingData {
     [key: string]: any;
 }
-
-export interface TrackingData extends ObjectLiteral { }
 
 /**
  * Describing a handler for A/B test events
@@ -41,11 +37,8 @@ export declare type TrackEventActionType = "Click";
  * @param newTrackingData
  */
 export function trackingDataExtenderFactory(newTrackingData: TrackingData): TrackingDataExtender {
-    return (trackingData: TrackingData) => $.extend(trackingData, newTrackingData);
-}
-
-export function setTrackingEventHandler(handler: TrackingEventHandler): void {
-    if (typeof handler === "object" && typeof handler.track === "function" && typeof handler.trackLink === "function") {
-        trackingEventHandler = handler;
-    }
+    return (trackingData: TrackingData) => ({ 
+        ...trackingData, 
+        ...newTrackingData
+    });
 }

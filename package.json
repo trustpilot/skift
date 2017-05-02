@@ -1,5 +1,5 @@
 {
-  "name": "trustpilot-splittest",
+  "name": "node-splittestingtool",
   "version": "2.0.0",
   "description": "Split testing tool for web",
   "main": "dist/trustpilot-splittest.js",

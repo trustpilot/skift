@@ -235,7 +235,7 @@ export namespace ui {
     }
 
     $(() => {
-        if (!config.uiCondition(userAgentInfo)) {
+        if (!config.globalCondition(userAgentInfo) || !config.uiCondition(userAgentInfo)) {
             return;
         }
 

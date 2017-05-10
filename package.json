@@ -1,8 +1,8 @@
 {
   "name": "node-splittestingtool",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Split testing tool for web",
-  "main": "dist/trustpilot-splittest.js",
+  "main": "dist/node-splittestingtool.js",
   "types": "types/main.d.ts",
   "dependencies": {
     "@types/jquery": "^2.0.41",

@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('jquery')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'jquery'], factory) :
-	(factory((global['trustpilot-splittest'] = global['trustpilot-splittest'] || {}),global.jQuery));
+	(factory((global['node-splittestingtool'] = global['node-splittestingtool'] || {}),global.jQuery));
 }(this, (function (exports,$$1) { 'use strict';
 
 $$1 = 'default' in $$1 ? $$1['default'] : $$1;
@@ -495,7 +495,7 @@ function reset() {
     }
     ui.hide = hide;
     $$1(function () {
-        if (!config.uiCondition(userAgentInfo)) {
+        if (!config.globalCondition(userAgentInfo) || !config.uiCondition(userAgentInfo)) {
             return;
         }
         setTimeout(function () {

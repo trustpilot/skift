@@ -2,6 +2,7 @@ import $ from "jquery";
 import _getUserAgentInfo, { UserAgentInfo } from "./useragentinfo";
 import UserSession from "./usersession";
 import { SplitTest, InternalVariation } from "./splittest";
+export { SplitTest } from "./splittest";
 import { TrackingDataExtender, trackingDataExtenderFactory, TrackingEventHandler } from "./tracking";
 import { parseQueryString } from "./utils";
 import _config, { ConditionFunction } from "./config";

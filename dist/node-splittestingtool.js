@@ -513,6 +513,7 @@ exports.getTestVariant = getTestVariant;
 exports.hasTestVariant = hasTestVariant;
 exports.setTestVariant = setTestVariant;
 exports.reset = reset;
+exports.SplitTest = SplitTest;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

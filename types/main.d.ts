@@ -1,5 +1,6 @@
 import { UserAgentInfo } from "./useragentinfo";
 import { SplitTest } from "./splittest";
+export { SplitTest } from "./splittest";
 import { TrackingEventHandler } from "./tracking";
 import { ConditionFunction } from "./config";
 export declare const config: {

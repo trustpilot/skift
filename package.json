@@ -1,6 +1,6 @@
 {
   "name": "node-splittestingtool",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Split testing tool for web",
   "main": "dist/node-splittestingtool.js",
   "types": "types/main.d.ts",

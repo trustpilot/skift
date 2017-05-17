@@ -194,7 +194,7 @@ var SplitTest = (function () {
         if (typeof variation.name !== "string" || variation.name === "" || this.getVariation(variation.name)) {
             throw new Error("Split test \"" + this.name + "\": Variation must have a unique name. Was \"" + variation.name + "\"");
         }
-        this._variations.push(__assign({}, variation, { normalizedWeight: 0, weight: variation.weight || 1 }));
+        this._variations.push(__assign({}, variation, { normalizedWeight: 0, weight: (typeof variation.weight === "number" ? variation.weight : 1) }));
         this.normalizeVariationWeights();
         return this;
     };

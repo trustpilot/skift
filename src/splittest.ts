@@ -54,7 +54,7 @@ export class SplitTest {
         this._variations.push({
             ...variation,
             normalizedWeight: 0,
-            weight: variation.weight || 1
+            weight: (typeof variation.weight === "number" ? variation.weight : 1)
         });
         this.normalizeVariationWeights();
         return this;

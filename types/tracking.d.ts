@@ -27,7 +27,7 @@ export interface TrackingDataExtender {
     (trackingData: TrackingData, event: string): TrackingData;
 }
 export declare type TrackEventType = "ExperimentViewed" | "ExperimentActionPerformed";
-export declare type TrackEventActionType = "Click";
+export declare type TrackEventActionType = "Click" | "Type";
 /**
  * Constructs a new TrackingDataExtender that extending the existing tracking data with the provided tracking data
  * @param newTrackingData

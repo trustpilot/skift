@@ -1,37 +1,36 @@
 {
-  "name": "node-splittestingtool",
-  "version": "2.1.0",
-  "description": "Split testing tool for web",
-  "main": "dist/node-splittestingtool.js",
-  "types": "types/main.d.ts",
+  "name": "skift",
+  "description": "Split testing tool for the Web",
+  "version": "1.0.0",
+  "author": "Trustpilot A/S",
+  "bugs": {
+    "url": "https://github.com/trustpilot/skift/issues"
+  },
   "dependencies": {
-    "@types/jquery": "^2.0.41",
+    "@types/jquery": "^2.0.41"
+  },
+  "devDependencies": {
+    "@alexlur/rollup-plugin-typescript": "^1.0.4",
+    "rollup": "^0.41.6",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.4.0",
+    "rollup-plugin-uglify": "^1.0.1",
+    "rollup-watch": "^3.2.2",
     "tslib": "^1.6.0",
     "typescript": "^2.2.2"
   },
-  "devDependencies": {
-    "rollup": "^0.41.6",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "@alexlur/rollup-plugin-typescript": "^1.0.4",
-    "rollup-plugin-typescript2": "^0.4.0",
-    "rollup-plugin-uglify": "^1.0.1",
-    "rollup-watch": "^3.2.2"
-  },
-  "scripts": {
-    "build": "./node_modules/.bin/tsc -p . && rollup --config build/rollup.config.debug.js",
-    "dev": "rollup --config build/rollup.config.debug.js -w",
-    "release": "npm run build && rollup --config build/rollup.config.release.js",
-    "ts": "./node_modules/.bin/tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "homepage": "https://github.com/trustpilot/skift#readme",
+  "license": "MIT",
+  "main": "dist/skift.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trustpilot/splittestingtool.git"
+    "url": "git+https://github.com/trustpilot/skift.git"
   },
-  "author": "Trustpilot A/S",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/trustpilot/splittestingtool/issues"
+  "scripts": {
+    "build": "tsc -p . && rollup --config build/rollup.config.debug.js",
+    "dev": "rollup --config build/rollup.config.debug.js -w",
+    "release": "npm run build && rollup --config build/rollup.config.release.js",
+    "ts": "tsc"
   },
-  "homepage": "https://github.com/trustpilot/splittestingtool#readme"
+  "types": "types/main.d.ts"
 }

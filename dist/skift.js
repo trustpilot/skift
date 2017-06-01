@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('jquery')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'jquery'], factory) :
-	(factory((global['node-splittestingtool'] = global['node-splittestingtool'] || {}),global.jQuery));
+	(factory((global.skift = global.skift || {}),global.jQuery));
 }(this, (function (exports,$$1) { 'use strict';
 
 $$1 = 'default' in $$1 ? $$1['default'] : $$1;

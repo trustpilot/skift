@@ -17,6 +17,7 @@
     "rollup-plugin-uglify": "^1.0.1",
     "rollup-watch": "^3.2.2",
     "tslib": "^1.6.0",
+    "tslint": "^5.4.0",
     "typescript": "^2.2.2"
   },
   "homepage": "https://github.com/trustpilot/skift#readme",
@@ -29,6 +30,7 @@
   "scripts": {
     "build": "tsc -p . && rollup --config build/rollup.config.debug.js",
     "dev": "rollup --config build/rollup.config.debug.js -w",
+    "lint": "tslint 'src/**/*.ts' --type-check --project ./",
     "release": "npm run build && rollup --config build/rollup.config.release.js",
     "ts": "tsc"
   },

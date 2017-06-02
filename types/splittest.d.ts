@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 import { UserAgentInfo } from './useragentinfo';
-import UserSession from './UserSession';
+import UserSession from './usersession';
 import { TrackingDataExtender, TrackEventActionType } from './tracking';
 import { ConditionFunction } from './config';
 export interface Variation {

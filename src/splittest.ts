@@ -1,5 +1,5 @@
 import {UserAgentInfo} from './useragentinfo';
-import UserSession from './UserSession';
+import UserSession from './usersession';
 import {
     TrackingDataExtender,
     trackingDataExtenderFactory,

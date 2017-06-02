@@ -1,4 +1,4 @@
-# Skift
+# Skift [![npm version](https://badge.fury.io/js/skift.svg)](https://badge.fury.io/js/skift) [![Build Status](https://travis-ci.org/trustpilot/skift.svg?branch=master)](https://travis-ci.org/trustpilot/skift)
 
 A/B Testing tool for the modern Web
 

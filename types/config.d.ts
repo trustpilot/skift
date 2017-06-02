@@ -1,5 +1,5 @@
-import { TrackingEventHandler } from "./tracking";
-import { UserAgentInfo } from "./useragentinfo";
+import { TrackingEventHandler } from './tracking';
+import { UserAgentInfo } from './useragentinfo';
 export interface UserSessionPersister {
     loadUserSession(): string | null;
     saveUserSession(userSession: string, daysToLive: number): void;

@@ -1,7 +1,7 @@
-import $ from "jquery";
-import { TrackingEventHandler, TrackEventType, TrackingData } from "./tracking"
-import usersessioncookiepersister from "./usersessioncookiepersister";
-import { UserAgentInfo } from "./useragentinfo";
+import $ from 'jquery';
+import {TrackingEventHandler, TrackEventType, TrackingData} from './tracking';
+import usersessioncookiepersister from './usersessioncookiepersister';
+import {UserAgentInfo} from './useragentinfo';
 
 export interface UserSessionPersister {
     loadUserSession(): string | null;
@@ -21,23 +21,24 @@ export interface SplitTestConfig {
     userSessionDaysToLive: number;
 }
 
-const defaultTrackingEventHandler: TrackingEventHandler = (function() {
+const defaultTrackingEventHandler: TrackingEventHandler = (() => {
     function log(event: TrackEventType, trackingData: TrackingData) {
-        console.log("Split testing event: " + event, trackingData);
+        console.log('Split testing event: ' + event, trackingData);
     }
-    return {    
+
+    return {
         track: log,
         trackLink(elements: Element | JQuery, event: TrackEventType, trackingData: TrackingData) {
-            $(elements).on("click", function() {
+            $(elements).on('click', () => {
                 log(event, trackingData);
             });
         }
-    }
+    };
 })();
 
 const config: SplitTestConfig = {
-    cookieName: "trustpilotABTest",
-    globalCondition: () => true,    
+    cookieName: 'trustpilotABTest',
+    globalCondition: () => true,
     sessionPersister: usersessioncookiepersister,
     tracking: defaultTrackingEventHandler,
     userSessionDaysToLive: 3,

@@ -1,8 +1,8 @@
-import { UserAgentInfo } from "./useragentinfo";
-import { SplitTest } from "./splittest";
-export { SplitTest } from "./splittest";
-import { TrackingEventHandler } from "./tracking";
-import { ConditionFunction } from "./config";
+import { UserAgentInfo } from './useragentinfo';
+import { SplitTest } from './splittest';
+export { SplitTest } from './splittest';
+import { TrackingEventHandler } from './tracking';
+import { ConditionFunction } from './config';
 export declare const config: {
     globalCondition: ConditionFunction;
     tracking: TrackingEventHandler;
@@ -18,6 +18,6 @@ export declare function hasTestVariant(testName: string, variant: string): boole
 export declare function setTestVariant(testName: string, variant: string): void;
 export declare function reset(): void;
 export declare namespace ui {
-    function show(tests: SplitTest[]): void;
+    function show(testsList: SplitTest[]): void;
     function hide(): void;
 }

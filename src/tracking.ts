@@ -17,7 +17,7 @@ export interface TrackingEventHandler {
      * A helper method that attaches the track call as a handler to a link
      * @param elements DOM element to be bound with track method
      * @param event The name of the event, passed to the track method
-     * @param trackingData A dictionary of properties to pass with the track method. 
+     * @param trackingData A dictionary of properties to pass with the track method.
      */
     trackLink(elements: Element | JQuery, event: TrackEventType, trackingData: TrackingData): void;
 }
@@ -29,16 +29,16 @@ export interface TrackingDataExtender {
     (trackingData: TrackingData, event: string): TrackingData;
 }
 
-export declare type TrackEventType = "ExperimentViewed" | "ExperimentActionPerformed";
-export declare type TrackEventActionType = "Click" | "Type";
+export declare type TrackEventType = 'ExperimentViewed' | 'ExperimentActionPerformed';
+export declare type TrackEventActionType = 'Click' | 'Type';
 
 /**
  * Constructs a new TrackingDataExtender that extending the existing tracking data with the provided tracking data
  * @param newTrackingData
  */
 export function trackingDataExtenderFactory(newTrackingData: TrackingData): TrackingDataExtender {
-    return (trackingData: TrackingData) => ({ 
-        ...trackingData, 
+    return (trackingData: TrackingData) => ({
+        ...trackingData,
         ...newTrackingData
     });
 }

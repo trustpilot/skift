@@ -1,16 +1,12 @@
 /// <reference types="jquery" />
-import { UserAgentInfo } from "./useragentinfo";
-import UserSession from "./UserSession";
-import { TrackingDataExtender, TrackEventActionType } from "./tracking";
-import { ConditionFunction } from "./config";
+import { UserAgentInfo } from './useragentinfo';
+import UserSession from './usersession';
+import { TrackingDataExtender, TrackEventActionType } from './tracking';
+import { ConditionFunction } from './config';
 export interface Variation {
-    /** A descriptive unique name of this variation */
     name: string;
-    /** A relative weight defining how many users should see this variation. Default value is 1 */
     weight?: number;
-    /** Function to be called when this variation has been chosen and should be setup. It's always called after DOMContentLoaded */
     setup?: (this: SplitTest, userAgentInfo: UserAgentInfo) => void;
-    /** Whether a track event should automatically be published once this variation has been setup. Default is true. */
     trackEventAutoPublish?: boolean;
 }
 export interface InternalVariation extends Variation {
@@ -37,7 +33,6 @@ export declare class SplitTest {
      * The tracking data extenders are called just before any event is published to the event handler.
      */
     extendTrackingData(trackingDataExtender: TrackingDataExtender): SplitTest;
-    private trackEvent(event, trackingData?);
     /**
      * Emits an "Experiment Viewed" tracking event
      */
@@ -56,4 +51,5 @@ export declare class SplitTest {
     trackLink(elements: Element | JQuery, name?: string): void;
     private normalizeVariationWeights();
     private selectRandomVariation();
+    private trackEvent(event, trackingData?);
 }

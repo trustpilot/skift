@@ -1,11 +1,16 @@
 export interface TestVariationsMap {
-    [key: string]: string; 
+    [key: string]: string;
 }
 
 export default class UserSession {
-    constructor(
-        private testVariations : TestVariationsMap = {}
-    ) { }
+
+    static fromJson(json: string): UserSession {
+        const obj = JSON.parse(json);
+        return new UserSession(obj.testVariations);
+    }
+
+    constructor(private testVariations: TestVariationsMap = {}) {
+    }
 
     setTestVariation(testName: string, variationName: string): void {
         this.testVariations[testName] = variationName;
@@ -19,10 +24,5 @@ export default class UserSession {
         return JSON.stringify({
             testVariations: this.testVariations
         });
-    }
-
-    static fromJson(json: string): UserSession {
-        const obj = JSON.parse(json);
-        return new UserSession(obj.testVariations);
     }
 }

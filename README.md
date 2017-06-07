@@ -4,12 +4,22 @@ A/B Testing tool for the modern Web
 
 ## Usage
 
-### As a module
+### Basic usage
 
 ```js
-import * as skift from 'skift';
+import skift from 'skift';
 
-skift
+// Configure Skift.
+const test = skift({
+  tracking: {
+      track: function(event, trackingData) {
+          console.log('A/B test event: ' + event, trackingData);
+      }
+  }
+});
+
+// Describe the A/B Test.
+test
   .create('My awesome test')
   .setCondition(() => {
       return window.location.pathname === 'contacts'
@@ -25,7 +35,7 @@ skift
   });
 ```
 ## New no A/B testing?
-
+We recommend using [Segment](https://segment.com/) for tracking the results.
 
 ## Contributing
 Interested in contributing? Please have a look at our [developer documentation](CONTRIBUTING.md) for more information on how to get started.

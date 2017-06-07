@@ -37,12 +37,12 @@ const defaultTrackingEventHandler: TrackingEventHandler = (() => {
 })();
 
 const config: SplitTestConfig = {
-    cookieName: 'trustpilotABTest',
+    cookieName: 'skiftABTest',
     globalCondition: () => true,
     sessionPersister: usersessioncookiepersister,
     tracking: defaultTrackingEventHandler,
     userSessionDaysToLive: 3,
-    uiCondition: () => false,
+    uiCondition: () => false
 };
 
 export default config;

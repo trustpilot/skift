@@ -1,11 +1,24 @@
 import $ from 'jquery';
 import _getUserAgentInfo, { UserAgentInfo } from './useragentinfo';
 import UserSession from './usersession';
-import {SplitTest, InternalVariation} from './splittest';
-export {SplitTest} from './splittest';
-import {TrackingDataExtender, trackingDataExtenderFactory, TrackingEventHandler} from './tracking';
-import {parseQueryString} from './utils';
-import _config, {ConditionFunction} from './config';
+import { SplitTest, InternalVariation } from './splittest';
+export { SplitTest } from './splittest';
+import {
+    TrackingDataExtender,
+    trackingDataExtenderFactory,
+    TrackingEventHandler
+} from './tracking';
+import { parseQueryString } from './utils';
+import _config, { ConditionFunction, UserSessionPersister } from './config';
+
+export interface UserConfig {
+    cookieName?: string;
+    globalCondition?: ConditionFunction;
+    sessionPersister?: UserSessionPersister;
+    tracking?: TrackingEventHandler;
+    uiCondition?: ConditionFunction;
+    userSessionDaysToLive?: number;
+}
 
 const userAgentInfo = _getUserAgentInfo();
 const tests: SplitTest[] = [];
@@ -41,6 +54,12 @@ export const config = {
     set userSessionDaysToLive(days: number) {
         _config.userSessionDaysToLive = days;
     },
+    get cookieName() {
+        return _config.cookieName;
+    },
+    set cookieName(name: string) {
+        _config.cookieName = name;
+    }
 };
 
 /**
@@ -77,7 +96,7 @@ function initializeFromQueryString(session: UserSession): void {
     }
 }
 
-function initialize(): void {
+export function initialize(): void {
     userSession = getOrCreateUserSession();
 
     // On DOMContentLoaded
@@ -103,7 +122,6 @@ function initialize(): void {
         isInitialized = true;
     });
 }
-setTimeout(() => initialize());
 
 // Public API
 

@@ -4,9 +4,16 @@ import UserSession from './usersession';
 import { TrackingDataExtender, TrackEventActionType } from './tracking';
 import { ConditionFunction } from './config';
 export interface Variation {
+    /** A descriptive unique name of this variation */
     name: string;
+    /** A relative weight defining how many users should see this variation. Default value is 1 */
     weight?: number;
+    /**
+     * Function to be called when this variation has been chosen and should be setup.
+     * It's always called after DOMContentLoaded
+     */
     setup?: (this: SplitTest, userAgentInfo: UserAgentInfo) => void;
+    /** Whether a track event should automatically be published once this variation has been setup. Default is true. */
     trackEventAutoPublish?: boolean;
 }
 export interface InternalVariation extends Variation {

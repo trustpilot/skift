@@ -13,6 +13,7 @@
       true,
       120
     ],
+    "arrow-parens": false,
     "callable-types": false,
     "no-angle-bracket-type-assertion": false,
     "trailing-comma": false,

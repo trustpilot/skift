@@ -34,5 +34,5 @@
     "release": "npm run build && rollup --config build/rollup.config.release.js",
     "ts": "tsc"
   },
-  "types": "types/main.d.ts"
+  "types": "types/index.d.ts"
 }

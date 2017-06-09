@@ -34,7 +34,7 @@ test
       name: 'Control'
   });
 ```
-## New no A/B testing?
+## New to A/B testing?
 We recommend using [Segment](https://segment.com/) for tracking the results.
 
 ## Contributing

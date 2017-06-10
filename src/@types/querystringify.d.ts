@@ -1,5 +1,4 @@
-﻿declare module "querystringify"
-{
+﻿declare module 'querystringify' {
     /**
      * Simple query string parser.
      * @param query The query string that needs to be parsed.

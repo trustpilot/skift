@@ -7,7 +7,7 @@ import {
     TrackEventType,
     TrackEventActionType
 } from './tracking';
-import qs from "querystringify";
+import qs from 'querystringify';
 import config, {ConditionFunction} from './config';
 
 export interface Variation {

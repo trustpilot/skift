@@ -1,6 +1,7 @@
 // rollup.config.js
 import typescript from '@alexlur/rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 const cfg = require('../package.json');
 
 export default {
@@ -11,6 +12,6 @@ export default {
     jquery: 'jQuery'
   },
   moduleName: cfg.name,
-  plugins: [resolve(), typescript()],
+  plugins: [commonjs(), resolve(), typescript()],
   external: ['jquery']
 };

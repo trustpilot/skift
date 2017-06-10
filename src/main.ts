@@ -8,7 +8,7 @@ import {
     trackingDataExtenderFactory,
     TrackingEventHandler
 } from './tracking';
-import { parseQueryString } from './utils';
+import qs from 'querystringify';
 import _config, { ConditionFunction, UserSessionPersister } from './config';
 
 export interface UserConfig {
@@ -81,7 +81,7 @@ function getOrCreateUserSession(): UserSession {
 }
 
 function initializeFromQueryString(session: UserSession): void {
-    const query = parseQueryString(location.search);
+    const query = qs.parse(location.search);
     const abtestParam = query['abtest'];
 
     if (typeof abtestParam === 'string') {
@@ -137,11 +137,10 @@ function validateTestName(testName: string) {
 }
 
 function reloadWithoutAbTestParameter() {
-    const query = parseQueryString(location.search);
+    const query = qs.parse(location.search);
     delete query['abtest'];
     location.href = location.href.replace(location.search, '').replace(location.hash, '') +
-        (Object.keys(query).length ? '?' : '') +
-        $.param(query) +
+        qs.stringify(query, Object.keys(query).length > 0) +
         location.hash;
 }
 

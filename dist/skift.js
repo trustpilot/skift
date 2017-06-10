@@ -104,16 +104,81 @@ function trackingDataExtenderFactory(newTrackingData) {
     return function (trackingData) { return (__assign({}, trackingData, newTrackingData)); };
 }
 
-function parseQueryString(queryString) {
-    if (queryString === void 0) { queryString = location.search; }
-    var parameters = location.search.replace(/^\?/, '').split('&');
-    var vars = {};
-    for (var i = 0; i < parameters.length && parameters[i] !== ''; i++) {
-        var _a = parameters[i].split('='), key = _a[0], value = _a[1];
-        vars[key] = decodeURIComponent(value);
-    }
-    return vars;
+var has = Object.prototype.hasOwnProperty;
+
+/**
+ * Decode a URI encoded string.
+ *
+ * @param {String} input The URI encoded string.
+ * @returns {String} The decoded string.
+ * @api private
+ */
+function decode(input) {
+  return decodeURIComponent(input.replace(/\+/g, ' '));
 }
+
+/**
+ * Simple query string parser.
+ *
+ * @param {String} query The query string that needs to be parsed.
+ * @returns {Object}
+ * @api public
+ */
+function querystring(query) {
+  var parser = /([^=?&]+)=?([^&]*)/g
+    , result = {}
+    , part;
+
+  //
+  // Little nifty parsing hack, leverage the fact that RegExp.exec increments
+  // the lastIndex property so we can continue executing this loop until we've
+  // parsed all results.
+  //
+  for (;
+    part = parser.exec(query);
+    result[decode(part[1])] = decode(part[2])
+  );
+
+  return result;
+}
+
+/**
+ * Transform a query string to an object.
+ *
+ * @param {Object} obj Object that should be transformed.
+ * @param {String} prefix Optional prefix.
+ * @returns {String}
+ * @api public
+ */
+function querystringify(obj, prefix) {
+  prefix = prefix || '';
+
+  var pairs = [];
+
+  //
+  // Optionally prefix with a '?' if needed
+  //
+  if ('string' !== typeof prefix) prefix = '?';
+
+  for (var key in obj) {
+    if (has.call(obj, key)) {
+      pairs.push(encodeURIComponent(key) +'='+ encodeURIComponent(obj[key]));
+    }
+  }
+
+  return pairs.length ? prefix + pairs.join('&') : '';
+}
+
+//
+// Expose the module.
+//
+var stringify = querystringify;
+var parse = querystring;
+
+var index$1 = {
+	stringify: stringify,
+	parse: parse
+};
 
 function createCookie(name, value, days) {
     var expires = '';
@@ -232,11 +297,11 @@ var SplitTest = (function () {
     };
     SplitTest.prototype.getVariationUrl = function (variationName) {
         var param = this.name + "=" + variationName;
-        var query = parseQueryString(location.search);
+        var query = index$1.parse(location.search);
         try {
             query.abtest = btoa(param);
             return location.protocol + '//' + location.host + location.pathname +
-                '?' + $.param(query) +
+                index$1.stringify(query, true) +
                 location.hash;
         }
         catch (e) {
@@ -361,7 +426,7 @@ function getOrCreateUserSession() {
         : new UserSession();
 }
 function initializeFromQueryString(session) {
-    var query = parseQueryString(location.search);
+    var query = index$1.parse(location.search);
     var abtestParam = query['abtest'];
     if (typeof abtestParam === 'string') {
         try {
@@ -410,11 +475,10 @@ function validateTestName(testName) {
     }
 }
 function reloadWithoutAbTestParameter() {
-    var query = parseQueryString(location.search);
+    var query = index$1.parse(location.search);
     delete query['abtest'];
     location.href = location.href.replace(location.search, '').replace(location.hash, '') +
-        (Object.keys(query).length ? '?' : '') +
-        $$1.param(query) +
+        index$1.stringify(query, Object.keys(query).length > 0) +
         location.hash;
 }
 function getUserAgentInfo() {

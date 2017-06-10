@@ -7,7 +7,7 @@ import {
     TrackEventType,
     TrackEventActionType
 } from './tracking';
-import {parseQueryString} from './utils';
+import qs from 'querystringify';
 import config, {ConditionFunction} from './config';
 
 export interface Variation {
@@ -103,11 +103,12 @@ export class SplitTest {
 
     getVariationUrl(variationName: string | null): string {
         const param = `${this.name}=${variationName}`;
-        const query = parseQueryString(location.search);
+        const query = qs.parse(location.search);
+
         try {
             query.abtest = btoa(param);
             return location.protocol + '//' + location.host + location.pathname +
-                '?' + $.param(query) +
+                qs.stringify(query, true) +
                 location.hash;
         } catch (e) {
             return location.href;

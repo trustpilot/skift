@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "sourceMap": false,
+    "strictNullChecks": true,
+    "target": "ES5",
+    "outDir": "./temp",
+    "module": "es2015",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./tests"
+  ]
+}

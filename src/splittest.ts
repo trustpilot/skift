@@ -1,5 +1,5 @@
 import {UserAgentInfo} from './useragentinfo';
-import UserSession from './usersession';
+import userSession from './usersession';
 import {
     TrackingDataExtender,
     trackingDataExtenderFactory,
@@ -31,6 +31,8 @@ export interface InternalVariation extends Variation {
 
 export class SplitTest {
 
+    isInitialized = false;
+
     private condition: ConditionFunction;
     private readonly _variations: InternalVariation[] = [];
 
@@ -38,7 +40,10 @@ export class SplitTest {
         return this._variations;
     }
 
-    constructor(public name: string, private trackingDataExtender: TrackingDataExtender) {
+    constructor(
+        public name: string,
+        private userAgentInfo: UserAgentInfo,
+        private trackingDataExtender: TrackingDataExtender) {
         this.extendTrackingData(trackingDataExtenderFactory({
             experimentName: name
         }));
@@ -48,7 +53,8 @@ export class SplitTest {
      * Determines whether this test is able to run or not.
      */
     public canRun(userAgentInfo: UserAgentInfo): boolean {
-        return typeof this.condition !== 'function' || this.condition(userAgentInfo);
+        return (typeof config.globalCondition !== 'function' || config.globalCondition(userAgentInfo))
+            && (typeof this.condition !== 'function' || this.condition(userAgentInfo));
     }
 
     public setCondition(condition: ConditionFunction): SplitTest {
@@ -69,9 +75,13 @@ export class SplitTest {
         return this;
     }
 
-    setup(userSession: UserSession, userAgentInfo: UserAgentInfo): boolean {
+    setup(): boolean {
+        if (this.isInitialized) { // Already set up?
+            return true;
+        }
+
         // Step 1: Run condition function, if any
-        if (typeof this.condition === 'function' && !this.condition(userAgentInfo)) {
+        if (!this.canRun(this.userAgentInfo)) {
             return false;
         }
 
@@ -87,13 +97,14 @@ export class SplitTest {
 
         // Step 3: Setup variation
         if (typeof variation.setup === 'function') {
-            variation.setup.call(this, userAgentInfo);
+            variation.setup.call(this, this.userAgentInfo);
         }
 
         // Step 4: Publish track event
         if (variation.trackEventAutoPublish !== false) {
             this.trackViewed();
         }
+        this.isInitialized = true;
         return true;
     }
 

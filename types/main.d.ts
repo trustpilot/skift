@@ -11,21 +11,14 @@ export interface UserConfig {
     uiCondition?: ConditionFunction;
     userSessionDaysToLive?: number;
 }
-export declare const config: {
-    globalCondition: ConditionFunction;
-    tracking: TrackingEventHandler;
-    uiCondition: ConditionFunction;
-    userSessionDaysToLive: number;
-    cookieName: string;
-};
+export declare const tests: SplitTest[];
+export declare function config(userConfig?: UserConfig): void;
 export declare function initialize(): void;
 export declare function getUserAgentInfo(): UserAgentInfo;
 export declare function getTest(name: string): SplitTest;
-export declare function canRunTest(test: SplitTest): boolean;
 export declare function create(name: string): SplitTest;
-export declare function getTestVariant(testName: string): string;
-export declare function hasTestVariant(testName: string, variant: string): boolean;
-export declare function setTestVariant(testName: string, variant: string): void;
+export declare function getCurrentTestVariation(testName: string): string;
+export declare function setCurrentTestVariation(testName: string, variation: string): void;
 export declare function reset(): void;
 export declare namespace ui {
     function show(testsList: SplitTest[]): void;

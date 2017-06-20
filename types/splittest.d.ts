@@ -1,6 +1,5 @@
 /// <reference types="jquery" />
 import { UserAgentInfo } from './useragentinfo';
-import UserSession from './usersession';
 import { TrackingDataExtender, TrackEventActionType } from './tracking';
 import { ConditionFunction } from './config';
 export interface Variation {
@@ -22,18 +21,20 @@ export interface InternalVariation extends Variation {
 }
 export declare class SplitTest {
     name: string;
+    private userAgentInfo;
     private trackingDataExtender;
+    isInitialized: boolean;
     private condition;
     private readonly _variations;
     readonly variations: Variation[];
-    constructor(name: string, trackingDataExtender: TrackingDataExtender);
+    constructor(name: string, userAgentInfo: UserAgentInfo, trackingDataExtender: TrackingDataExtender);
     /**
      * Determines whether this test is able to run or not.
      */
     canRun(userAgentInfo: UserAgentInfo): boolean;
     setCondition(condition: ConditionFunction): SplitTest;
     addVariation(variation: Variation): SplitTest;
-    setup(userSession: UserSession, userAgentInfo: UserAgentInfo): boolean;
+    setup(): boolean;
     getVariation(name: string): Variation;
     getVariationUrl(variationName: string | null): string;
     /**

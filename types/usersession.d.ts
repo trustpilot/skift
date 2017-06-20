@@ -1,11 +1,9 @@
-export interface TestVariationsMap {
-    [key: string]: string;
-}
-export default class UserSession {
-    private testVariations;
-    static fromJson(json: string): UserSession;
-    constructor(testVariations?: TestVariationsMap);
+export declare class UserSession {
     setTestVariation(testName: string, variationName: string): void;
     getTestVariation(testName: string): string;
-    toJson(): string;
+    reset(): void;
+    private saveVariations(variationsMap);
+    private loadVariations();
 }
+declare const userSession: UserSession;
+export default userSession;

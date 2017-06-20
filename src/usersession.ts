@@ -1,28 +1,35 @@
-export interface TestVariationsMap {
+import config from './config';
+
+interface TestVariationsMap {
     [key: string]: string;
 }
 
-export default class UserSession {
-
-    static fromJson(json: string): UserSession {
-        const obj = JSON.parse(json);
-        return new UserSession(obj.testVariations);
-    }
-
-    constructor(private testVariations: TestVariationsMap = {}) {
-    }
+export class UserSession {
 
     setTestVariation(testName: string, variationName: string): void {
-        this.testVariations[testName] = variationName;
+        const variationsMap = this.loadVariations();
+        variationsMap[testName] = variationName;
+        this.saveVariations(variationsMap);
     }
 
     getTestVariation(testName: string): string {
-        return this.testVariations[testName];
+        const variationsMap = this.loadVariations();
+        return variationsMap[testName];
     }
 
-    toJson(): string {
-        return JSON.stringify({
-            testVariations: this.testVariations
-        });
+    reset() {
+        this.saveVariations({});
+    }
+
+    private saveVariations(variationsMap: TestVariationsMap) {
+        config.sessionPersister.saveUserSession(JSON.stringify(variationsMap), config.userSessionDaysToLive);
+    }
+
+    private loadVariations(): TestVariationsMap {
+        const variationsMap: TestVariationsMap = JSON.parse(config.sessionPersister.loadUserSession() || '{}');
+        return variationsMap;
     }
 }
+
+const userSession = new UserSession();
+export default userSession;

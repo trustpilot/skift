@@ -9,9 +9,8 @@ module.exports = {
         test: /\.ts$/,
         use: [
           {
-            loader: 'awesome-typescript-loader',
+            loader: 'ts-loader',
             query: {
-              configFileName: 'tsconfig.test.json',
               sourceMap: false,
               inlineSourceMap: true,
               compilerOptions: {

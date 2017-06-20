@@ -76,6 +76,11 @@ export class SplitTest {
     }
 
     setup(): boolean {
+
+        if (this._variations.length === 0) {
+            throw new Error('Skift: can\'t setup a test without variations');
+        }
+
         if (this.isInitialized) { // Already set up?
             return true;
         }

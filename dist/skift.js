@@ -73,6 +73,7 @@ function getUserAgentInfo$1() {
     return __assign({}, getNameAndVersion(), { isMobile: isMobile() });
 }
 
+<<<<<<< HEAD
 var UserSession = (function () {
     function UserSession(testVariations) {
         if (testVariations === void 0) { testVariations = {}; }
@@ -238,6 +239,113 @@ var SplitTest = (function () {
     function SplitTest(name, trackingDataExtender) {
         this.name = name;
         this.trackingDataExtender = trackingDataExtender;
+=======
+function createCookie(name, value, days) {
+    var expires = '';
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = '; expires=' + date.toUTCString();
+    }
+    document.cookie = name + '=' + value + expires + '; path=/';
+}
+function readCookie(name) {
+    var nameEq = name + '=';
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') {
+            c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEq) === 0) {
+            return c.substring(nameEq.length, c.length);
+        }
+    }
+    return null;
+}
+var persister = {
+    loadUserSession: function () {
+        return readCookie(config$1.cookieName);
+    },
+    saveUserSession: function (userSession, daysToLive) {
+        createCookie(config$1.cookieName, userSession, daysToLive);
+    }
+};
+
+var defaultTrackingEventHandler = (function () {
+    function log(event, trackingData) {
+        console.log('Split testing event: ' + event, trackingData);
+    }
+    return {
+        track: log,
+        trackLink: function (elements, event, trackingData) {
+            $$1(elements).on('click', function () {
+                log(event, trackingData);
+            });
+        }
+    };
+})();
+var config$1 = {
+    cookieName: 'skiftABTest',
+    globalCondition: function () { return true; },
+    sessionPersister: persister,
+    tracking: defaultTrackingEventHandler,
+    userSessionDaysToLive: 3,
+    uiCondition: function () { return false; }
+};
+
+var UserSession = (function () {
+    function UserSession() {
+    }
+    UserSession.prototype.setTestVariation = function (testName, variationName) {
+        var variationsMap = this.loadVariations();
+        variationsMap[testName] = variationName;
+        this.saveVariations(variationsMap);
+    };
+    UserSession.prototype.getTestVariation = function (testName) {
+        var variationsMap = this.loadVariations();
+        return variationsMap[testName];
+    };
+    UserSession.prototype.reset = function () {
+        this.saveVariations({});
+    };
+    UserSession.prototype.saveVariations = function (variationsMap) {
+        config$1.sessionPersister.saveUserSession(JSON.stringify(variationsMap), config$1.userSessionDaysToLive);
+    };
+    UserSession.prototype.loadVariations = function () {
+        var variationsMap = JSON.parse(config$1.sessionPersister.loadUserSession() || '{}');
+        return variationsMap;
+    };
+    return UserSession;
+}());
+var userSession = new UserSession();
+
+/**
+ * Constructs a new TrackingDataExtender that extending the existing tracking data with the provided tracking data
+ * @param newTrackingData
+ */
+function trackingDataExtenderFactory(newTrackingData) {
+    return function (trackingData) { return (__assign({}, trackingData, newTrackingData)); };
+}
+
+function parseQueryString(queryString) {
+    if (queryString === void 0) { queryString = location.search; }
+    var parameters = location.search.replace(/^\?/, '').split('&');
+    var vars = {};
+    for (var i = 0; i < parameters.length && parameters[i] !== ''; i++) {
+        var _a = parameters[i].split('='), key = _a[0], value = _a[1];
+        vars[key] = decodeURIComponent(value);
+    }
+    return vars;
+}
+
+var SplitTest = (function () {
+    function SplitTest(name, userAgentInfo, trackingDataExtender) {
+        this.name = name;
+        this.userAgentInfo = userAgentInfo;
+        this.trackingDataExtender = trackingDataExtender;
+        this.isInitialized = false;
+>>>>>>> Rewriting session management and test setup
         this._variations = [];
         this.extendTrackingData(trackingDataExtenderFactory({
             experimentName: name
@@ -254,7 +362,12 @@ var SplitTest = (function () {
      * Determines whether this test is able to run or not.
      */
     SplitTest.prototype.canRun = function (userAgentInfo) {
+<<<<<<< HEAD
         return typeof this.condition !== 'function' || this.condition(userAgentInfo);
+=======
+        return (typeof config$1.globalCondition !== 'function' || config$1.globalCondition(userAgentInfo))
+            && (typeof this.condition !== 'function' || this.condition(userAgentInfo));
+>>>>>>> Rewriting session management and test setup
     };
     SplitTest.prototype.setCondition = function (condition) {
         this.condition = condition;
@@ -268,9 +381,18 @@ var SplitTest = (function () {
         this.normalizeVariationWeights();
         return this;
     };
+<<<<<<< HEAD
     SplitTest.prototype.setup = function (userSession, userAgentInfo) {
         // Step 1: Run condition function, if any
         if (typeof this.condition === 'function' && !this.condition(userAgentInfo)) {
+=======
+    SplitTest.prototype.setup = function () {
+        if (this.isInitialized) {
+            return true;
+        }
+        // Step 1: Run condition function, if any
+        if (!this.canRun(this.userAgentInfo)) {
+>>>>>>> Rewriting session management and test setup
             return false;
         }
         // Step 2: Select variation
@@ -284,12 +406,20 @@ var SplitTest = (function () {
         }));
         // Step 3: Setup variation
         if (typeof variation.setup === 'function') {
+<<<<<<< HEAD
             variation.setup.call(this, userAgentInfo);
+=======
+            variation.setup.call(this, this.userAgentInfo);
+>>>>>>> Rewriting session management and test setup
         }
         // Step 4: Publish track event
         if (variation.trackEventAutoPublish !== false) {
             this.trackViewed();
         }
+<<<<<<< HEAD
+=======
+        this.isInitialized = true;
+>>>>>>> Rewriting session management and test setup
         return true;
     };
     SplitTest.prototype.getVariation = function (name) {
@@ -297,11 +427,19 @@ var SplitTest = (function () {
     };
     SplitTest.prototype.getVariationUrl = function (variationName) {
         var param = this.name + "=" + variationName;
+<<<<<<< HEAD
         var query = index$1.parse(location.search);
         try {
             query.abtest = btoa(param);
             return location.protocol + '//' + location.host + location.pathname +
                 index$1.stringify(query, true) +
+=======
+        var query = parseQueryString(location.search);
+        try {
+            query.abtest = btoa(param);
+            return location.protocol + '//' + location.host + location.pathname +
+                '?' + $.param(query) +
+>>>>>>> Rewriting session management and test setup
                 location.hash;
         }
         catch (e) {
@@ -371,6 +509,7 @@ var SplitTest = (function () {
 
 var userAgentInfo = getUserAgentInfo$1();
 var tests = [];
+<<<<<<< HEAD
 var isInitialized = false;
 var userSession;
 var config = {
@@ -409,6 +548,26 @@ var config = {
         config$1.cookieName = name;
     }
 };
+=======
+function config(userConfig) {
+    if (userConfig === void 0) { userConfig = {}; }
+    if (userConfig.cookieName) {
+        config$1.cookieName = userConfig.cookieName;
+    }
+    if (userConfig.globalCondition) {
+        config$1.globalCondition = userConfig.globalCondition;
+    }
+    if (userConfig.tracking) {
+        config$1.tracking = userConfig.tracking;
+    }
+    if (userConfig.uiCondition) {
+        config$1.uiCondition = userConfig.uiCondition;
+    }
+    if (userConfig.userSessionDaysToLive) {
+        config$1.userSessionDaysToLive = userConfig.userSessionDaysToLive;
+    }
+}
+>>>>>>> Rewriting session management and test setup
 /**
  * The base tracking data extender supplying general tracking data
  */
@@ -419,6 +578,7 @@ function baseTrackingDataExtenderFactory() {
         isMobile: userAgentInfo.isMobile
     });
 }
+<<<<<<< HEAD
 function getOrCreateUserSession() {
     var existingSession = config$1.sessionPersister.loadUserSession();
     return existingSession != null
@@ -433,6 +593,14 @@ function initializeFromQueryString(session) {
             var testAndVariant = atob(abtestParam).split('=');
             var test = testAndVariant[0];
             var variant = testAndVariant[1];
+=======
+function initializeFromQueryString(session) {
+    var query = parseQueryString(location.search);
+    var abtestParam = query['abtest'];
+    if (typeof abtestParam === 'string') {
+        try {
+            var _a = atob(abtestParam).split('='), test = _a[0], variant = _a[1];
+>>>>>>> Rewriting session management and test setup
             session.setTestVariation(test, variant);
         }
         catch (e) {
@@ -441,6 +609,7 @@ function initializeFromQueryString(session) {
     }
 }
 function initialize() {
+<<<<<<< HEAD
     userSession = getOrCreateUserSession();
     // On DOMContentLoaded
     $$1(function () {
@@ -467,10 +636,19 @@ function initialize() {
 function validateInitialized() {
     if (!isInitialized) {
         throw new Error('A/B Test: Not ready yet! (wait for DOMContentLoaded)');
+=======
+    initializeFromQueryString(userSession);
+}
+// Public API
+function validateInitialized(test) {
+    if (!test.isInitialized) {
+        throw new Error('Skift: Test not initialized yet!');
+>>>>>>> Rewriting session management and test setup
     }
 }
 function validateTestName(testName) {
     if (!getTest(testName)) {
+<<<<<<< HEAD
         throw new Error("A/B Test: Unknown test '" + testName + "\"");
     }
 }
@@ -479,6 +657,17 @@ function reloadWithoutAbTestParameter() {
     delete query['abtest'];
     location.href = location.href.replace(location.search, '').replace(location.hash, '') +
         index$1.stringify(query, Object.keys(query).length > 0) +
+=======
+        throw new Error("Skift: Unknown test '" + testName + "\"");
+    }
+}
+function reloadWithoutAbTestParameter() {
+    var query = parseQueryString(location.search);
+    delete query['abtest'];
+    location.href = location.href.replace(location.search, '').replace(location.hash, '') +
+        (Object.keys(query).length ? '?' : '') +
+        $$1.param(query) +
+>>>>>>> Rewriting session management and test setup
         location.hash;
 }
 function getUserAgentInfo() {
@@ -487,6 +676,7 @@ function getUserAgentInfo() {
 function getTest(name) {
     return tests.filter(function (t) { return t.name === name; })[0];
 }
+<<<<<<< HEAD
 function canRunTest(test) {
     return config.globalCondition(userAgentInfo) && test.canRun(userAgentInfo);
 }
@@ -527,6 +717,26 @@ function setTestVariant(testName, variant) {
 }
 function reset() {
     userSession = new UserSession();
+=======
+function create(name) {
+    var test = new SplitTest(name, userAgentInfo, baseTrackingDataExtenderFactory());
+    tests.push(test);
+    return test;
+}
+function getCurrentTestVariation(testName) {
+    validateTestName(testName);
+    validateInitialized(getTest(testName));
+    return userSession.getTestVariation(testName);
+}
+function setCurrentTestVariation(testName, variation) {
+    validateTestName(testName);
+    validateInitialized(getTest(testName));
+    userSession.setTestVariation(testName, variation);
+    reloadWithoutAbTestParameter();
+}
+function reset() {
+    userSession.reset();
+>>>>>>> Rewriting session management and test setup
     reloadWithoutAbTestParameter();
 }
 // tslint:disable
@@ -538,7 +748,11 @@ var ui;
         return Math.round(variation.normalizedWeight * 100) + '%';
     }
     function showSplitTestUi(test) {
+<<<<<<< HEAD
         var variation = getTestVariant(test.name);
+=======
+        var variation = getCurrentTestVariation(test.name);
+>>>>>>> Rewriting session management and test setup
         var $abTestContainer = $$1("<div class=\"" + uiClass + " hideme\"></div>")
             .appendTo('body')
             .append("\n              <div class=\"abtest-header\">Split test. Viewing <span class=\"abtest-variant\">" + variation + "</span></div>\n            ");
@@ -579,7 +793,11 @@ var ui;
     }
     ui.hide = hide;
     $$1(function () {
+<<<<<<< HEAD
         if (!config.globalCondition(userAgentInfo) || !config.uiCondition(userAgentInfo)) {
+=======
+        if (!config$1.globalCondition(userAgentInfo) || !config$1.uiCondition(userAgentInfo)) {
+>>>>>>> Rewriting session management and test setup
             return;
         }
         setTimeout(function () { return show(tests); }, 1000);
@@ -588,21 +806,21 @@ var ui;
 // tslint:enable
 
 
-var skift = Object.freeze({
+var skift$1 = Object.freeze({
+	tests: tests,
 	config: config,
 	initialize: initialize,
 	getUserAgentInfo: getUserAgentInfo,
 	getTest: getTest,
-	canRunTest: canRunTest,
 	create: create,
-	getTestVariant: getTestVariant,
-	hasTestVariant: hasTestVariant,
-	setTestVariant: setTestVariant,
+	getCurrentTestVariation: getCurrentTestVariation,
+	setCurrentTestVariation: setCurrentTestVariation,
 	reset: reset,
 	get ui () { return ui; },
 	SplitTest: SplitTest
 });
 
+<<<<<<< HEAD
 var index = function (userConfig) {
     if (userConfig === void 0) { userConfig = {}; }
     if (userConfig.cookieName) {
@@ -623,7 +841,10 @@ var index = function (userConfig) {
     initialize();
     return skift;
 };
+=======
+initialize();
+>>>>>>> Rewriting session management and test setup
 
-return index;
+return skift$1;
 
 })));

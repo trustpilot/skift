@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _getUserAgentInfo, { UserAgentInfo } from './useragentinfo';
-import UserSession from './usersession';
+import userSession, { UserSession } from './usersession';
 import { SplitTest, InternalVariation } from './splittest';
 export { SplitTest } from './splittest';
 import {
@@ -21,46 +21,25 @@ export interface UserConfig {
 }
 
 const userAgentInfo = _getUserAgentInfo();
-const tests: SplitTest[] = [];
-let isInitialized = false;
-let userSession: UserSession;
+export const tests: SplitTest[] = [];
 
-export const config = {
-    get globalCondition() {
-        return _config.globalCondition;
-    },
-    /** Set a global condition that must return true before initializing any tests */
-    set globalCondition(value: ConditionFunction) {
-        if (isInitialized) {
-            throw new Error(`Split test: Too late. Tests already running`);
-        }
-        _config.globalCondition = value;
-    },
-    get tracking() {
-        return _config.tracking;
-    },
-    set tracking(tracking: TrackingEventHandler) {
-        _config.tracking = tracking;
-    },
-    get uiCondition() {
-        return _config.uiCondition;
-    },
-    set uiCondition(value: ConditionFunction) {
-        _config.uiCondition = value;
-    },
-    get userSessionDaysToLive() {
-        return _config.userSessionDaysToLive;
-    },
-    set userSessionDaysToLive(days: number) {
-        _config.userSessionDaysToLive = days;
-    },
-    get cookieName() {
-        return _config.cookieName;
-    },
-    set cookieName(name: string) {
-        _config.cookieName = name;
+export function config(userConfig: UserConfig = {}) {
+    if (userConfig.cookieName) {
+        _config.cookieName = userConfig.cookieName;
     }
-};
+    if (userConfig.globalCondition) {
+        _config.globalCondition = userConfig.globalCondition;
+    }
+    if (userConfig.tracking) {
+        _config.tracking = userConfig.tracking;
+    }
+    if (userConfig.uiCondition) {
+        _config.uiCondition = userConfig.uiCondition;
+    }
+    if (userConfig.userSessionDaysToLive) {
+        _config.userSessionDaysToLive = userConfig.userSessionDaysToLive;
+    }
+}
 
 /**
  * The base tracking data extender supplying general tracking data
@@ -73,22 +52,13 @@ function baseTrackingDataExtenderFactory(): TrackingDataExtender {
     });
 }
 
-function getOrCreateUserSession(): UserSession {
-    const existingSession = _config.sessionPersister.loadUserSession();
-    return existingSession != null
-        ? UserSession.fromJson(existingSession)
-        : new UserSession();
-}
-
 function initializeFromQueryString(session: UserSession): void {
     const query = qs.parse(location.search);
     const abtestParam = query['abtest'];
 
     if (typeof abtestParam === 'string') {
         try {
-            const testAndVariant = atob(abtestParam).split('=');
-            const test = testAndVariant[0];
-            const variant = testAndVariant[1];
+            const [test, variant] = atob(abtestParam).split('=');
             session.setTestVariation(test, variant);
         } catch (e) {
             // TODO: Handle error.
@@ -97,42 +67,19 @@ function initializeFromQueryString(session: UserSession): void {
 }
 
 export function initialize(): void {
-    userSession = getOrCreateUserSession();
-
-    // On DOMContentLoaded
-    $(() => {
-        if (config.globalCondition(userAgentInfo)) {
-            initializeFromQueryString(userSession);
-
-            window.addEventListener('pagehide', () => {
-                if (tests.length > 0) {
-                    _config.sessionPersister.saveUserSession(userSession.toJson(), config.userSessionDaysToLive);
-                }
-            });
-
-            tests.forEach((test, index, testList) => {
-                if (!test.setup(userSession, userAgentInfo)) {
-                    testList.splice(index);
-                }
-            });
-            // tests = tests.filter((test) => {
-            //     return test.setup(userSession, userAgentInfo);
-            // });
-        }
-        isInitialized = true;
-    });
+    initializeFromQueryString(userSession);
 }
 
 // Public API
 
-function validateInitialized() {
-    if (!isInitialized) {
-        throw new Error('A/B Test: Not ready yet! (wait for DOMContentLoaded)');
+function validateInitialized(test: SplitTest) {
+    if (!test.isInitialized) {
+        throw new Error('Skift: Test not initialized yet!');
     }
 }
 function validateTestName(testName: string) {
     if (!getTest(testName)) {
-        throw new Error(`A/B Test: Unknown test '${testName}"`);
+        throw new Error(`Skift: Unknown test '${testName}"`);
     }
 }
 
@@ -152,50 +99,28 @@ export function getTest(name: string) {
     return tests.filter((t) => t.name === name)[0];
 }
 
-export function canRunTest(test: SplitTest): boolean {
-    return config.globalCondition(userAgentInfo) && test.canRun(userAgentInfo);
-}
-
 export function create(name: string): SplitTest {
-    const test = new SplitTest(name, baseTrackingDataExtenderFactory());
-    if (isInitialized) {
-        if (config.globalCondition(userAgentInfo)) {
-            // Setup "immediately" in the next cycle of the event loop.
-            // This will allow a condition and test variations to be added on beforehand.
-            setTimeout(() => {
-                if (test.setup(userSession, userAgentInfo)) {
-                    tests.push(test);
-                }
-            });
-        }
-    } else {
-        tests.push(test);
-    }
+    const test = new SplitTest(name, userAgentInfo, baseTrackingDataExtenderFactory());
+    tests.push(test);
     return test;
 }
 
-export function getTestVariant(testName: string): string {
-    validateInitialized();
+export function getCurrentTestVariation(testName: string): string {
     validateTestName(testName);
+    validateInitialized(getTest(testName));
     return userSession.getTestVariation(testName);
 }
 
-export function hasTestVariant(testName: string, variant: string): boolean {
-    if (!isInitialized) {
-        console.warn(`Split test: Not yet initialized`);
-    }
-    return isInitialized && userSession.getTestVariation(testName) === variant && getTest(testName) != null;
-}
-
-export function setTestVariant(testName: string, variant: string): void {
-    validateInitialized();
+export function setCurrentTestVariation(testName: string, variation: string): void {
     validateTestName(testName);
-    userSession.setTestVariation(testName, variant);
+    validateInitialized(getTest(testName));
+
+    userSession.setTestVariation(testName, variation);
     reloadWithoutAbTestParameter();
 }
 
 export function reset(): void {
-    userSession = new UserSession();
+    userSession.reset();
     reloadWithoutAbTestParameter();
 }
 
@@ -209,7 +134,7 @@ export namespace ui {
     }
 
     function showSplitTestUi(test: SplitTest) {
-        const variation = getTestVariant(test.name);
+        const variation = getCurrentTestVariation(test.name);
         const $abTestContainer = $(`<div class="${uiClass} hideme"></div>`)
             .appendTo('body')
             .append(`
@@ -262,7 +187,7 @@ export namespace ui {
     }
 
     $(() => {
-        if (!config.globalCondition(userAgentInfo) || !config.uiCondition(userAgentInfo)) {
+        if (!_config.globalCondition(userAgentInfo) || !_config.uiCondition(userAgentInfo)) {
             return;
         }
 

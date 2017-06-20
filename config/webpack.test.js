@@ -1,4 +1,5 @@
 module.exports = {
+  devtool: 'inline-source-map',
   resolve: {
     extensions: ['.ts', '.js'],
     modules: ['node_modules']
@@ -9,14 +10,7 @@ module.exports = {
         test: /\.ts$/,
         use: [
           {
-            loader: 'ts-loader',
-            query: {
-              sourceMap: false,
-              inlineSourceMap: true,
-              compilerOptions: {
-                removeComments: true
-              }
-            }
+            loader: 'ts-loader'
           }
         ]
       }

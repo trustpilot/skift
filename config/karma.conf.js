@@ -15,7 +15,7 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
-    files: [{ pattern: 'tests/**/*.ts', watched: false }],
+    files: [{ pattern: 'tests/main.js', watched: false }],
 
     // list of files to exclude
     exclude: [],
@@ -23,7 +23,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'tests/**/*.ts': ['webpack']
+      'tests/main.js': ['webpack', 'sourcemap']
     },
 
     // test results reporter to use

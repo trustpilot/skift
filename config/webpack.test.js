@@ -13,6 +13,17 @@ module.exports = {
             loader: 'ts-loader'
           }
         ]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'css-to-string-loader'
+          },
+          {
+            loader: 'css-loader'
+          }
+        ]
       }
     ]
   },

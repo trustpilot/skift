@@ -1,0 +1,73 @@
+.skift-ui-container {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 300px;
+  height: 300px;
+  padding: 10px;
+  color: #292929;
+  z-index: 999;
+  background-color: #FFFFFF;
+  border: 1px solid #f2800d;
+  box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.2);
+  transition: all .5s ease-out;
+  opacity: 1;
+}
+.skift-ui-container.hideme {
+  bottom: -350px;
+  opacity: 0;
+}
+.skift-ui-container .skift-header {
+  position: relative;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  margin: -10px;
+  margin-bottom: 10px;
+  background-color: #292929;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: bold;
+  width: 298px;
+}
+.skift-ui-container .skift-data-label {
+  display: inline-block;
+  margin-bottom: 2px;
+  margin-right: 5px;
+  color: #292929;
+}
+.skift-ui-container .skift-data-label:after {
+  content: ":";
+}
+.skift-ui-container .skift-data-value {
+  color: #000;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.skift-ui-container .skift-variant {
+  text-transform: uppercase;
+  color: #66ff33;
+}
+.skift-ui-container .skift-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #f2800d;
+  color: #000;
+  height: 20px;
+  width: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.skift-ui-container .delete-skift-cookie {
+  display: block;
+  margin: 10px auto;
+  padding: 5px 10px;
+  background-color: #f2800d;
+  font-size: 18px;
+  color: #FFFFFF;
+  border: 0;
+}

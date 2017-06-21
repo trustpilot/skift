@@ -34,6 +34,20 @@ module.exports = {
           }
         ],
         exclude: [/\.e2e\.ts$/]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'css-to-string-loader'
+          },
+          {
+            loader: 'css-loader',
+            query: {
+              minimize: true
+            }
+          }
+        ]
       }
     ]
   },

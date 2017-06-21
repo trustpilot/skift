@@ -10,7 +10,7 @@ A/B Testing tool for the modern Web
 import skift from 'skift';
 
 // Configure Skift.
-const test = skift({
+skift.config({
   tracking: {
       track: function(event, trackingData) {
           console.log('A/B test event: ' + event, trackingData);
@@ -19,7 +19,7 @@ const test = skift({
 });
 
 // Describe the A/B Test.
-test
+skift
   .create('My awesome test')
   .setCondition(() => {
       return window.location.pathname === 'contacts'
@@ -32,10 +32,14 @@ test
   })
   .addVariation({
       name: 'Control'
-  });
+  })
+  .setup(); // Don't forget to setup the test!
 ```
+
 ## New to A/B testing?
-We recommend using [Segment](https://segment.com/) for tracking the results.
+
+We recommend using [Amplitude](https://amplitude.com/) for goal tracking.
 
 ## Contributing
+
 Interested in contributing? Please have a look at our [developer documentation](CONTRIBUTING.md) for more information on how to get started.

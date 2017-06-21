@@ -32,4 +32,18 @@ describe('Top-level api', () => {
         expect(skift.getTest('Another awesome test!')).toBeDefined();
         expect(test === skift.getTest('Another awesome test!')).toBeTruthy();
     });
+
+    it('should be possible to show the UI', () => {
+        const testName = 'The test to check out!';
+        skift
+            .create(testName)
+            .addVariation({ name: 'Variation A' })
+            .addVariation({ name: 'Variation B' })
+            .setup();
+
+        skift.ui.show([ skift.getTest(testName) ]);
+
+        const root = document.querySelector('div').shadowRoot;
+        expect(root.querySelector('.skift-ui-container')).toBeDefined();
+    });
 });

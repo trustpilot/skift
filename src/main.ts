@@ -124,21 +124,35 @@ export function reset(): void {
     reloadWithoutAbTestParameter();
 }
 
+declare const require: any;
+
 // tslint:disable
 export namespace ui {
-    const uiClass = 'abtest-ui-container';
+    const uiClassPrefix = 'skift';
     let isInitialized = false;
+    let $abTestContainer: JQuery;
 
     function getVariationPercentage(variation: InternalVariation): string {
         return Math.round(variation.normalizedWeight * 100) + '%';
     }
 
     function showSplitTestUi(test: SplitTest) {
+
+        if(!document.head.attachShadow) {
+            console.warn(`Skift: Sorry, we don't support the UI in the browsers witout Shadow DOM for now`);
+            return;
+        }
+
+        const containerElement = document.createElement('div');
+        const shadowRoot = containerElement.attachShadow({mode: 'open'});
+        const style = document.createElement('style');
+        style.innerHTML = require('./main.css');
         const variation = getCurrentTestVariation(test.name);
-        const $abTestContainer = $(`<div class="${uiClass} hideme"></div>`)
-            .appendTo('body')
+        $abTestContainer = $(`<div class="${uiClassPrefix}-ui-container hideme"></div>`)
             .append(`
-              <div class="abtest-header">Split test. Viewing <span class="abtest-variant">${variation}</span></div>
+              <div class="${uiClassPrefix}-header">
+                Split test. Viewing <span class="abtest-variant">${variation}</span>
+              </div>
             `);
         const data: { [key: string]: any } = {
             'Test': test.name,
@@ -149,7 +163,8 @@ export namespace ui {
         Object.keys(data).forEach((key) => {
             $abTestContainer.append(`
               <div>
-                <span class="abtest-data-label">${key}</span><span class="abtest-data-value">${data[key]}</span>
+                <span class="${uiClassPrefix}-data-label">${key}</span>
+                <span class="${uiClassPrefix}-data-value">${data[key]}</span>
               </div>
             `);
         });
@@ -165,25 +180,28 @@ export namespace ui {
             .on('click', reset)
             .appendTo($abTestContainer);
 
-        $('<div class="abtest-close">X</div>')
+        $(`<div class="${uiClassPrefix}-close">X</div>`)
             .on('click', hide)
             .appendTo($abTestContainer);
 
         // Make UI fadein
         $abTestContainer.removeClass('hideme');
+        shadowRoot.appendChild(style);
+        shadowRoot.appendChild($abTestContainer[0]);
+        document.body.appendChild(containerElement);
         isInitialized = true;
     }
 
     export function show(testsList: SplitTest[]) {
         if (isInitialized) {
-            $(`.${uiClass}`).removeClass('hideme');
+            $abTestContainer.removeClass('hideme');
         } else if (testsList.length > 0) {
             showSplitTestUi(testsList[0]);
         }
     }
 
     export function hide() {
-        $(`.${uiClass}`).addClass('hideme');
+        $abTestContainer.addClass('hideme');
     }
 
     $(() => {

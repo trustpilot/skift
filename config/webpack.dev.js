@@ -5,7 +5,7 @@ module.exports = {
   output: {
     filename: 'dist/[name].js',
     sourceMapFilename: 'dist/[name].source.map',
-    library: 'lib',
+    library: 'skift',
     libraryTarget: 'umd'
   },
   resolve: {

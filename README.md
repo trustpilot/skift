@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="460" height="auto" src="https://user-images.githubusercontent.com/3983879/27422227-ac2dc336-572d-11e7-9c48-94a56fcf1191.png">
+</p>
+
 # Skift [![npm version](https://badge.fury.io/js/skift.svg)](https://badge.fury.io/js/skift) [![Build Status](https://travis-ci.org/trustpilot/skift.svg?branch=master)](https://travis-ci.org/trustpilot/skift)
 
 A/B Testing tool for the modern Web

@@ -10,7 +10,6 @@
     "@types/jquery": "^2.0.41"
   },
   "devDependencies": {
-    "@alexlur/rollup-plugin-typescript": "^1.0.4",
     "@types/jasmine": "^2.5.52",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
@@ -25,12 +24,6 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.3",
     "querystringify": "^1.0.0",
-    "rollup": "^0.41.6",
-    "rollup-plugin-commonjs": "^8.0.2",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-typescript2": "^0.4.0",
-    "rollup-plugin-uglify": "^1.0.1",
-    "rollup-watch": "^3.2.2",
     "ts-loader": "^2.1.0",
     "tslib": "^1.6.0",
     "tslint": "^5.4.0",
@@ -45,13 +38,11 @@
     "url": "git+https://github.com/trustpilot/skift.git"
   },
   "scripts": {
-    "build": "tsc -p . && rollup --config build/rollup.config.debug.js",
     "build:prod": "cross-env NODE_ENV=production webpack",
     "build:dev": "cross-env NODE_ENV=development webpack",
     "ci:travis": "npm run lint && npm run test",
-    "dev": "rollup --config build/rollup.config.debug.js -w",
     "lint": "tslint 'src/**/*.ts' --type-check --project ./",
-    "release": "npm run build && rollup --config build/rollup.config.release.js",
+    "release": "npm run build:prod",
     "test": "karma start",
     "ts": "tsc",
     "start": "node local-serve/serve.js"

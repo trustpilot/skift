@@ -2,7 +2,6 @@ import skift from '../src/index';
 import { SplitTest } from '../src/splittest';
 
 describe('Top-level api', () => {
-
     it('should export the object', () => {
         expect(typeof skift).toBe('object');
         expect(skift).toBeDefined();
@@ -41,9 +40,11 @@ describe('Top-level api', () => {
             .addVariation({ name: 'Variation B' })
             .setup();
 
-        skift.ui.show([ skift.getTest(testName) ]);
+        skift.ui.show([skift.getTest(testName)]);
 
-        const root = document.querySelector('div').shadowRoot;
+        const div = <HTMLElement>document.querySelector('div');
+        const root = <ShadowRoot>div.shadowRoot;
+
         expect(root.querySelector('.skift-ui-container')).toBeDefined();
     });
 });

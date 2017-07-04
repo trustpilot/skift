@@ -1,13 +1,13 @@
 # Development
 
-When developing, it's preferable to run in watch mode:
+When developing, it's preferable to run in test mode:
 
 ```
-npm run dev
+npm test
 ```
 
 ## Build a new release
 
 ```
-npm run release
+npm run build:prod
 ```

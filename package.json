@@ -24,11 +24,11 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.3",
     "querystringify": "^1.0.0",
-    "ts-loader": "^2.1.0",
+    "ts-loader": "^2.2.2",
     "tslib": "^1.6.0",
     "tslint": "^5.4.0",
     "typescript": "^2.2.2",
-    "webpack": "^2.6.1"
+    "webpack": "^3.0.0"
   },
   "homepage": "https://github.com/trustpilot/skift#readme",
   "license": "MIT",
@@ -42,7 +42,6 @@
     "build:dev": "cross-env NODE_ENV=development webpack",
     "ci:travis": "npm run lint && npm run test",
     "lint": "tslint 'src/**/*.ts' --type-check --project ./",
-    "release": "npm run build:prod",
     "test": "karma start",
     "ts": "tsc",
     "start": "node local-serve/serve.js"

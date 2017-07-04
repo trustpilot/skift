@@ -1,9 +1,12 @@
+const path = require('path');
+
 module.exports = {
   entry: {
     skift: './src/index.ts'
   },
   output: {
-    filename: 'dist/[name].js',
+    path: path.resolve(__dirname, '../dist'),
+    filename: '[name].js',
     sourceMapFilename: 'dist/[name].source.map',
     library: 'skift',
     libraryTarget: 'umd'

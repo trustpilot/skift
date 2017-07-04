@@ -1,3 +1,4 @@
+const path = require('path');
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 
 module.exports = {
@@ -14,9 +15,9 @@ module.exports = {
     }
   },
   output: {
-    filename: 'dist/[name].min.js',
+    path: path.resolve(__dirname, '../dist'),
+    filename: '[name].min.js',
     sourceMapFilename: '[name].source.map',
-
     library: 'skift',
     libraryTarget: 'umd'
   },

@@ -9,8 +9,10 @@ import {
     reset,
     ui,
     SplitTest,
-    initialize
+    initialize,
+    UserConfig
 } from './main';
+import { UserAgentInfo } from './useragentinfo';
 
 initialize();
 
@@ -25,4 +27,18 @@ export {
     reset,
     ui,
     SplitTest
+};
+
+export default {
+    tests,
+    config,
+    getUserAgentInfo,
+    getTest,
+    create,
+    getCurrentTestVariation,
+    setCurrentTestVariation,
+    reset,
+    ui,
+    SplitTest,
+    initialize
 };

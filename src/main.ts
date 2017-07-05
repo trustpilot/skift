@@ -86,7 +86,8 @@ function validateTestName(testName: string) {
 function reloadWithoutAbTestParameter() {
     const query = qs.parse(location.search);
     delete query['abtest'];
-    location.href = location.href.replace(location.search, '').replace(location.hash, '') +
+    location.href =
+        location.href.replace(location.search, '').replace(location.hash, '') +
         qs.stringify(query, Object.keys(query).length > 0) +
         location.hash;
 }
@@ -96,11 +97,15 @@ export function getUserAgentInfo() {
 }
 
 export function getTest(name: string) {
-    return tests.filter((t) => t.name === name)[0];
+    return tests.filter(t => t.name === name)[0];
 }
 
 export function create(name: string): SplitTest {
-    const test = new SplitTest(name, userAgentInfo, baseTrackingDataExtenderFactory());
+    const test = new SplitTest(
+        name,
+        userAgentInfo,
+        baseTrackingDataExtenderFactory()
+    );
     tests.push(test);
     return test;
 }
@@ -111,7 +116,10 @@ export function getCurrentTestVariation(testName: string): string {
     return userSession.getTestVariation(testName);
 }
 
-export function setCurrentTestVariation(testName: string, variation: string): void {
+export function setCurrentTestVariation(
+    testName: string,
+    variation: string
+): void {
     validateTestName(testName);
     validateInitialized(getTest(testName));
 
@@ -137,30 +145,34 @@ export namespace ui {
     }
 
     function showSplitTestUi(test: SplitTest) {
-
-        if(!document.head.attachShadow) {
-            console.warn(`Skift: Sorry, we don't support the UI in the browsers witout Shadow DOM for now`);
+        if (!document.head.attachShadow) {
+            console.warn(
+                `Skift: Sorry, we don't support the UI in the browsers witout Shadow DOM for now`
+            );
             return;
         }
 
         const containerElement = document.createElement('div');
-        const shadowRoot = containerElement.attachShadow({mode: 'open'});
+        const shadowRoot = containerElement.attachShadow({ mode: 'open' });
         const style = document.createElement('style');
         style.innerHTML = require('./main.css');
         const variation = getCurrentTestVariation(test.name);
-        $abTestContainer = $(`<div class="${uiClassPrefix}-ui-container hideme"></div>`)
-            .append(`
+        $abTestContainer = $(
+            `<div class="${uiClassPrefix}-ui-container hideme"></div>`
+        ).append(`
               <div class="${uiClassPrefix}-header">
                 Split test. Viewing <span class="abtest-variant">${variation}</span>
               </div>
             `);
         const data: { [key: string]: any } = {
-            'Test': test.name,
-            'Variation': `${variation} (${getVariationPercentage(<InternalVariation>test.getVariation(variation))})`,
-            'Browser': getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
+            Test: test.name,
+            Variation: `${variation} (${getVariationPercentage(
+                <InternalVariation>test.getVariation(variation)
+            )})`,
+            Browser: getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
             'Mobile device': getUserAgentInfo().isMobile
         };
-        Object.keys(data).forEach((key) => {
+        Object.keys(data).forEach(key => {
             $abTestContainer.append(`
               <div>
                 <span class="${uiClassPrefix}-data-label">${key}</span>
@@ -169,10 +181,12 @@ export namespace ui {
             `);
         });
 
-        const variationHtml = test.variations.map((variant) => {
+        const variationHtml = test.variations.map(variant => {
             return `
               <a href="${test.getVariationUrl(variant.name)}"
-                 title="Segment: ${getVariationPercentage(<InternalVariation>variant)}">${variant.name}</a>`;
+                 title="Segment: ${getVariationPercentage(
+                     <InternalVariation>variant
+                 )}">${variant.name}</a>`;
         });
         $(variationHtml.join('&nbsp;&bull;&nbsp;')).appendTo($abTestContainer);
 
@@ -205,7 +219,10 @@ export namespace ui {
     }
 
     $(() => {
-        if (!_config.globalCondition(userAgentInfo) || !_config.uiCondition(userAgentInfo)) {
+        if (
+            !_config.globalCondition(userAgentInfo) ||
+            !_config.uiCondition(userAgentInfo)
+        ) {
             return;
         }
 

@@ -44,7 +44,7 @@
     "lint": "tslint 'src/**/*.ts' --type-check --project ./",
     "test": "karma start",
     "ts": "tsc",
-    "start": "node local-serve/serve.js"
+    "start": "node examples/serve.js"
   },
   "types": "types/index.d.ts"
 }

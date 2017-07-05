@@ -1,5 +1,28 @@
-import * as skift from './main';
+import {
+    tests,
+    config,
+    getUserAgentInfo,
+    getTest,
+    create,
+    getCurrentTestVariation,
+    setCurrentTestVariation,
+    reset,
+    ui,
+    SplitTest,
+    initialize
+} from './main';
 
-skift.initialize();
+initialize();
 
-export default skift;
+export {
+    tests,
+    config,
+    getUserAgentInfo,
+    getTest,
+    create,
+    getCurrentTestVariation,
+    setCurrentTestVariation,
+    reset,
+    ui,
+    SplitTest
+};

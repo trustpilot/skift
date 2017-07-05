@@ -1,4 +1,4 @@
-import skift from '../src/index';
+import * as skift from '../src/index';
 import { SplitTest } from '../src/splittest';
 
 describe('Top-level api', () => {

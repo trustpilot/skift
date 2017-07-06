@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import {
     tests,
     config,
@@ -7,14 +8,25 @@ import {
     getCurrentTestVariation,
     setCurrentTestVariation,
     reset,
-    ui,
     SplitTest,
     initialize,
-    UserConfig
+    UserConfig,
+    shouldShowUI
 } from './main';
 import { UserAgentInfo } from './useragentinfo';
+import { uiFactory } from './ui';
 
 initialize();
+
+const ui = uiFactory(reset, getCurrentTestVariation, getUserAgentInfo);
+
+$(() => {
+    if (shouldShowUI()) {
+        return;
+    }
+
+    setTimeout(() => ui.show(tests), 1000);
+});
 
 export {
     tests,

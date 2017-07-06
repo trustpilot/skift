@@ -74,12 +74,12 @@ export function initialize(): void {
 
 function validateInitialized(test: SplitTest) {
     if (!test.isInitialized) {
-        throw new Error('Skift: Test not initialized yet!');
+        throw new Error(`Skift: Test "${test.name}" is not initialized yet!`);
     }
 }
 function validateTestName(testName: string) {
     if (!getTest(testName)) {
-        throw new Error(`Skift: Unknown test '${testName}"`);
+        throw new Error(`Skift: Unknown test "${testName}"`);
     }
 }
 

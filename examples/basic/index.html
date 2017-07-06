@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Skift: A/B test basic example</title>
+  <style>
+    body {
+      font-family: Helvetica Neue, serif;
+    }
+
+    div {
+      background-color: #0000FF;
+      width: 200px;
+      padding: 30px;
+      color: #FFFFFF;
+      text-align: center;
+      border: none;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="skift.js"></script>
+</head>
+<body>
+
+<h1>Skift: A/B test basic example</h1>
+<p>This is an A/B split test</p>
+<p>Below there's a div. It will be blue originally, and orange if you're in the A/B test.</p>
+
+<div id="test-button">This is the original div</div>
+<button onclick="skift.reset();">Reset</button>
+
+<script type="text/javascript">
+    skift
+    .create('name-of-a-test')
+    .setCondition(() => {
+        return true;
+    })
+    .addVariation({
+        name: 'control', // No setup required.
+    })
+    .addVariation({
+        name: 'name-of-a-variation',
+        setup() {
+            document.getElementById('test-button').style.backgroundColor = '#ffcc00';
+        }
+    })
+    .setup();
+</script>
+</body>
+</html>

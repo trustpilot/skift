@@ -18,14 +18,14 @@ import { uiFactory } from './ui';
 
 initialize();
 
-const ui = uiFactory(reset, getCurrentTestVariation, getUserAgentInfo);
+const ui = uiFactory(tests, reset, getCurrentTestVariation, getUserAgentInfo);
 
 $(() => {
     if (shouldShowUI()) {
         return;
     }
 
-    setTimeout(() => ui.show(tests), 1000);
+    setTimeout(() => ui.show(), 1000);
 });
 
 export {

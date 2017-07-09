@@ -40,7 +40,7 @@ describe('Top-level api', () => {
             .addVariation({ name: 'Variation B' })
             .setup();
 
-        skift.ui.show([skift.getTest(testName)]);
+        skift.ui.show();
 
         const div = <HTMLElement>document.querySelector('div');
         const root = <ShadowRoot>div.shadowRoot;

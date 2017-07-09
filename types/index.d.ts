@@ -1,5 +1,9 @@
-import { tests, config, getUserAgentInfo, getTest, create, getCurrentTestVariation, setCurrentTestVariation, reset, ui, SplitTest, UserConfig } from './main';
+import { tests, config, getUserAgentInfo, getTest, create, getCurrentTestVariation, setCurrentTestVariation, reset, SplitTest, UserConfig } from './main';
 import { UserAgentInfo } from './useragentinfo';
+declare const ui: {
+    show: () => void;
+    hide: () => void;
+};
 export { tests, config, getUserAgentInfo, getTest, create, getCurrentTestVariation, setCurrentTestVariation, reset, ui, SplitTest };
 declare const _default: {
     tests: SplitTest[];
@@ -10,7 +14,10 @@ declare const _default: {
     getCurrentTestVariation: (testName: string) => string;
     setCurrentTestVariation: (testName: string, variation: string) => void;
     reset: () => void;
-    ui: typeof ui;
+    ui: {
+        show: () => void;
+        hide: () => void;
+    };
     SplitTest: typeof SplitTest;
     initialize: () => void;
 };

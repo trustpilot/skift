@@ -29,6 +29,7 @@ before_script:
 
 script:
   - npm run ci:travis
+  - npm run build:prod
 
 after_success:
   - npm run semantic-release

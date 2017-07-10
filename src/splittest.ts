@@ -1,4 +1,4 @@
-import {UserAgentInfo} from './useragentinfo';
+import { UserAgentInfo } from './useragentinfo';
 import userSession from './usersession';
 import {
     TrackingDataExtender,
@@ -8,7 +8,7 @@ import {
     TrackEventActionType
 } from './tracking';
 import qs from 'querystringify';
-import config, {ConditionFunction} from './config';
+import config, { ConditionFunction } from './config';
 
 export interface Variation {
     /** A descriptive unique name of this variation */
@@ -30,7 +30,6 @@ export interface InternalVariation extends Variation {
 }
 
 export class SplitTest {
-
     isInitialized = false;
 
     private condition: ConditionFunction;
@@ -43,18 +42,25 @@ export class SplitTest {
     constructor(
         public name: string,
         private userAgentInfo: UserAgentInfo,
-        private trackingDataExtender: TrackingDataExtender) {
-        this.extendTrackingData(trackingDataExtenderFactory({
-            experimentName: name
-        }));
+        private trackingDataExtender: TrackingDataExtender
+    ) {
+        this.extendTrackingData(
+            trackingDataExtenderFactory({
+                experimentName: name
+            })
+        );
     }
 
     /**
      * Determines whether this test is able to run or not.
      */
     public canRun(userAgentInfo: UserAgentInfo): boolean {
-        return (typeof config.globalCondition !== 'function' || config.globalCondition(userAgentInfo))
-            && (typeof this.condition !== 'function' || this.condition(userAgentInfo));
+        return (
+            (typeof config.globalCondition !== 'function' ||
+                config.globalCondition(userAgentInfo)) &&
+            (typeof this.condition !== 'function' ||
+                this.condition(userAgentInfo))
+        );
     }
 
     public setCondition(condition: ConditionFunction): SplitTest {
@@ -63,25 +69,32 @@ export class SplitTest {
     }
 
     addVariation(variation: Variation): SplitTest {
-        if (typeof variation.name !== 'string' || variation.name === '' || this.getVariation(variation.name)) {
-            throw new Error(`Split test "${this.name}": Variation must have a unique name. Was "${variation.name}"`);
+        if (
+            typeof variation.name !== 'string' ||
+            variation.name === '' ||
+            this.getVariation(variation.name)
+        ) {
+            throw new Error(
+                `Split test "${this
+                    .name}": Variation must have a unique name. Was "${variation.name}"`
+            );
         }
         this._variations.push({
             ...variation,
             normalizedWeight: 0,
-            weight: (typeof variation.weight === 'number' ? variation.weight : 1)
+            weight: typeof variation.weight === 'number' ? variation.weight : 1
         });
         this.normalizeVariationWeights();
         return this;
     }
 
     setup(): boolean {
-
         if (this._variations.length === 0) {
-            throw new Error('Skift: can\'t setup a test without variations');
+            throw new Error("Skift: can't setup a test without variations");
         }
 
-        if (this.isInitialized) { // Already set up?
+        if (this.isInitialized) {
+            // Already set up?
             return true;
         }
 
@@ -91,14 +104,18 @@ export class SplitTest {
         }
 
         // Step 2: Select variation
-        let variation = this.getVariation(userSession.getTestVariation(this.name));
+        let variation = this.getVariation(
+            userSession.getTestVariation(this.name)
+        );
         if (!variation) {
             variation = this.selectRandomVariation();
             userSession.setTestVariation(this.name, variation.name);
         }
-        this.extendTrackingData(trackingDataExtenderFactory({
-            variationName: variation.name
-        }));
+        this.extendTrackingData(
+            trackingDataExtenderFactory({
+                variationName: variation.name
+            })
+        );
 
         // Step 3: Setup variation
         if (typeof variation.setup === 'function') {
@@ -114,7 +131,7 @@ export class SplitTest {
     }
 
     getVariation(name: string): Variation {
-        return this._variations.filter((v) => v.name === name)[0];
+        return this._variations.filter(v => v.name === name)[0];
     }
 
     getVariationUrl(variationName: string | null): string {
@@ -123,9 +140,14 @@ export class SplitTest {
 
         try {
             query.abtest = btoa(param);
-            return location.protocol + '//' + location.host + location.pathname +
+            return (
+                location.protocol +
+                '//' +
+                location.host +
+                location.pathname +
                 qs.stringify(query, true) +
-                location.hash;
+                location.hash
+            );
         } catch (e) {
             return location.href;
         }
@@ -136,8 +158,14 @@ export class SplitTest {
      */
     extendTrackingData(trackingDataExtender: TrackingDataExtender): SplitTest {
         const currentExtender = this.trackingDataExtender;
-        this.trackingDataExtender = (trackingData: TrackingData, eventName: string) => {
-            return trackingDataExtender(currentExtender(trackingData, eventName), eventName);
+        this.trackingDataExtender = (
+            trackingData: TrackingData,
+            eventName: string
+        ) => {
+            return trackingDataExtender(
+                currentExtender(trackingData, eventName),
+                eventName
+            );
         };
         return this;
     }
@@ -157,7 +185,7 @@ export class SplitTest {
     trackActionPerformed(action: TrackEventActionType, target?: string): void {
         this.trackEvent('ExperimentActionPerformed', {
             action,
-            actionTarget: (target || '')
+            actionTarget: target || ''
         });
     }
 
@@ -168,16 +196,22 @@ export class SplitTest {
      */
     trackLink(elements: Element | JQuery, name?: string): void {
         const event: TrackEventType = 'ExperimentActionPerformed';
-        const trackingData = this.trackingDataExtender({
-            action: 'Click',
-            actionTarget: name || $(elements).text()
-        }, event);
+        const trackingData = this.trackingDataExtender(
+            {
+                action: 'Click',
+                actionTarget: name || $(elements).text()
+            },
+            event
+        );
         config.tracking.trackLink(elements, event, trackingData);
     }
 
     private normalizeVariationWeights(): void {
-        const weightsSum = this._variations.reduce((sum, variation) => sum + variation.weight, 0);
-        this._variations.forEach((variation) => {
+        const weightsSum = this._variations.reduce(
+            (sum, variation) => sum + variation.weight,
+            0
+        );
+        this._variations.forEach(variation => {
             variation.normalizedWeight = variation.weight / weightsSum;
         });
     }
@@ -185,14 +219,26 @@ export class SplitTest {
     private selectRandomVariation(): Variation {
         let i = 0;
         // Disable the rule for now and refactor this, when covered by a test.
-        // tslint:disable-next-line:max-line-length no-conditional-assignment no-empty
-        for (let runningTotal = 0, testSegment = Math.random(); i < this._variations.length && (runningTotal += this._variations[i].normalizedWeight) < testSegment; i++) {
-        }
+        // tslint:disable:max-line-length no-conditional-assignment no-empty
+        for (
+            let runningTotal = 0, testSegment = Math.random();
+            i < this._variations.length &&
+            (runningTotal += this._variations[i].normalizedWeight) <
+                testSegment;
+            i++
+        ) {}
+        // tslint:enable:max-line-length no-conditional-assignment no-empty
         return this._variations[i];
     }
 
-    private trackEvent(event: TrackEventType, trackingData?: TrackingData): void {
-        const allTrackingData = this.trackingDataExtender(trackingData || {}, event);
+    private trackEvent(
+        event: TrackEventType,
+        trackingData?: TrackingData
+    ): void {
+        const allTrackingData = this.trackingDataExtender(
+            trackingData || {},
+            event
+        );
         config.tracking.track(event, allTrackingData);
     }
 }

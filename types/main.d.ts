@@ -20,7 +20,4 @@ export declare function create(name: string): SplitTest;
 export declare function getCurrentTestVariation(testName: string): string;
 export declare function setCurrentTestVariation(testName: string, variation: string): void;
 export declare function reset(): void;
-export declare namespace ui {
-    function show(testsList: SplitTest[]): void;
-    function hide(): void;
-}
+export declare function shouldShowUI(): boolean;

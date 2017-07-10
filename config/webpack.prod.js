@@ -6,6 +6,13 @@ module.exports = {
   entry: {
     skift: './src/index.ts'
   },
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: '[name].min.js',
+    sourceMapFilename: '[name].source.map',
+    library: 'skift',
+    libraryTarget: 'umd'
+  },
   externals: {
     jquery: {
       commonjs: 'jquery',
@@ -13,13 +20,6 @@ module.exports = {
       amd: 'jquery',
       root: 'jQuery'
     }
-  },
-  output: {
-    path: path.resolve(__dirname, '../dist'),
-    filename: '[name].min.js',
-    sourceMapFilename: '[name].source.map',
-    library: 'skift',
-    libraryTarget: 'umd'
   },
   resolve: {
     extensions: ['.ts', '.js'],

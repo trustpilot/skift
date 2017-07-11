@@ -37,6 +37,9 @@
     "typescript": "^2.2.2",
     "webpack": "^3.0.0"
   },
+  "files": [
+    "dist/"
+  ],
   "homepage": "https://github.com/trustpilot/skift#readme",
   "license": "MIT",
   "main": "dist/skift.js",
@@ -45,12 +48,12 @@
     "url": "https://github.com/trustpilot/skift.git"
   },
   "scripts": {
-    "precz": "npm run lint",
-    "cz": "git-cz",
     "build:dev": "cross-env NODE_ENV=development webpack",
     "build:prod": "cross-env NODE_ENV=production webpack",
     "ci:travis": "npm run lint && npm run test",
+    "cz": "git-cz",
     "lint": "tslint 'src/**/*.ts' --type-check --project ./",
+    "precz": "npm run lint",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "node examples/serve.js",
     "test": "karma start",

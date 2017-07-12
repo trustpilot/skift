@@ -138,7 +138,7 @@ export function reset(): void {
 
 export function shouldShowUI() {
     return (
-        !_config.globalCondition(userAgentInfo) ||
-        !_config.uiCondition(userAgentInfo)
+        _config.globalCondition(userAgentInfo) === true &&
+        _config.uiCondition(userAgentInfo) === true
     );
 }

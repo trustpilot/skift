@@ -1,5 +1,6 @@
 /// <reference types="jquery" />
 import { UserAgentInfo } from './useragentinfo';
+import { BehavioralSubject } from './behavioral-subject';
 import { TrackingDataExtender, TrackEventActionType } from './tracking';
 import { ConditionFunction } from './config';
 export interface Variation {
@@ -24,6 +25,7 @@ export declare class SplitTest {
     private userAgentInfo;
     private trackingDataExtender;
     isInitialized: boolean;
+    changes: BehavioralSubject<this>;
     private condition;
     private readonly _variations;
     readonly variations: Variation[];

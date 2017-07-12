@@ -1,5 +1,6 @@
 import { UserAgentInfo } from './useragentinfo';
 import { SplitTest } from './splittest';
+import { BehavioralSubject } from './behavioral-subject';
 export { SplitTest } from './splittest';
 import { TrackingEventHandler } from './tracking';
 import { ConditionFunction, UserSessionPersister } from './config';
@@ -12,6 +13,7 @@ export interface UserConfig {
     userSessionDaysToLive?: number;
 }
 export declare const tests: SplitTest[];
+export declare const testsObservable: BehavioralSubject<SplitTest[]>;
 export declare function config(userConfig?: UserConfig): void;
 export declare function initialize(): void;
 export declare function getUserAgentInfo(): UserAgentInfo;

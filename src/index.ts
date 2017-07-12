@@ -28,10 +28,8 @@ const ui = uiFactory(
 
 $(() => {
     if (shouldShowUI()) {
-        return;
+        ui.show();
     }
-
-    setTimeout(() => ui.show(), 1000);
 });
 
 export {

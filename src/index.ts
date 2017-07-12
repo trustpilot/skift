@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import {
     tests,
+    testsObservable,
     config,
     getUserAgentInfo,
     getTest,
@@ -18,7 +19,12 @@ import { uiFactory } from './ui';
 
 initialize();
 
-const ui = uiFactory(tests, reset, getCurrentTestVariation, getUserAgentInfo);
+const ui = uiFactory(
+    testsObservable,
+    reset,
+    getCurrentTestVariation,
+    getUserAgentInfo
+);
 
 $(() => {
     if (shouldShowUI()) {

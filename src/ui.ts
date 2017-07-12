@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { InternalVariation, SplitTest } from './splittest';
 import { UserAgentInfo } from './useragentinfo';
+import { BehavioralSubject } from './behavioral-subject';
 
 declare const require: any;
 
@@ -13,7 +14,7 @@ function getVariationPercentage(variation: InternalVariation): string {
 }
 
 export const uiFactory = (
-    tests: SplitTest[],
+    tests: BehavioralSubject<SplitTest[]>,
     reset: () => void,
     getCurrentTestVariation: (testName: string) => string,
     getUserAgentInfo: () => UserAgentInfo
@@ -79,8 +80,18 @@ export const uiFactory = (
         const style = document.createElement('style');
         style.innerHTML = require('./main.css');
 
+        const testListEl = document.createElement('div');
+        testListEl.className = 'test-list';
+
+        tests.subscribe(list => {
+            while (testListEl.hasChildNodes()) {
+                testListEl.removeChild(<Node>testListEl.lastChild);
+            }
+            testListEl.innerHTML = list.map(renderTest).join('');
+        });
+
         $abTestContainer = $(`<div class="ui-container hideme"></div>`).append(
-            `<div class="test-list">${tests.map(renderTest).join('')}</div>`
+            testListEl
         );
 
         $(`<button type="button" class="reset">Reset all</button>`)
@@ -102,7 +113,7 @@ export const uiFactory = (
     function show() {
         if (isInitialized) {
             $abTestContainer.removeClass('hideme');
-        } else if (tests.length > 0) {
+        } else {
             showSplitTestUi();
         }
     }

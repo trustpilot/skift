@@ -27,9 +27,11 @@ const ui = uiFactory(
 );
 
 $(() => {
-    if (shouldShowUI()) {
-        ui.show();
-    }
+    setTimeout(() => {
+        if (shouldShowUI()) {
+            ui.show();
+        }
+    }, 0);
 });
 
 export {

@@ -1,5 +1,6 @@
 import { UserAgentInfo } from './useragentinfo';
 import userSession from './usersession';
+import { BehavioralSubject } from './behavioral-subject';
 import {
     TrackingDataExtender,
     trackingDataExtenderFactory,
@@ -31,6 +32,7 @@ export interface InternalVariation extends Variation {
 
 export class SplitTest {
     isInitialized = false;
+    changes = new BehavioralSubject(this);
 
     private condition: ConditionFunction;
     private readonly _variations: InternalVariation[] = [];
@@ -85,6 +87,7 @@ export class SplitTest {
             weight: typeof variation.weight === 'number' ? variation.weight : 1
         });
         this.normalizeVariationWeights();
+        this.changes.next(this);
         return this;
     }
 
@@ -127,6 +130,7 @@ export class SplitTest {
             this.trackViewed();
         }
         this.isInitialized = true;
+        this.changes.next(this);
         return true;
     }
 

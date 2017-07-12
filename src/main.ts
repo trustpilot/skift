@@ -1,6 +1,7 @@
 import _getUserAgentInfo, { UserAgentInfo } from './useragentinfo';
 import userSession, { UserSession } from './usersession';
 import { SplitTest, InternalVariation } from './splittest';
+import { BehavioralSubject } from './behavioral-subject';
 export { SplitTest } from './splittest';
 import {
     TrackingDataExtender,
@@ -21,6 +22,9 @@ export interface UserConfig {
 
 const userAgentInfo = _getUserAgentInfo();
 export const tests: SplitTest[] = [];
+export const testsObservable: BehavioralSubject<
+    SplitTest[]
+> = new BehavioralSubject(tests);
 
 export function config(userConfig: UserConfig = {}) {
     if (userConfig.cookieName) {
@@ -106,6 +110,7 @@ export function create(name: string): SplitTest {
         baseTrackingDataExtenderFactory()
     );
     tests.push(test);
+    test.changes.subscribe(() => testsObservable.next(tests));
     return test;
 }
 

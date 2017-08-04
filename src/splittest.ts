@@ -61,7 +61,8 @@ export class SplitTest {
             (typeof config.globalCondition !== 'function' ||
                 config.globalCondition(userAgentInfo)) &&
             (typeof this.condition !== 'function' ||
-                this.condition(userAgentInfo))
+                this.condition(userAgentInfo)) &&
+            !/bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent)
         );
     }
 

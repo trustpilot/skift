@@ -42,11 +42,17 @@ function isBot() {
     return /bot|googlebot|crawler|spider|robot|crawling/i.test(ua)
 }
 
+function isGhostInspector() {
+    const ua = navigator.userAgent || navigator.vendor;
+    return ua.indexOf('Ghost Inspector') !== -1;
+}
+
 export interface UserAgentInfo {
     name: string;
     version: string;
     isMobile: boolean;
     isBot: boolean;
+    isGhostInspector: boolean;
 }
 
 export default function getUserAgentInfo(): UserAgentInfo {
@@ -54,5 +60,6 @@ export default function getUserAgentInfo(): UserAgentInfo {
         ...getNameAndVersion(),
         isMobile: isMobile(),
         isBot: isBot(),
+        isGhostInspector: isGhostInspector()
     };
 }

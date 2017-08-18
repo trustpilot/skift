@@ -39,7 +39,7 @@ function isMobile() {
 
 function isBot() {
     const ua = navigator.userAgent || navigator.vendor;
-    return /bot|googlebot|crawler|spider|robot|crawling/i.test(ua)
+    return /bot|googlebot|crawler|spider|robot|crawling/i.test(ua);
 }
 
 function isGhostInspector() {

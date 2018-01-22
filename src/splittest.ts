@@ -120,15 +120,16 @@ export class SplitTest {
             })
         );
 
-        // Step 3: Setup variation
+        // Step 3: Publish track event
+        if (variation.trackEventAutoPublish !== false) {
+            this.trackViewed();
+        }
+
+        // Step 4: Setup variation
         if (typeof variation.setup === 'function') {
             variation.setup.call(this, this.userAgentInfo);
         }
 
-        // Step 4: Publish track event
-        if (variation.trackEventAutoPublish !== false) {
-            this.trackViewed();
-        }
         this.isInitialized = true;
         this.changes.next(this);
         return true;

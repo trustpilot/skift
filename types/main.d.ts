@@ -22,4 +22,4 @@ export declare function create(name: string): SplitTest;
 export declare function getCurrentTestVariation(testName: string): string;
 export declare function setCurrentTestVariation(testName: string, variation: string): void;
 export declare function reset(): void;
-export declare function shouldShowUI(): boolean;
+export declare function shouldShowUI(): Promise<boolean>;

@@ -5,7 +5,7 @@ export interface UserSessionPersister {
     saveUserSession(userSession: string, daysToLive: number): void;
 }
 export interface ConditionFunction {
-    (userAgentInfo: UserAgentInfo): boolean;
+    (userAgentInfo: UserAgentInfo): boolean | Promise<boolean>;
 }
 export interface SplitTestConfig {
     cookieName: string;

@@ -1,5 +1,4 @@
-import { tests, config, getUserAgentInfo, getTest, create, getCurrentTestVariation, setCurrentTestVariation, reset, SplitTest, UserConfig } from './main';
-import { UserAgentInfo } from './useragentinfo';
+import { tests, config, getUserAgentInfo, getTest, create, getCurrentTestVariation, setCurrentTestVariation, reset, SplitTest, initialize } from './main';
 declare const ui: {
     show: () => void;
     hide: () => void;
@@ -7,18 +6,18 @@ declare const ui: {
 export { tests, config, getUserAgentInfo, getTest, create, getCurrentTestVariation, setCurrentTestVariation, reset, ui, SplitTest };
 declare const _default: {
     tests: SplitTest[];
-    config: (userConfig?: UserConfig) => void;
-    getUserAgentInfo: () => UserAgentInfo;
-    getTest: (name: string) => SplitTest;
-    create: (name: string) => SplitTest;
-    getCurrentTestVariation: (testName: string) => string;
-    setCurrentTestVariation: (testName: string, variation: string) => void;
-    reset: () => void;
+    config: typeof config;
+    getUserAgentInfo: typeof getUserAgentInfo;
+    getTest: typeof getTest;
+    create: typeof create;
+    getCurrentTestVariation: typeof getCurrentTestVariation;
+    setCurrentTestVariation: typeof setCurrentTestVariation;
+    reset: typeof reset;
     ui: {
         show: () => void;
         hide: () => void;
     };
     SplitTest: typeof SplitTest;
-    initialize: () => void;
+    initialize: typeof initialize;
 };
 export default _default;

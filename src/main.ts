@@ -10,6 +10,7 @@ import {
 } from './tracking';
 import qs from 'querystringify';
 import _config, { ConditionFunction, UserSessionPersister } from './config';
+import { alwaysPromise } from './alwaysPromise';
 
 export interface UserConfig {
     cookieName?: string;
@@ -75,8 +76,8 @@ export function initialize(): void {
 
 // Public API
 
-function validateInitialized(test: SplitTest) {
-    if (!test.isInitialized) {
+async function validateInitialized(test: SplitTest) {
+    if (!await test.isInitialized()) {
         throw new Error(`Skift: Test "${test.name}" is not initialized yet!`);
     }
 }
@@ -136,9 +137,11 @@ export function reset(): void {
     reloadWithoutAbTestParameter();
 }
 
-export function shouldShowUI() {
-    return (
-        _config.globalCondition(userAgentInfo) === true &&
-        _config.uiCondition(userAgentInfo) === true
-    );
+export async function shouldShowUI() {
+    const promises = [
+        _config.globalCondition(userAgentInfo),
+        _config.uiCondition(userAgentInfo)
+    ].map(alwaysPromise);
+
+    return (await Promise.all(promises)).every(a => a);
 }

@@ -10,6 +10,7 @@ import {
 } from './tracking';
 import qs from 'querystringify';
 import config, { ConditionFunction } from './config';
+import { alwaysPromise } from './alwaysPromise';
 
 export interface Variation {
     /** A descriptive unique name of this variation */
@@ -30,11 +31,12 @@ export interface InternalVariation extends Variation {
     weight: number;
 }
 
-export class SplitTest {
-    isInitialized = false;
-    changes = new BehavioralSubject(this);
+export type State = 'uninitialized' | 'initializing' | 'initialized' | 'canceled';
 
-    private condition: ConditionFunction;
+export class SplitTest {
+    state: State = 'uninitialized';
+    changes = new BehavioralSubject(this);
+    private finalStateListeners: Array<() => void> = [];
     private readonly _variations: InternalVariation[] = [];
 
     get variations(): Variation[] {
@@ -56,13 +58,13 @@ export class SplitTest {
     /**
      * Determines whether this test is able to run or not.
      */
-    public canRun(userAgentInfo: UserAgentInfo): boolean {
-        return (
-            (typeof config.globalCondition !== 'function' ||
-                config.globalCondition(userAgentInfo)) &&
-            (typeof this.condition !== 'function' ||
-                this.condition(userAgentInfo))
-        );
+    public async shouldRun(userAgentInfo: UserAgentInfo): Promise<boolean> {
+        const conditionPromises = [
+            config.globalCondition(userAgentInfo),
+            this.condition(userAgentInfo)
+        ].map(alwaysPromise);
+
+        return (await Promise.all(conditionPromises)).every(a => a);
     }
 
     public setCondition(condition: ConditionFunction): SplitTest {
@@ -91,18 +93,22 @@ export class SplitTest {
         return this;
     }
 
-    setup(): boolean {
+    async setup(): Promise<boolean> {
         if (this._variations.length === 0) {
             throw new Error("Skift: can't setup a test without variations");
         }
 
-        if (this.isInitialized) {
+        if (this.state === 'initialized') {
             // Already set up?
             return true;
         }
 
+        this.transitionState('initializing');
+
         // Step 1: Run condition function, if any
-        if (!this.canRun(this.userAgentInfo)) {
+        const passesConditions = await this.shouldRun(this.userAgentInfo);
+        if (!passesConditions) {
+            this.transitionState('canceled');
             return false;
         }
 
@@ -129,9 +135,23 @@ export class SplitTest {
         if (variation.trackEventAutoPublish !== false) {
             this.trackViewed();
         }
-        this.isInitialized = true;
+        this.transitionState('initialized');
         this.changes.next(this);
         return true;
+    }
+
+    async isInitialized(): Promise<boolean> {
+        const {state} = this;
+
+        if (state === 'initializing') {
+            return await new Promise<boolean>((resolve, reject) => {
+                this.subscribeStateListener(() => {
+                    resolve(this.state === 'initialized');
+                });
+            });
+        }
+
+        return this.state === 'initialized';
     }
 
     getVariation(name: string): Variation {
@@ -210,6 +230,8 @@ export class SplitTest {
         config.tracking.trackLink(elements, event, trackingData);
     }
 
+    private condition: ConditionFunction = () => true;
+
     private normalizeVariationWeights(): void {
         const weightsSum = this._variations.reduce(
             (sum, variation) => sum + variation.weight,
@@ -218,6 +240,18 @@ export class SplitTest {
         this._variations.forEach(variation => {
             variation.normalizedWeight = variation.weight / weightsSum;
         });
+    }
+
+    private transitionState(state: State) {
+        this.state = state;
+        if (state !== 'initializing') {
+            this.finalStateListeners.forEach(l => l());
+            this.finalStateListeners = [];
+        }
+    }
+
+    private subscribeStateListener(listener: () => void) {
+        this.finalStateListeners.push(listener);
     }
 
     private selectRandomVariation(): Variation {

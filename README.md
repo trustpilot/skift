@@ -16,29 +16,29 @@ import skift from 'skift';
 
 // Configure Skift.
 skift.config({
-  tracking: {
-      track: function(event, trackingData) {
-          console.log('A/B test event: ' + event, trackingData);
-      }
-  }
+    tracking: {
+        track: function(event, trackingData) {
+            console.log('A/B test event: ' + event, trackingData);
+        }
+    }
 });
 
 // Describe the A/B Test.
 skift
-  .create('My awesome test')
-  .setCondition(() => {
-      return window.location.pathname === 'contacts'
-  })
-  .addVariation({
-      name: 'A form with the new design',
-      setup() {
-          document.getElementsById('form').addClass('visible')
-      }
-  })
-  .addVariation({
-      name: 'Control'
-  })
-  .setup(); // Don't forget to setup the test!
+    .create('My awesome test')
+    .setCondition(() => {
+        return window.location.pathname === 'contacts'
+    })
+    .addVariation({
+        name: 'A form with the new design',
+        setup() {
+            document.getElementsById('form').addClass('visible')
+        }
+    })
+    .addVariation({
+        name: 'Control'
+    })
+    .setup(); // Don't forget to setup the test!
 ```
 
 ## New to A/B testing?

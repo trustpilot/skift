@@ -20,23 +20,25 @@ export interface InternalVariation extends Variation {
     normalizedWeight: number;
     weight: number;
 }
+export declare type State = 'uninitialized' | 'initializing' | 'initialized' | 'canceled';
 export declare class SplitTest {
     name: string;
     private userAgentInfo;
     private trackingDataExtender;
-    isInitialized: boolean;
+    state: State;
     changes: BehavioralSubject<this>;
-    private condition;
+    private finalStateListeners;
     private readonly _variations;
     readonly variations: Variation[];
     constructor(name: string, userAgentInfo: UserAgentInfo, trackingDataExtender: TrackingDataExtender);
     /**
      * Determines whether this test is able to run or not.
      */
-    canRun(userAgentInfo: UserAgentInfo): boolean;
+    shouldRun(userAgentInfo: UserAgentInfo): Promise<boolean>;
     setCondition(condition: ConditionFunction): SplitTest;
     addVariation(variation: Variation): SplitTest;
-    setup(): boolean;
+    setup(): Promise<boolean>;
+    isInitialized(): Promise<boolean>;
     getVariation(name: string): Variation;
     getVariationUrl(variationName: string | null): string;
     /**
@@ -59,7 +61,10 @@ export declare class SplitTest {
      * @param name A human readable name of the link. If left out, the innerText of the element is used
      */
     trackLink(elements: Element | JQuery, name?: string): void;
+    private condition;
     private normalizeVariationWeights();
+    private transitionState(state);
+    private subscribeStateListener(listener);
     private selectRandomVariation();
     private trackEvent(event, trackingData?);
 }

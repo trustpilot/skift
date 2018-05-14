@@ -27,8 +27,8 @@ const ui = uiFactory(
 );
 
 $(() => {
-    setTimeout(() => {
-        if (shouldShowUI()) {
+    setTimeout(async () => {
+        if (await shouldShowUI()) {
             ui.show();
         }
     }, 0);

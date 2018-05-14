@@ -3,6 +3,7 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "sourceMap": false,
+    "lib": ["es2015", "dom"],
     "strictNullChecks": true,
     "target": "ES5",
     "outDir": "./temp",

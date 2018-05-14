@@ -1,7 +1,7 @@
 import $ from 'jquery';
+import { BehavioralSubject } from './behavioral-subject';
 import { InternalVariation, SplitTest } from './splittest';
 import { UserAgentInfo } from './useragentinfo';
-import { BehavioralSubject } from './behavioral-subject';
 
 declare const require: any;
 
@@ -19,14 +19,14 @@ export const uiFactory = (
     getCurrentTestVariation: (testName: string) => string,
     getUserAgentInfo: () => UserAgentInfo
 ) => {
-    function renderTest(test: SplitTest): string {
-        if (test.isInitialized) {
+    async function renderTest(test: SplitTest): Promise<string> {
+        if (await test.isInitialized()) {
             const variation = getCurrentTestVariation(test.name);
 
             const data: { [key: string]: any } = {
                 Test: test.name,
                 Variation: `${variation} (${getVariationPercentage(
-                    <InternalVariation>test.getVariation(variation)
+                    test.getVariation(variation) as InternalVariation
                 )})`,
                 Browser:
                     getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
@@ -37,7 +37,7 @@ export const uiFactory = (
                 return `<a href="${test.getVariationUrl(
                     variant.name
                 )}" title="Segment: ${getVariationPercentage(
-                    <InternalVariation>variant
+                    variant as InternalVariation
                 )}">${variant.name}</a>`;
             });
 
@@ -53,16 +53,15 @@ export const uiFactory = (
                           ]}</span></div>`
                   )
                   .join('')}
-        ${variationHtml.join('&nbsp;&bull;&nbsp;')}</div>`;
+            ${variationHtml.join('&nbsp;&bull;&nbsp;')}</div>`;
         } else {
+            const canRun = await test.shouldRun(getUserAgentInfo());
             return `<div class="test">
                     <div class="header">
                       Viewing: <span class="abtest-variant">Not initialized</span>
                     </div>
                     <div>Test <span class="data-value">${test.name}</span> is not initialized</div>
-                    <div><span class="data-label">Can run</span><span class="data-value">${test.canRun(
-                        getUserAgentInfo()
-                    )}</span></div>
+                    <div><span class="data-label">Can run</span><span class="data-value">${canRun}</span></div>
                 </div>`;
         }
     }
@@ -70,7 +69,7 @@ export const uiFactory = (
     function showSplitTestUi() {
         if (!document.head.attachShadow) {
             console.warn(
-                `Skift: Sorry, we don't support the UI in the browsers witout Shadow DOM for now`
+                `Skift: Sorry, we don't support the UI in the browsers without Shadow DOM for now`
             );
             return;
         }
@@ -83,11 +82,11 @@ export const uiFactory = (
         const testListEl = document.createElement('div');
         testListEl.className = 'test-list';
 
-        tests.subscribe(list => {
+        tests.subscribe(async list => {
             while (testListEl.hasChildNodes()) {
-                testListEl.removeChild(<Node>testListEl.lastChild);
+                testListEl.removeChild(testListEl.lastChild as Node);
             }
-            testListEl.innerHTML = list.map(renderTest).join('');
+            testListEl.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
 
         $abTestContainer = $(`<div class="ui-container hideme"></div>`).append(

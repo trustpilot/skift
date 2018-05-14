@@ -9,7 +9,7 @@ export interface UserSessionPersister {
 }
 
 export interface ConditionFunction {
-    (userAgentInfo: UserAgentInfo): boolean;
+    (userAgentInfo: UserAgentInfo): boolean | Promise<boolean>;
 }
 
 export interface SplitTestConfig {

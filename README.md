@@ -32,7 +32,7 @@ skift
     .addVariation({
         name: 'A form with the new design',
         setup() {
-            document.getElementsById('form').addClass('visible')
+            document.getElementById('form').addClass('visible')
         }
     })
     .addVariation({

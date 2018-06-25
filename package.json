@@ -17,10 +17,10 @@
   "devDependencies": {
     "@types/jest": "23.1.1",
     "ajv": "6.5.1",
-    "cross-env": "5.2.0",
     "cz-conventional-changelog": "2.1.0",
     "express": "4.16.3",
     "jest": "23.1.0",
+    "pre-commit": "1.2.2",
     "semantic-release": "15.6.0",
     "ts-jest": "22.4.6",
     "ts-loader": "4.4.1",
@@ -30,7 +30,7 @@
     "uglifyjs-webpack-plugin": "1.2.6",
     "useragent-generator": "1.0.3",
     "webpack": "4.12.1",
-    "webpack-command": "0.2.1"
+    "webpack-cli": "3.0.8"
   },
   "files": [
     "dist",
@@ -45,16 +45,17 @@
     "url": "https://github.com/trustpilot/skift.git"
   },
   "scripts": {
-    "build:dev": "cross-env NODE_ENV=development webpack",
-    "build:prod": "cross-env NODE_ENV=production webpack",
-    "ci:travis": "npm run lint && npm run test",
+    "build:dev": "webpack-cli --config ./config/webpack.dev.js",
+    "build:prod": "webpack-cli --config ./config/webpack.prod.js",
     "cz": "git-cz",
-    "lint": "tslint 'src/**/*.ts' --type-check --project ./",
-    "precz": "npm run lint",
+    "lint": "tslint 'src/**/*.ts' --project ./",
+    "lint:fix": "tslint 'src/**/*.ts' --project ./ --fix",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "node examples/serve.js",
-    "test": "jest --config ./config/jest.config.js",
-    "ts": "tsc"
+    "test": "jest --config ./config/jest.config.js"
   },
-  "types": "types/index.d.ts"
+  "pre-commit": [
+    "lint"
+  ],
+  "types": "types/skift.d.ts"
 }

@@ -342,4 +342,50 @@ describe('SplitTest', () => {
             });
         });
     });
+
+    describe('#getCurrentVariation', () => {
+        it('should get the current variation', async () => {
+            const test = skift.create('test').addVariation({
+                name: 'Variation 1'
+            });
+
+            await test.setup();
+            expect(test.getCurrentVariation()).toEqual({
+                name: 'Variation 1',
+                normalizedWeight: 1,
+                weight: 1
+            });
+        });
+    });
+
+    describe('#setCurrentVariation', () => {
+        it('should set the current variation', async () => {
+            const test = skift.create('test').addVariation({
+                name: 'Variation 1'
+            }).addVariation({
+                name: 'Variation 2'
+            });
+
+            await test.setup();
+            const currentVariation = test.getCurrentVariation();
+            if (currentVariation.name === 'Variation 1') {
+                await test.setCurrentVariation('Variation 2');
+                expect(test.getCurrentVariation().name).toEqual('Variation 2');
+            } else if (currentVariation.name === 'Variation 2') {
+                await test.setCurrentVariation('Variation 1');
+                expect(test.getCurrentVariation().name).toEqual('Variation 1');
+            }
+        });
+
+        it('should return false if the variation is unknown', async () => {
+            const test = skift.create('test').addVariation({
+                name: 'Variation 1'
+            });
+
+            await test.setup();
+
+            const success = await test.setCurrentVariation('Variation 3');
+            expect(success).toEqual(false);
+        });
+    });
 });

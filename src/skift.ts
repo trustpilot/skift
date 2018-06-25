@@ -1,9 +1,5 @@
 import SplitTest from './splitTest';
-import * as userAgent from './userAgent';
 import _config, { UserConfig } from './config';
-
-export const tests: SplitTest[] = [];
-const userAgentInfo = userAgent.getInfo();
 
 export function config(userConfig: UserConfig = {}) {
     if (userConfig.cookieName) {
@@ -20,16 +16,6 @@ export function config(userConfig: UserConfig = {}) {
     }
 }
 
-export function getTest(name: string) {
-    return tests.filter(t => t.name === name)[0];
-}
-
 export function create(name: string): SplitTest {
-    const test = new SplitTest(
-        name,
-        userAgentInfo,
-        _config,
-    );
-    tests.push(test);
-    return test;
+    return new SplitTest(name, _config);
 }

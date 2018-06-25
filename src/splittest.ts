@@ -1,6 +1,6 @@
 import qs from 'querystringify';
 
-import { UserAgentInfo } from './userAgent';
+import { getInfo, UserAgentInfo } from './userAgent';
 import { UserSession } from './userSession';
 import {
     TrackingData,
@@ -40,16 +40,16 @@ class SplitTest {
     private _condition: Condition;
     private _config: SkiftConfig;
     private _name: string;
-    private _selectedVariation: Variation;
+    private _currentVariation: Variation;
     private _state: State = State.UNINITIALIZED;
     private _userAgentInfo: UserAgentInfo;
     private _userSession: UserSession;
     private _finalStateListeners: Array<() => void> = [];
     private _variations: InternalVariation[] = [];
 
-    constructor(name: string, userAgentInfo: UserAgentInfo, config: SkiftConfig) {
+    constructor(name: string, config: SkiftConfig) {
         this._name = name;
-        this._userAgentInfo = userAgentInfo;
+        this._userAgentInfo = getInfo();
         this._condition = () => Promise.resolve(true);
         this._config = config;
         this._userSession = new UserSession(config);
@@ -57,6 +57,22 @@ class SplitTest {
 
     public get name() {
         return this._name;
+    }
+
+    public getCurrentVariation(): Variation {
+        return this._currentVariation;
+    }
+
+    public setCurrentVariation(name: string) {
+        const doesVariationExist = this._variations.some((variation) => variation.name === name);
+
+        if (doesVariationExist) {
+            this.transitionState(State.UNINITIALIZED);
+            this._userSession.setTestVariation(this.name, name);
+            return this.setup();
+        } else {
+            return Promise.resolve(false);
+        }
     }
 
     public get config() {
@@ -112,14 +128,14 @@ class SplitTest {
             variation = this.selectRandomVariation();
             this._userSession.setTestVariation(this.name, variation.name);
         }
-        this._selectedVariation = variation;
+        this._currentVariation = variation;
 
         // Step 3: Setup variation
         if (typeof variation.setup === 'function') {
             variation.setup.call(this, this._userAgentInfo);
         }
 
-        // Step 4: Publish track event
+        // Step 4: Publish tracking event
         if (variation.trackEventAutoPublish !== false) {
             this.trackViewed();
         }
@@ -201,7 +217,7 @@ class SplitTest {
             browser: this._userAgentInfo.name,
             browserVersion: this._userAgentInfo.version,
             isMobile: this._userAgentInfo.isMobile,
-            variationName: this._selectedVariation.name,
+            variationName: this._currentVariation.name,
         };
 
         this._config.trackingHandler.trackLink(element, event, extendedTrackingData);
@@ -214,7 +230,7 @@ class SplitTest {
             browser: this._userAgentInfo.name,
             browserVersion: this._userAgentInfo.version,
             isMobile: this._userAgentInfo.isMobile,
-            variationName: this._selectedVariation.name,
+            variationName: this._currentVariation.name,
         };
 
         this._config.trackingHandler.track(event, extendedTrackingData);

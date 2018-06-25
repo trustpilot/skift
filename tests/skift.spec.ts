@@ -10,12 +10,15 @@ describe('skift', () => {
                 sessionPersister: {
                     loadUserSession: () => 'test',
                     saveUserSession: (userSession: string, dayToLive: number) => {
-                        // Doing nothing
+                        // Do nothing
                     },
                 },
                 trackingHandler: {
                     track: () => {
-                        // Doing nothing
+                        // Do nothing
+                    },
+                    trackLink: () => {
+                        // Do nothing
                     },
                 },
             });
@@ -27,12 +30,6 @@ describe('skift', () => {
     });
 
     describe('#create', () => {
-        skift.create('test');
-        expect(skift.tests).toHaveLength(1);
-    });
-
-    describe('#getTest', () => {
-        skift.create('test');
-        expect(skift.getTest('test')).toBeDefined();
+        expect(skift.create('test')).toBeDefined();
     });
 });

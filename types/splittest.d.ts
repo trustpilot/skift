@@ -1,8 +1,7 @@
-/// <reference types="jquery" />
-import { UserAgentInfo } from './useragentinfo';
-import { BehavioralSubject } from './behavioral-subject';
-import { TrackingDataExtender, TrackEventActionType } from './tracking';
-import { ConditionFunction } from './config';
+import { UserAgentInfo } from './userAgent';
+import { TrackingActionType } from './tracking';
+import { SkiftConfig } from './config';
+import { Condition } from './condition';
 export interface Variation {
     /** A descriptive unique name of this variation */
     name: string;
@@ -20,31 +19,31 @@ export interface InternalVariation extends Variation {
     normalizedWeight: number;
     weight: number;
 }
-export declare type State = 'uninitialized' | 'initializing' | 'initialized' | 'canceled';
-export declare class SplitTest {
-    name: string;
-    private userAgentInfo;
-    private trackingDataExtender;
-    state: State;
-    changes: BehavioralSubject<this>;
-    private finalStateListeners;
-    private readonly _variations;
-    readonly variations: Variation[];
-    constructor(name: string, userAgentInfo: UserAgentInfo, trackingDataExtender: TrackingDataExtender);
-    /**
-     * Determines whether this test is able to run or not.
-     */
-    shouldRun(userAgentInfo: UserAgentInfo): Promise<boolean>;
-    setCondition(condition: ConditionFunction): SplitTest;
+export declare enum State {
+    UNINITIALIZED = "uninitialized",
+    INITIALIZING = "initializing",
+    INITIALIZED = "initialized",
+    CANCELED = "canceled"
+}
+declare class SplitTest {
+    private _condition;
+    private _config;
+    private _name;
+    private _selectedVariation;
+    private _state;
+    private _userAgentInfo;
+    private _userSession;
+    private _finalStateListeners;
+    private _variations;
+    constructor(name: string, userAgentInfo: UserAgentInfo, config: SkiftConfig);
+    readonly name: string;
+    readonly config: SkiftConfig;
+    setCondition(condition: Condition): SplitTest;
     addVariation(variation: Variation): SplitTest;
     setup(): Promise<boolean>;
     isInitialized(): Promise<boolean>;
     getVariation(name: string): Variation;
     getVariationUrl(variationName: string | null): string;
-    /**
-     * The tracking data extenders are called just before any event is published to the event handler.
-     */
-    extendTrackingData(trackingDataExtender: TrackingDataExtender): SplitTest;
     /**
      * Emits an "Experiment Viewed" tracking event
      */
@@ -54,17 +53,22 @@ export declare class SplitTest {
      * @param action Specifies the action type that has been performed
      * @param target Specifies a target the action has affected or originated from
      */
-    trackActionPerformed(action: TrackEventActionType, target?: string): void;
+    trackActionPerformed(action: TrackingActionType, target?: string): void;
     /**
      * Attaches a <code>trackActionPerformed</code> call as a handler to a link.
-     * @param elements The DOM element to be bound with track method.
-     * @param name A human readable name of the link. If left out, the innerText of the element is used
+     * @param element The DOM element to be bound with track method.
+     * @param target A human readable name of the link. If left out, the innerText of the element is used
      */
-    trackLink(elements: Element | JQuery, name?: string): void;
-    private condition;
-    private normalizeVariationWeights();
-    private transitionState(state);
-    private subscribeStateListener(listener);
-    private selectRandomVariation();
-    private trackEvent(event, trackingData?);
+    trackLink(element: Element, target?: string): void;
+    private internalTrackLink;
+    private trackEvent;
+    /**
+     * Determines whether this test is able to run or not.
+     */
+    private shouldRun;
+    private normalizeVariationWeights;
+    private transitionState;
+    private subscribeStateListener;
+    private selectRandomVariation;
 }
+export default SplitTest;

@@ -1,10 +1,11 @@
 const path = require('path');
-const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
+  mode: 'production',
   devtool: 'cheap-source-map',
   entry: {
-    skift: './src/index.ts'
+    skift: './src/skift.ts'
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -13,68 +14,24 @@ module.exports = {
     library: 'skift',
     libraryTarget: 'umd'
   },
-  externals: {
-    jquery: {
-      commonjs: 'jquery',
-      commonjs2: 'jquery',
-      amd: 'jquery',
-      root: 'jQuery'
-    }
-  },
   resolve: {
     extensions: ['.ts', '.js'],
     modules: ['node_modules']
   },
   module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: [
-          {
-            loader: 'ts-loader'
-          }
-        ],
-        exclude: [/\.e2e\.ts$/]
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: 'css-to-string-loader'
-          },
-          {
-            loader: 'css-loader',
-            query: {
-              minimize: true
-            }
-          }
-        ]
-      }
-    ]
+    rules: [{
+      test: /\.ts$/,
+      use: [{
+        loader: 'ts-loader'
+      }],
+      exclude: [/\.e2e\.ts$/]
+    }]
   },
   plugins: [
     new UglifyJsPlugin({
-      beautify: false, //prod
-      output: {
-        comments: false
-      }, //prod
-      mangle: {
-        screw_ie8: true
-      }, //prod
-      compress: {
-        screw_ie8: true,
-        warnings: false,
-        conditionals: true,
-        unused: true,
-        comparisons: true,
-        sequences: true,
-        dead_code: true,
-        evaluate: true,
-        if_return: true,
-        join_vars: true,
-        negate_iife: false // we need this for lazy v8
-      }
-    })
+      parallel: true,
+      cache: true,
+    }),
   ],
   node: {
     global: true,

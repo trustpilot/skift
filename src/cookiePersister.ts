@@ -1,12 +1,15 @@
-import config, {UserSessionPersister} from './config';
+import config from './config';
+
+export interface SessionPersister {
+    loadUserSession(): string | null;
+    saveUserSession(userSession: string, daysToLive: number): void;
+}
 
 function createCookie(name: string, value: string, days: number): void {
     let expires = '';
-    if (days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = '; expires=' + date.toUTCString();
-    }
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = '; expires=' + date.toUTCString();
     document.cookie = name + '=' + value + expires + '; path=/';
 }
 
@@ -25,13 +28,14 @@ function readCookie(name: string): string | null {
     return null;
 }
 
-const persister: UserSessionPersister = {
-    loadUserSession(): string | null {
+const persister = {
+    loadUserSession() {
         return readCookie(config.cookieName);
     },
 
-    saveUserSession(userSession: string, daysToLive: number): void {
+    saveUserSession(userSession: string, daysToLive: number) {
         createCookie(config.cookieName, userSession, daysToLive);
     }
 };
+
 export default persister;

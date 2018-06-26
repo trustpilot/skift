@@ -1,32 +1,31 @@
-import { TrackingHandler } from './tracking';
+import { Analytics } from './analytics';
 import { SessionPersister } from './cookiePersister';
-import { UserAgentInfo } from './userAgent';
+import { Condition } from './condition';
 export interface UserConfig {
     cookieName?: string;
-    globalCondition?: ConditionFunction;
+    globalCondition?: Condition;
     sessionPersister?: SessionPersister;
-    trackingHandler?: TrackingHandler;
+    analytics?: Analytics;
     userSessionDaysToLive?: number;
 }
 export interface SkiftConfig {
     cookieName: string;
-    globalCondition: ConditionFunction;
+    globalCondition: Condition;
     sessionPersister: SessionPersister;
-    trackingHandler: TrackingHandler;
+    analytics: Analytics;
     userSessionDaysToLive: number;
 }
-export declare type ConditionFunction = (userAgentInfo?: UserAgentInfo) => Promise<boolean>;
 declare class Config {
     private _sessionPersister;
-    private _trackingHandler;
+    private _analytics;
     private _userSessionDaysToLive;
     private _cookieName;
     private _globalCondition;
     sessionPersister: SessionPersister;
-    trackingHandler: TrackingHandler;
+    analytics: Analytics;
     userSessionDaysToLive: number;
     cookieName: string;
-    globalCondition: ConditionFunction;
+    globalCondition: Condition;
 }
 declare const _default: Config;
 export default _default;

@@ -1,14 +1,13 @@
-import { getDefaultTrackingEventHandler } from '../src/tracking';
+import consoleAnalytics from '../src/analytics';
 import { BrowserEnv } from './browser';
 
 declare const global: BrowserEnv;
 
-describe('Tracking', () => {
-    describe('#getDefaultTrackingEventHandler', () => {
+describe('Analytics', () => {
+    describe('ConsoleAnalytics', () => {
         it('should return default tracking handler', () => {
             console.log = jest.fn();
-            const trackingHandler = getDefaultTrackingEventHandler();
-            trackingHandler.track('ExperimentViewed', {});
+            consoleAnalytics.track('ExperimentViewed', {});
             expect(console.log).toHaveBeenCalledWith('Split testing event: ExperimentViewed', {});
         });
 
@@ -20,9 +19,8 @@ describe('Tracking', () => {
             document.body.appendChild(link);
 
             console.log = jest.fn();
-            const trackingHandler = getDefaultTrackingEventHandler();
             const element = document.getElementById('test');
-            trackingHandler.trackLink(element, 'ExperimentActionPerformed', {
+            consoleAnalytics.trackLink(element, 'ExperimentActionPerformed', {
                 action: 'Click',
                 actionTarget: element.textContent
             });

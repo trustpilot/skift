@@ -6,7 +6,7 @@ import {
     TrackingData,
     TrackingType,
     TrackingActionType,
-} from './tracking';
+} from './analytics';
 import { SkiftConfig } from './config';
 import { Condition } from './condition';
 
@@ -220,7 +220,7 @@ class SplitTest {
             variationName: this._currentVariation.name,
         };
 
-        this._config.trackingHandler.trackLink(element, event, extendedTrackingData);
+        this._config.analytics.trackLink(element, event, extendedTrackingData);
     }
 
     private trackEvent(event: TrackingType, trackingData?: TrackingData) {
@@ -233,7 +233,7 @@ class SplitTest {
             variationName: this._currentVariation.name,
         };
 
-        this._config.trackingHandler.track(event, extendedTrackingData);
+        this._config.analytics.track(event, extendedTrackingData);
     }
 
     /**

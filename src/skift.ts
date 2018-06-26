@@ -8,11 +8,14 @@ export function config(userConfig: UserConfig = {}) {
     if (userConfig.globalCondition) {
         _config.globalCondition = userConfig.globalCondition;
     }
-    if (userConfig.trackingHandler) {
-        _config.trackingHandler = userConfig.trackingHandler;
+    if (userConfig.tracking) {
+        _config.analytics = userConfig.tracking;
     }
     if (userConfig.userSessionDaysToLive) {
         _config.userSessionDaysToLive = userConfig.userSessionDaysToLive;
+    }
+    if (userConfig.sessionPersister) {
+        _config.sessionPersister = userConfig.sessionPersister;
     }
 }
 

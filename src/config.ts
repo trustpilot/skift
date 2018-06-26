@@ -1,31 +1,29 @@
-import { getDefaultTrackingEventHandler, TrackingHandler} from './tracking';
+import consoleAnalytics, { Analytics } from './analytics';
 import userSessionCookiePersister, { SessionPersister } from './cookiePersister';
-import { UserAgentInfo } from './userAgent';
+import { Condition } from './condition';
 
 export interface UserConfig {
     cookieName?: string;
-    globalCondition?: ConditionFunction;
+    globalCondition?: Condition;
     sessionPersister?: SessionPersister;
-    trackingHandler?: TrackingHandler;
+    tracking?: Analytics;
     userSessionDaysToLive?: number;
 }
 
 export interface SkiftConfig {
     cookieName: string;
-    globalCondition: ConditionFunction;
+    globalCondition: Condition;
     sessionPersister: SessionPersister;
-    trackingHandler: TrackingHandler;
+    analytics: Analytics;
     userSessionDaysToLive: number;
 }
 
-export type ConditionFunction = (userAgentInfo?: UserAgentInfo) => Promise<boolean>;
-
 class Config {
     private _sessionPersister = userSessionCookiePersister;
-    private _trackingHandler = getDefaultTrackingEventHandler();
+    private _analytics = consoleAnalytics;
     private _userSessionDaysToLive = 3;
     private _cookieName = 'skiftABTest';
-    private _globalCondition = () => Promise.resolve(true);
+    private _globalCondition: Condition = () => Promise.resolve(true);
 
     public get sessionPersister() {
         return this._sessionPersister;
@@ -35,12 +33,12 @@ class Config {
         this._sessionPersister = value;
     }
 
-    public get trackingHandler() {
-        return this._trackingHandler;
+    public get analytics() {
+        return this._analytics;
     }
 
-    public set trackingHandler(value: TrackingHandler) {
-        this._trackingHandler = value;
+    public set analytics(value: Analytics) {
+        this._analytics = value;
     }
 
     public get userSessionDaysToLive() {
@@ -63,7 +61,7 @@ class Config {
         return this._globalCondition;
     }
 
-    public set globalCondition(value: ConditionFunction) {
+    public set globalCondition(value: Condition) {
         this._globalCondition = value;
     }
 }

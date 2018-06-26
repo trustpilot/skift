@@ -1,5 +1,5 @@
 import { UserAgentInfo } from './userAgent';
-import { TrackingActionType } from './tracking';
+import { TrackingActionType } from './analytics';
 import { SkiftConfig } from './config';
 import { Condition } from './condition';
 export interface Variation {
@@ -29,14 +29,16 @@ declare class SplitTest {
     private _condition;
     private _config;
     private _name;
-    private _selectedVariation;
+    private _currentVariation;
     private _state;
     private _userAgentInfo;
     private _userSession;
     private _finalStateListeners;
     private _variations;
-    constructor(name: string, userAgentInfo: UserAgentInfo, config: SkiftConfig);
+    constructor(name: string, config: SkiftConfig);
     readonly name: string;
+    getCurrentVariation(): Variation;
+    setCurrentVariation(name: string): Promise<boolean>;
     readonly config: SkiftConfig;
     setCondition(condition: Condition): SplitTest;
     addVariation(variation: Variation): SplitTest;

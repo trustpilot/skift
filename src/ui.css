@@ -1,0 +1,70 @@
+.skiftui .container{
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+  max-width: 300px;
+  max-height: 500px;
+  color: #292929;
+  z-index: 999;
+  background-color: #FFFFFF;
+  border: 2px solid #00b67a;
+}
+
+.skiftui.hideme {
+  display: none;
+}
+
+.skiftui .header {
+  position: relative;
+  padding: 8px;
+  background-color: #00b67a;
+  color: #FFFFFF;
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: bold;
+}
+
+.skiftui .close {
+  position: absolute;
+  right: 8px;
+  background-color: #fff;
+  color: #00b67a;
+  width: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  text-align: center;
+  line-height: 16px;
+  font-size: 12px;
+}
+
+.skiftui .test.info {
+  padding: 8px 8px 0 8px;
+}
+
+.skiftui .test.details {
+  padding: 8px;
+  background: #f4f7f9;
+  border-top: 1px solid #dfe2e5;
+  font-size: 12px;
+}
+
+.skiftui .test.details ul {
+  margin: 0;
+}
+
+.skiftui .data-label {
+  display: inline-block;
+  margin-bottom: 2px;
+  margin-right: 5px;
+  color: #292929;
+}
+
+.skiftui .data-label:after {
+  content: ":";
+}
+
+.skiftui .data-value {
+  color: #000;
+  font-weight: bold;
+  text-transform: capitalize;
+}

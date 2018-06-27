@@ -3,4 +3,4 @@ export interface UserAgentInfo {
     version: string;
     isMobile: boolean;
 }
-export default function getUserAgentInfo(): UserAgentInfo;
+export declare function getInfo(userAgent?: string): UserAgentInfo;

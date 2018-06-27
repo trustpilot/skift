@@ -1,35 +1,42 @@
-import config from './config';
+import defaultConfig, { SkiftConfig } from './config';
 
 interface TestVariationsMap {
     [key: string]: string;
 }
 
 export class UserSession {
+    private _config: SkiftConfig;
 
-    setTestVariation(testName: string, variationName: string): void {
+    constructor(config: SkiftConfig) {
+        this._config = config;
+    }
+
+    public setTestVariation(testName: string, variationName: string): void {
         const variationsMap = this.loadVariations();
         variationsMap[testName] = variationName;
         this.saveVariations(variationsMap);
     }
 
-    getTestVariation(testName: string): string {
+    public getTestVariation(testName: string): string {
         const variationsMap = this.loadVariations();
         return variationsMap[testName];
     }
 
-    reset() {
+    public reset() {
         this.saveVariations({});
     }
 
     private saveVariations(variationsMap: TestVariationsMap) {
-        config.sessionPersister.saveUserSession(JSON.stringify(variationsMap), config.userSessionDaysToLive);
+        this._config.sessionPersister.saveUserSession(
+            JSON.stringify(variationsMap),
+            this._config.userSessionDaysToLive
+        );
     }
 
     private loadVariations(): TestVariationsMap {
-        const variationsMap: TestVariationsMap = JSON.parse(config.sessionPersister.loadUserSession() || '{}');
+        const variationsMap: TestVariationsMap = JSON.parse(this._config.sessionPersister.loadUserSession() || '{}');
         return variationsMap;
     }
 }
 
-const userSession = new UserSession();
-export default userSession;
+export default new UserSession(defaultConfig);

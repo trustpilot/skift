@@ -1,52 +1,69 @@
-import $ from 'jquery';
-import { TrackingEventHandler, TrackEventType, TrackingData } from './tracking';
-import usersessioncookiepersister from './usersessioncookiepersister';
-import { UserAgentInfo } from './useragentinfo';
+import consoleTracking, { Tracking } from './tracking';
+import userSessionCookiePersister, { SessionPersister } from './cookiePersister';
+import { Condition } from './condition';
 
-export interface UserSessionPersister {
-    loadUserSession(): string | null;
-    saveUserSession(userSession: string, daysToLive: number): void;
+export interface UserConfig {
+    cookieName?: string;
+    globalCondition?: Condition;
+    sessionPersister?: SessionPersister;
+    tracking?: Tracking;
+    userSessionDaysToLive?: number;
 }
 
-export interface ConditionFunction {
-    (userAgentInfo: UserAgentInfo): boolean | Promise<boolean>;
-}
-
-export interface SplitTestConfig {
+export interface SkiftConfig {
     cookieName: string;
-    globalCondition: ConditionFunction;
-    sessionPersister: UserSessionPersister;
-    tracking: TrackingEventHandler;
-    uiCondition: ConditionFunction;
+    globalCondition: Condition;
+    sessionPersister: SessionPersister;
+    tracking: Tracking;
     userSessionDaysToLive: number;
 }
 
-const defaultTrackingEventHandler: TrackingEventHandler = (() => {
-    function log(event: TrackEventType, trackingData: TrackingData) {
-        console.log('Split testing event: ' + event, trackingData);
+class Config {
+    private _sessionPersister = userSessionCookiePersister;
+    private _tracking = consoleTracking;
+    private _userSessionDaysToLive = 3;
+    private _cookieName = 'skiftABTest';
+    private _globalCondition: Condition = () => Promise.resolve(true);
+
+    public get sessionPersister() {
+        return this._sessionPersister;
     }
 
-    return {
-        track: log,
-        trackLink(
-            elements: Element | JQuery,
-            event: TrackEventType,
-            trackingData: TrackingData
-        ) {
-            $(elements).on('click', () => {
-                log(event, trackingData);
-            });
-        }
-    };
-})();
+    public set sessionPersister(value: SessionPersister) {
+        this._sessionPersister = value;
+    }
 
-const config: SplitTestConfig = {
-    cookieName: 'skiftABTest',
-    globalCondition: () => true,
-    sessionPersister: usersessioncookiepersister,
-    tracking: defaultTrackingEventHandler,
-    userSessionDaysToLive: 3,
-    uiCondition: () => false
-};
+    public get tracking() {
+        return this._tracking;
+    }
 
-export default config;
+    public set tracking(value: Tracking) {
+        this._tracking = value;
+    }
+
+    public get userSessionDaysToLive() {
+        return this._userSessionDaysToLive;
+    }
+
+    public set userSessionDaysToLive(value: number) {
+        this._userSessionDaysToLive = value;
+    }
+
+    public get cookieName() {
+        return this._cookieName;
+    }
+
+    public set cookieName(value: string) {
+        this._cookieName = value;
+    }
+
+    public get globalCondition() {
+        return this._globalCondition;
+    }
+
+    public set globalCondition(value: Condition) {
+        this._globalCondition = value;
+    }
+}
+
+export default new Config();

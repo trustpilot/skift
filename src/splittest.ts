@@ -1,16 +1,15 @@
-import { UserAgentInfo } from './useragentinfo';
-import userSession from './usersession';
-import { BehavioralSubject } from './behavioral-subject';
-import {
-    TrackingDataExtender,
-    trackingDataExtenderFactory,
-    TrackingData,
-    TrackEventType,
-    TrackEventActionType
-} from './tracking';
 import qs from 'querystringify';
-import config, { ConditionFunction } from './config';
-import { alwaysPromise } from './alwaysPromise';
+
+import { getInfo, UserAgentInfo } from './userAgent';
+import { UserSession } from './userSession';
+import {
+    TrackingData,
+    TrackingType,
+    TrackingActionType,
+} from './tracking';
+import { SkiftConfig } from './config';
+import { Condition } from './condition';
+import * as ui from './ui';
 
 export interface Variation {
     /** A descriptive unique name of this variation */
@@ -31,48 +30,72 @@ export interface InternalVariation extends Variation {
     weight: number;
 }
 
-export type State = 'uninitialized' | 'initializing' | 'initialized' | 'canceled';
+export enum State {
+    UNINITIALIZED = 'uninitialized',
+    INITIALIZING = 'initializing',
+    INITIALIZED = 'initialized',
+    CANCELED = 'canceled',
+}
 
-export class SplitTest {
-    state: State = 'uninitialized';
-    changes = new BehavioralSubject(this);
-    private finalStateListeners: Array<() => void> = [];
-    private readonly _variations: InternalVariation[] = [];
+class SplitTest {
+    private _condition: Condition;
+    private _config: SkiftConfig;
+    private _name: string;
+    private _currentVariation: InternalVariation;
+    private _state: State = State.UNINITIALIZED;
+    private _userAgentInfo: UserAgentInfo;
+    private _userSession: UserSession;
+    private _finalStateListeners: Array<() => void> = [];
+    private _variations: InternalVariation[] = [];
 
-    get variations(): Variation[] {
+    constructor(name: string, config: SkiftConfig) {
+        this._name = name;
+        this._userAgentInfo = getInfo();
+        this._condition = () => Promise.resolve(true);
+        this._config = config;
+        this._userSession = new UserSession(config);
+    }
+
+    public get name() {
+        return this._name;
+    }
+
+    public get userAgentInfo() {
+        return this._userAgentInfo;
+    }
+
+    public get variations() {
         return this._variations;
     }
 
-    constructor(
-        public name: string,
-        private userAgentInfo: UserAgentInfo,
-        private trackingDataExtender: TrackingDataExtender
-    ) {
-        this.extendTrackingData(
-            trackingDataExtenderFactory({
-                experimentName: name
-            })
-        );
+    public getCurrentVariation() {
+        return this._currentVariation;
     }
 
-    /**
-     * Determines whether this test is able to run or not.
-     */
-    public async shouldRun(userAgentInfo: UserAgentInfo): Promise<boolean> {
-        const conditionPromises = [
-            config.globalCondition(userAgentInfo),
-            this.condition(userAgentInfo)
-        ].map(alwaysPromise);
+    public async setCurrentVariation(name: string) {
+        const doesVariationExist = this._variations.some((variation) => variation.name === name);
 
-        return (await Promise.all(conditionPromises)).every(a => a);
+        if (doesVariationExist) {
+            this.transitionState(State.UNINITIALIZED);
+            this._userSession.setTestVariation(this.name, name);
+            await this.setup();
+            location.reload();
+            return Promise.resolve(true);
+        } else {
+            return Promise.resolve(false);
+        }
     }
 
-    public setCondition(condition: ConditionFunction): SplitTest {
-        this.condition = condition;
+    public get config() {
+        return this._config;
+    }
+
+    public setCondition(condition: Condition): SplitTest {
+        this._condition = condition;
         return this;
     }
 
-    addVariation(variation: Variation): SplitTest {
+    public addVariation(variation: Variation): SplitTest {
         if (
             typeof variation.name !== 'string' ||
             variation.name === '' ||
@@ -89,76 +112,67 @@ export class SplitTest {
             weight: typeof variation.weight === 'number' ? variation.weight : 1
         });
         this.normalizeVariationWeights();
-        this.changes.next(this);
         return this;
     }
 
-    async setup(): Promise<boolean> {
+    public async setup(): Promise<boolean> {
         if (this._variations.length === 0) {
-            throw new Error("Skift: can't setup a test without variations");
+            throw new Error('Skift: can\'t setup a test without variations');
         }
 
-        if (this.state === 'initialized') {
-            // Already set up?
+        if (this._state === State.INITIALIZED) {
             return true;
         }
 
-        this.transitionState('initializing');
+        this.transitionState(State.INITIALIZING);
 
         // Step 1: Run condition function, if any
-        const passesConditions = await this.shouldRun(this.userAgentInfo);
+        const passesConditions = await this.shouldRun(this._userAgentInfo);
         if (!passesConditions) {
-            this.transitionState('canceled');
+            this.transitionState(State.CANCELED);
             return false;
         }
 
         // Step 2: Select variation
-        let variation = this.getVariation(
-            userSession.getTestVariation(this.name)
-        );
+        let variation = this.getVariation(this._userSession.getTestVariation(this.name));
         if (!variation) {
             variation = this.selectRandomVariation();
-            userSession.setTestVariation(this.name, variation.name);
+            this._userSession.setTestVariation(this.name, variation.name);
         }
-        this.extendTrackingData(
-            trackingDataExtenderFactory({
-                variationName: variation.name
-            })
-        );
+        this._currentVariation = variation;
 
         // Step 3: Setup variation
         if (typeof variation.setup === 'function') {
-            variation.setup.call(this, this.userAgentInfo);
+            variation.setup.call(this, this._userAgentInfo);
         }
 
-        // Step 4: Publish track event
+        // Step 4: Publish tracking event
         if (variation.trackEventAutoPublish !== false) {
             this.trackViewed();
         }
-        this.transitionState('initialized');
-        this.changes.next(this);
+
+        this.transitionState(State.INITIALIZED);
+        ui.show(this);
         return true;
     }
 
-    async isInitialized(): Promise<boolean> {
-        const {state} = this;
-
-        if (state === 'initializing') {
-            return await new Promise<boolean>((resolve, reject) => {
+    public async isInitialized(): Promise<boolean> {
+        if (this._state === State.INITIALIZING) {
+            return await new Promise<boolean>((resolve) => {
                 this.subscribeStateListener(() => {
-                    resolve(this.state === 'initialized');
+                    resolve(this._state === State.INITIALIZED);
                 });
             });
         }
 
-        return this.state === 'initialized';
+        return this._state === State.INITIALIZED;
     }
 
-    getVariation(name: string): Variation {
+    public getVariation(name: string) {
         return this._variations.filter(v => v.name === name)[0];
     }
 
-    getVariationUrl(variationName: string | null): string {
+    public getVariationUrl(variationName: string | null): string {
         const param = `${this.name}=${variationName}`;
         const query = qs.parse(location.search);
 
@@ -178,26 +192,9 @@ export class SplitTest {
     }
 
     /**
-     * The tracking data extenders are called just before any event is published to the event handler.
-     */
-    extendTrackingData(trackingDataExtender: TrackingDataExtender): SplitTest {
-        const currentExtender = this.trackingDataExtender;
-        this.trackingDataExtender = (
-            trackingData: TrackingData,
-            eventName: string
-        ) => {
-            return trackingDataExtender(
-                currentExtender(trackingData, eventName),
-                eventName
-            );
-        };
-        return this;
-    }
-
-    /**
      * Emits an "Experiment Viewed" tracking event
      */
-    trackViewed(): void {
+    public trackViewed() {
         this.trackEvent('ExperimentViewed');
     }
 
@@ -206,7 +203,7 @@ export class SplitTest {
      * @param action Specifies the action type that has been performed
      * @param target Specifies a target the action has affected or originated from
      */
-    trackActionPerformed(action: TrackEventActionType, target?: string): void {
+    public trackActionPerformed(action: TrackingActionType, target?: string) {
         this.trackEvent('ExperimentActionPerformed', {
             action,
             actionTarget: target || ''
@@ -215,22 +212,53 @@ export class SplitTest {
 
     /**
      * Attaches a <code>trackActionPerformed</code> call as a handler to a link.
-     * @param elements The DOM element to be bound with track method.
-     * @param name A human readable name of the link. If left out, the innerText of the element is used
+     * @param element The DOM element to be bound with track method.
+     * @param target A human readable name of the link. If left out, the innerText of the element is used
      */
-    trackLink(elements: Element | JQuery, name?: string): void {
-        const event: TrackEventType = 'ExperimentActionPerformed';
-        const trackingData = this.trackingDataExtender(
-            {
-                action: 'Click',
-                actionTarget: name || $(elements).text()
-            },
-            event
-        );
-        config.tracking.trackLink(elements, event, trackingData);
+    public trackLink(element: Element, target?: string): void {
+        this.internalTrackLink(element, 'ExperimentActionPerformed', {
+            action: 'Click',
+            actionTarget: target || element.textContent
+        });
     }
 
-    private condition: ConditionFunction = () => true;
+    private internalTrackLink(element: Element, event: TrackingType, trackingData?: TrackingData) {
+        const extendedTrackingData = {
+            ...trackingData,
+            experimentName: this._name,
+            browser: this._userAgentInfo.name,
+            browserVersion: this._userAgentInfo.version,
+            isMobile: this._userAgentInfo.isMobile,
+            variationName: this._currentVariation.name,
+        };
+
+        this._config.tracking.trackLink(element, event, extendedTrackingData);
+    }
+
+    private trackEvent(event: TrackingType, trackingData?: TrackingData) {
+        const extendedTrackingData = {
+            ...trackingData,
+            experimentName: this._name,
+            browser: this._userAgentInfo.name,
+            browserVersion: this._userAgentInfo.version,
+            isMobile: this._userAgentInfo.isMobile,
+            variationName: this._currentVariation.name,
+        };
+
+        this._config.tracking.track(event, extendedTrackingData);
+    }
+
+    /**
+     * Determines whether this test is able to run or not.
+     */
+    private async shouldRun(userAgentInfo?: UserAgentInfo): Promise<boolean> {
+        const conditionPromises = [
+            this._config.globalCondition(userAgentInfo),
+            this._condition(userAgentInfo)
+        ].map((condition) => Promise.resolve(condition));
+
+        return (await Promise.all(conditionPromises)).every(a => a);
+    }
 
     private normalizeVariationWeights(): void {
         const weightsSum = this._variations.reduce(
@@ -243,40 +271,30 @@ export class SplitTest {
     }
 
     private transitionState(state: State) {
-        this.state = state;
-        if (state !== 'initializing') {
-            this.finalStateListeners.forEach(l => l());
-            this.finalStateListeners = [];
+        this._state = state;
+        if (state !== State.INITIALIZING) {
+            this._finalStateListeners.forEach(l => l());
+            this._finalStateListeners = [];
         }
     }
 
     private subscribeStateListener(listener: () => void) {
-        this.finalStateListeners.push(listener);
+        this._finalStateListeners.push(listener);
     }
 
-    private selectRandomVariation(): Variation {
+    private selectRandomVariation() {
         let i = 0;
-        // Disable the rule for now and refactor this, when covered by a test.
         // tslint:disable:max-line-length no-conditional-assignment no-empty
         for (
             let runningTotal = 0, testSegment = Math.random();
             i < this._variations.length &&
             (runningTotal += this._variations[i].normalizedWeight) <
-                testSegment;
+            testSegment;
             i++
-        ) {}
+        ) { }
         // tslint:enable:max-line-length no-conditional-assignment no-empty
         return this._variations[i];
     }
-
-    private trackEvent(
-        event: TrackEventType,
-        trackingData?: TrackingData
-    ): void {
-        const allTrackingData = this.trackingDataExtender(
-            trackingData || {},
-            event
-        );
-        config.tracking.track(event, allTrackingData);
-    }
 }
+
+export default SplitTest;

@@ -2,8 +2,9 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    skift: './src/index.ts'
+    skift: './src/skift.ts'
   },
+  mode: 'development',
   devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -12,41 +13,25 @@ module.exports = {
     library: 'skift',
     libraryTarget: 'umd'
   },
-  externals: {
-    jquery: {
-      commonjs: 'jquery',
-      commonjs2: 'jquery',
-      amd: 'jquery',
-      root: 'jQuery'
-    }
-  },
   resolve: {
     extensions: ['.ts', '.js'],
     modules: ['node_modules']
   },
   module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: [
-          {
-            loader: 'ts-loader'
-          }
-        ],
-        exclude: [/\.e2e\.ts$/]
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: 'css-to-string-loader'
-          },
-          {
-            loader: 'css-loader'
-          }
-        ]
-      }
-    ]
+    rules: [{
+      test: /\.ts$/,
+      use: [{
+        loader: 'ts-loader'
+      }],
+      exclude: [/\.e2e\.ts$/]
+    }, {
+      test: /\.css$/,
+      use: [{
+        loader: 'css-to-string-loader'
+      }, {
+        loader: 'css-loader',
+      }]
+    }]
   },
   plugins: [],
   node: {

@@ -1,19 +1,31 @@
-import { TrackingEventHandler } from './tracking';
-import { UserAgentInfo } from './useragentinfo';
-export interface UserSessionPersister {
-    loadUserSession(): string | null;
-    saveUserSession(userSession: string, daysToLive: number): void;
+import { Tracking } from './tracking';
+import { SessionPersister } from './cookiePersister';
+import { Condition } from './condition';
+export interface UserConfig {
+    cookieName?: string;
+    globalCondition?: Condition;
+    sessionPersister?: SessionPersister;
+    tracking?: Tracking;
+    userSessionDaysToLive?: number;
 }
-export interface ConditionFunction {
-    (userAgentInfo: UserAgentInfo): boolean | Promise<boolean>;
-}
-export interface SplitTestConfig {
+export interface SkiftConfig {
     cookieName: string;
-    globalCondition: ConditionFunction;
-    sessionPersister: UserSessionPersister;
-    tracking: TrackingEventHandler;
-    uiCondition: ConditionFunction;
+    globalCondition: Condition;
+    sessionPersister: SessionPersister;
+    tracking: Tracking;
     userSessionDaysToLive: number;
 }
-declare const config: SplitTestConfig;
-export default config;
+declare class Config {
+    private _sessionPersister;
+    private _tracking;
+    private _userSessionDaysToLive;
+    private _cookieName;
+    private _globalCondition;
+    sessionPersister: SessionPersister;
+    tracking: Tracking;
+    userSessionDaysToLive: number;
+    cookieName: string;
+    globalCondition: Condition;
+}
+declare const _default: Config;
+export default _default;

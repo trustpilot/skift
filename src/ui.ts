@@ -1,128 +1,99 @@
-import $ from 'jquery';
-import { BehavioralSubject } from './behavioral-subject';
-import { InternalVariation, SplitTest } from './splittest';
-import { UserAgentInfo } from './useragentinfo';
-
-declare const require: any;
-
-const uiClassPrefix = 'skift';
-let isInitialized = false;
-let $abTestContainer: JQuery;
+import SplitTest, { InternalVariation } from './splitTest';
+import * as ui from './ui.css';
 
 function getVariationPercentage(variation: InternalVariation): string {
-    return Math.round(variation.normalizedWeight * 100) + '%';
+    return '(' + Math.round(variation.normalizedWeight * 100) + '%)';
 }
 
-export const uiFactory = (
-    tests: BehavioralSubject<SplitTest[]>,
-    reset: () => void,
-    getCurrentTestVariation: (testName: string) => string,
-    getUserAgentInfo: () => UserAgentInfo
-) => {
-    async function renderTest(test: SplitTest): Promise<string> {
-        if (await test.isInitialized()) {
-            const variation = getCurrentTestVariation(test.name);
+function renderTest(splitTest: SplitTest, hide: () => void) {
+    const currentVariation = splitTest.getCurrentVariation();
+    const userAgentInfo = splitTest.userAgentInfo;
 
-            const data: { [key: string]: any } = {
-                Test: test.name,
-                Variation: `${variation} (${getVariationPercentage(
-                    test.getVariation(variation) as InternalVariation
-                )})`,
-                Browser:
-                    getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
-                'Mobile device': getUserAgentInfo().isMobile
-            };
+    const info = document.createElement('div');
+    info.className = 'test info';
 
-            const variationHtml = test.variations.map(variant => {
-                return `<a href="${test.getVariationUrl(
-                    variant.name
-                )}" title="Segment: ${getVariationPercentage(
-                    variant as InternalVariation
-                )}">${variant.name}</a>`;
-            });
+    const details = document.createElement('div');
+    details.className = 'test details';
 
-            return `
-            <div class="test">
-              <div class="header">
-                Viewing: <span class="abtest-variant">${variation}</span>
-              </div>${Object.keys(data)
-                  .map(
-                      key =>
-                          `<div><span class="data-label">${key}</span><span class="data-value">${data[
-                              key
-                          ]}</span></div>`
-                  )
-                  .join('')}
-            ${variationHtml.join('&nbsp;&bull;&nbsp;')}</div>`;
-        } else {
-            const canRun = await test.shouldRun(getUserAgentInfo());
-            return `<div class="test">
-                    <div class="header">
-                      Viewing: <span class="abtest-variant">Not initialized</span>
-                    </div>
-                    <div>Test <span class="data-value">${test.name}</span> is not initialized</div>
-                    <div><span class="data-label">Can run</span><span class="data-value">${canRun}</span></div>
-                </div>`;
-        }
-    }
+    const name = document.createElement('div');
+    name.innerHTML = `<span class="data-label">Test</span><span class="data-value">${splitTest.name}</span>`;
 
-    function showSplitTestUi() {
-        if (!document.head.attachShadow) {
-            console.warn(
-                `Skift: Sorry, we don't support the UI in the browsers without Shadow DOM for now`
-            );
-            return;
-        }
+    const variation = document.createElement('div');
+    variation.innerHTML = `
+        <span class="data-label">Current variation</span>
+        <span class="data-value">${currentVariation.name + ' ' + getVariationPercentage(currentVariation)}</span>
+    `;
 
-        const containerElement = document.createElement('div');
-        const shadowRoot = containerElement.attachShadow({ mode: 'open' });
-        const style = document.createElement('style');
-        style.innerHTML = require('./main.css');
+    const browser = document.createElement('div');
+    browser.innerHTML = `
+        <span class="data-label">Browser</span>
+        <span class="data-value">${userAgentInfo.name + ' ' + userAgentInfo.version}</span>
+    `;
 
-        const testListEl = document.createElement('div');
-        testListEl.className = 'test-list';
+    const mobile = document.createElement('div');
+    mobile.innerHTML = `
+        <span class="data-label">Mobile device</span>
+        <span class="data-value">${userAgentInfo.isMobile}</span>
+    `;
 
-        tests.subscribe(async list => {
-            while (testListEl.hasChildNodes()) {
-                testListEl.removeChild(testListEl.lastChild as Node);
-            }
-            testListEl.innerHTML = (await Promise.all(list.map(renderTest))).join('');
+    const variationsTitle = document.createElement('div');
+    variationsTitle.innerText = 'Variations available: ';
+    details.appendChild(variationsTitle);
+
+    const variations = document.createElement('ul');
+    splitTest.variations.map((variant) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.innerText = variant.name;
+        link.setAttribute('href', '#');
+        link.addEventListener('click', () => {
+            hide();
+            splitTest.setCurrentVariation(variant.name);
         });
+        item.appendChild(link);
+        variations.appendChild(item);
+    });
 
-        $abTestContainer = $(`<div class="ui-container hideme"></div>`).append(
-            testListEl
-        );
+    info.appendChild(name);
+    info.appendChild(variation);
+    info.appendChild(browser);
+    info.appendChild(mobile);
+    details.appendChild(variations);
 
-        $(`<button type="button" class="reset">Reset all</button>`)
-            .on('click', reset)
-            .appendTo($abTestContainer);
+    return [info, details];
+}
 
-        $(`<div class="close">X</div>`)
-            .on('click', hide)
-            .appendTo($abTestContainer);
+export function show(splitTest: SplitTest) {
+    const skiftUI = document.createElement('div');
+    skiftUI.className = 'skiftui';
 
-        // Make UI fadein
-        $abTestContainer.removeClass('hideme');
-        shadowRoot.appendChild(style);
-        shadowRoot.appendChild($abTestContainer[0]);
-        document.body.appendChild(containerElement);
-        isInitialized = true;
-    }
+    const style = document.createElement('style');
+    style.innerHTML = ui;
 
-    function show() {
-        if (isInitialized) {
-            $abTestContainer.removeClass('hideme');
-        } else {
-            showSplitTestUi();
-        }
-    }
+    const container = document.createElement('div');
+    container.className = 'container';
+
+    const close = document.createElement('span');
+    close.className = 'close';
+    close.innerText = 'X';
 
     function hide() {
-        $abTestContainer.addClass('hideme');
+        skiftUI.className = 'skiftui hideme';
     }
 
-    return {
-        show,
-        hide
-    };
-};
+    close.addEventListener('click', hide);
+
+    const header = document.createElement('div');
+    header.className = 'header';
+    header.innerText = 'Skift';
+    header.appendChild(close);
+
+    container.appendChild(header);
+    renderTest(splitTest, hide).forEach((e) => {
+        container.appendChild(e);
+    });
+
+    skiftUI.appendChild(style);
+    skiftUI.appendChild(container);
+    document.body.appendChild(skiftUI);
+}

@@ -96,6 +96,112 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/css-loader/index.js!./src/ui.css":
+/*!**********************************************!*\
+  !*** ./node_modules/css-loader!./src/ui.css ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".skiftui .container{\n  position: fixed;\n  bottom: 5px;\n  right: 5px;\n  max-width: 300px;\n  max-height: 500px;\n  color: #292929;\n  z-index: 999;\n  background-color: #FFFFFF;\n  border: 2px solid #00b67a;\n}\n\n.skiftui.hideme {\n  display: none;\n}\n\n.skiftui .header {\n  position: relative;\n  padding: 8px;\n  background-color: #00b67a;\n  color: #FFFFFF;\n  font-size: 16px;\n  line-height: 16px;\n  font-weight: bold;\n}\n\n.skiftui .close {\n  position: absolute;\n  right: 8px;\n  background-color: #fff;\n  color: #00b67a;\n  width: 16px;\n  border-radius: 50%;\n  cursor: pointer;\n  text-align: center;\n  line-height: 16px;\n  font-size: 12px;\n}\n\n.skiftui .test.info {\n  padding: 8px 8px 0 8px;\n}\n\n.skiftui .test.details {\n  padding: 8px;\n  background: #f4f7f9;\n  border-top: 1px solid #dfe2e5;\n  font-size: 12px;\n}\n\n.skiftui .test.details ul {\n  margin: 0;\n}\n\n.skiftui .data-label {\n  display: inline-block;\n  margin-bottom: 2px;\n  margin-right: 5px;\n  color: #292929;\n}\n\n.skiftui .data-label:after {\n  content: \":\";\n}\n\n.skiftui .data-value {\n  color: #000;\n  font-weight: bold;\n  text-transform: capitalize;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/lib/css-base.js":
+/*!*************************************************!*\
+  !*** ./node_modules/css-loader/lib/css-base.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/querystringify/index.js":
 /*!**********************************************!*\
   !*** ./node_modules/querystringify/index.js ***!
@@ -360,6 +466,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var querystringify__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(querystringify__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _userAgent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./userAgent */ "./src/userAgent.ts");
 /* harmony import */ var _userSession__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./userSession */ "./src/userSession.ts");
+/* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ui */ "./src/ui.ts");
 var __assign = (undefined && undefined.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -406,6 +513,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 
+
 var State;
 (function (State) {
     State["UNINITIALIZED"] = "uninitialized";
@@ -431,19 +539,42 @@ var SplitTest = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(SplitTest.prototype, "userAgentInfo", {
+        get: function () {
+            return this._userAgentInfo;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SplitTest.prototype, "variations", {
+        get: function () {
+            return this._variations;
+        },
+        enumerable: true,
+        configurable: true
+    });
     SplitTest.prototype.getCurrentVariation = function () {
         return this._currentVariation;
     };
     SplitTest.prototype.setCurrentVariation = function (name) {
-        var doesVariationExist = this._variations.some(function (variation) { return variation.name === name; });
-        if (doesVariationExist) {
-            this.transitionState(State.UNINITIALIZED);
-            this._userSession.setTestVariation(this.name, name);
-            return this.setup();
-        }
-        else {
-            return Promise.resolve(false);
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var doesVariationExist;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        doesVariationExist = this._variations.some(function (variation) { return variation.name === name; });
+                        if (!doesVariationExist) return [3 /*break*/, 2];
+                        this.transitionState(State.UNINITIALIZED);
+                        this._userSession.setTestVariation(this.name, name);
+                        return [4 /*yield*/, this.setup()];
+                    case 1:
+                        _a.sent();
+                        location.reload();
+                        return [2 /*return*/, Promise.resolve(true)];
+                    case 2: return [2 /*return*/, Promise.resolve(false)];
+                }
+            });
+        });
     };
     Object.defineProperty(SplitTest.prototype, "config", {
         get: function () {
@@ -502,6 +633,7 @@ var SplitTest = /** @class */ (function () {
                             this.trackViewed();
                         }
                         this.transitionState(State.INITIALIZED);
+                        _ui__WEBPACK_IMPORTED_MODULE_3__["show"](this);
                         return [2 /*return*/, true];
                 }
             });
@@ -655,6 +787,112 @@ var ConsoleTracking = /** @class */ (function () {
     return ConsoleTracking;
 }());
 /* harmony default export */ __webpack_exports__["default"] = (new ConsoleTracking());
+
+
+/***/ }),
+
+/***/ "./src/ui.css":
+/*!********************!*\
+  !*** ./src/ui.css ***!
+  \********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// css-to-string-loader: transforms styles from css-loader to a string output
+
+// Get the styles
+var styles = __webpack_require__(/*! !../node_modules/css-loader!./ui.css */ "./node_modules/css-loader/index.js!./src/ui.css");
+
+if (typeof styles === 'string') {
+  // Return an existing string
+  module.exports = styles;
+} else {
+  // Call the custom toString method from css-loader module
+  module.exports = styles.toString();
+}
+
+/***/ }),
+
+/***/ "./src/ui.ts":
+/*!*******************!*\
+  !*** ./src/ui.ts ***!
+  \*******************/
+/*! exports provided: show */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "show", function() { return show; });
+/* harmony import */ var _ui_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ui.css */ "./src/ui.css");
+/* harmony import */ var _ui_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_ui_css__WEBPACK_IMPORTED_MODULE_0__);
+
+function getVariationPercentage(variation) {
+    return '(' + Math.round(variation.normalizedWeight * 100) + '%)';
+}
+function renderTest(splitTest, hide) {
+    var currentVariation = splitTest.getCurrentVariation();
+    var userAgentInfo = splitTest.userAgentInfo;
+    var info = document.createElement('div');
+    info.className = 'test info';
+    var details = document.createElement('div');
+    details.className = 'test details';
+    var name = document.createElement('div');
+    name.innerHTML = "<span class=\"data-label\">Test</span><span class=\"data-value\">" + splitTest.name + "</span>";
+    var variation = document.createElement('div');
+    variation.innerHTML = "\n        <span class=\"data-label\">Current variation</span>\n        <span class=\"data-value\">" + (currentVariation.name + ' ' + getVariationPercentage(currentVariation)) + "</span>\n    ";
+    var browser = document.createElement('div');
+    browser.innerHTML = "\n        <span class=\"data-label\">Browser</span>\n        <span class=\"data-value\">" + (userAgentInfo.name + ' ' + userAgentInfo.version) + "</span>\n    ";
+    var mobile = document.createElement('div');
+    mobile.innerHTML = "\n        <span class=\"data-label\">Mobile device</span>\n        <span class=\"data-value\">" + userAgentInfo.isMobile + "</span>\n    ";
+    var variationsTitle = document.createElement('div');
+    variationsTitle.innerText = 'Variations available: ';
+    details.appendChild(variationsTitle);
+    var variations = document.createElement('ul');
+    splitTest.variations.map(function (variant) {
+        var item = document.createElement('li');
+        var link = document.createElement('a');
+        link.innerText = variant.name;
+        link.setAttribute('href', '#');
+        link.addEventListener('click', function () {
+            hide();
+            splitTest.setCurrentVariation(variant.name);
+        });
+        item.appendChild(link);
+        variations.appendChild(item);
+    });
+    info.appendChild(name);
+    info.appendChild(variation);
+    info.appendChild(browser);
+    info.appendChild(mobile);
+    details.appendChild(variations);
+    return [info, details];
+}
+function show(splitTest) {
+    var skiftUI = document.createElement('div');
+    skiftUI.className = 'skiftui';
+    var style = document.createElement('style');
+    style.innerHTML = _ui_css__WEBPACK_IMPORTED_MODULE_0__;
+    var container = document.createElement('div');
+    container.className = 'container';
+    var close = document.createElement('span');
+    close.className = 'close';
+    close.innerText = 'X';
+    function hide() {
+        skiftUI.className = 'skiftui hideme';
+    }
+    close.addEventListener('click', hide);
+    var header = document.createElement('div');
+    header.className = 'header';
+    header.innerText = 'Skift';
+    header.appendChild(close);
+    container.appendChild(header);
+    renderTest(splitTest, hide).forEach(function (e) {
+        container.appendChild(e);
+    });
+    skiftUI.appendChild(style);
+    skiftUI.appendChild(container);
+    document.body.appendChild(skiftUI);
+}
 
 
 /***/ }),

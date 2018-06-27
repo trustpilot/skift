@@ -9,6 +9,7 @@ import {
 } from './tracking';
 import { SkiftConfig } from './config';
 import { Condition } from './condition';
+import * as ui from './ui';
 
 export interface Variation {
     /** A descriptive unique name of this variation */
@@ -40,7 +41,7 @@ class SplitTest {
     private _condition: Condition;
     private _config: SkiftConfig;
     private _name: string;
-    private _currentVariation: Variation;
+    private _currentVariation: InternalVariation;
     private _state: State = State.UNINITIALIZED;
     private _userAgentInfo: UserAgentInfo;
     private _userSession: UserSession;
@@ -59,17 +60,27 @@ class SplitTest {
         return this._name;
     }
 
-    public getCurrentVariation(): Variation {
+    public get userAgentInfo() {
+        return this._userAgentInfo;
+    }
+
+    public get variations() {
+        return this._variations;
+    }
+
+    public getCurrentVariation() {
         return this._currentVariation;
     }
 
-    public setCurrentVariation(name: string) {
+    public async setCurrentVariation(name: string) {
         const doesVariationExist = this._variations.some((variation) => variation.name === name);
 
         if (doesVariationExist) {
             this.transitionState(State.UNINITIALIZED);
             this._userSession.setTestVariation(this.name, name);
-            return this.setup();
+            await this.setup();
+            location.reload();
+            return Promise.resolve(true);
         } else {
             return Promise.resolve(false);
         }
@@ -141,6 +152,7 @@ class SplitTest {
         }
 
         this.transitionState(State.INITIALIZED);
+        ui.show(this);
         return true;
     }
 
@@ -156,7 +168,7 @@ class SplitTest {
         return this._state === State.INITIALIZED;
     }
 
-    public getVariation(name: string): Variation {
+    public getVariation(name: string) {
         return this._variations.filter(v => v.name === name)[0];
     }
 
@@ -270,7 +282,7 @@ class SplitTest {
         this._finalStateListeners.push(listener);
     }
 
-    private selectRandomVariation(): Variation {
+    private selectRandomVariation() {
         let i = 0;
         // tslint:disable:max-line-length no-conditional-assignment no-empty
         for (

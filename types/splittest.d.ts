@@ -37,14 +37,16 @@ declare class SplitTest {
     private _variations;
     constructor(name: string, config: SkiftConfig);
     readonly name: string;
-    getCurrentVariation(): Variation;
+    readonly userAgentInfo: UserAgentInfo;
+    readonly variations: InternalVariation[];
+    getCurrentVariation(): InternalVariation;
     setCurrentVariation(name: string): Promise<boolean>;
     readonly config: SkiftConfig;
     setCondition(condition: Condition): SplitTest;
     addVariation(variation: Variation): SplitTest;
     setup(): Promise<boolean>;
     isInitialized(): Promise<boolean>;
-    getVariation(name: string): Variation;
+    getVariation(name: string): InternalVariation;
     getVariationUrl(variationName: string | null): string;
     /**
      * Emits an "Experiment Viewed" tracking event

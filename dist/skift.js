@@ -199,7 +199,7 @@ __webpack_require__.r(__webpack_exports__);
 var Config = /** @class */ (function () {
     function Config() {
         this._sessionPersister = _cookiePersister__WEBPACK_IMPORTED_MODULE_1__["default"];
-        this._trackingHandler = Object(_tracking__WEBPACK_IMPORTED_MODULE_0__["getDefaultTrackingEventHandler"])();
+        this._tracking = _tracking__WEBPACK_IMPORTED_MODULE_0__["default"];
         this._userSessionDaysToLive = 3;
         this._cookieName = 'skiftABTest';
         this._globalCondition = function () { return Promise.resolve(true); };
@@ -214,12 +214,12 @@ var Config = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Config.prototype, "trackingHandler", {
+    Object.defineProperty(Config.prototype, "tracking", {
         get: function () {
-            return this._trackingHandler;
+            return this._tracking;
         },
         set: function (value) {
-            this._trackingHandler = value;
+            this._tracking = value;
         },
         enumerable: true,
         configurable: true
@@ -310,45 +310,37 @@ var persister = {
 /*!**********************!*\
   !*** ./src/skift.ts ***!
   \**********************/
-/*! exports provided: tests, config, getTest, create */
+/*! exports provided: config, create */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tests", function() { return tests; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "config", function() { return config; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTest", function() { return getTest; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "create", function() { return create; });
 /* harmony import */ var _splitTest__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./splitTest */ "./src/splitTest.ts");
-/* harmony import */ var _userAgent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./userAgent */ "./src/userAgent.ts");
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./config */ "./src/config.ts");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./config */ "./src/config.ts");
 
 
-
-var tests = [];
-var userAgentInfo = _userAgent__WEBPACK_IMPORTED_MODULE_1__["getInfo"]();
 function config(userConfig) {
     if (userConfig === void 0) { userConfig = {}; }
     if (userConfig.cookieName) {
-        _config__WEBPACK_IMPORTED_MODULE_2__["default"].cookieName = userConfig.cookieName;
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].cookieName = userConfig.cookieName;
     }
     if (userConfig.globalCondition) {
-        _config__WEBPACK_IMPORTED_MODULE_2__["default"].globalCondition = userConfig.globalCondition;
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].globalCondition = userConfig.globalCondition;
     }
-    if (userConfig.trackingHandler) {
-        _config__WEBPACK_IMPORTED_MODULE_2__["default"].trackingHandler = userConfig.trackingHandler;
+    if (userConfig.tracking) {
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].tracking = userConfig.tracking;
     }
     if (userConfig.userSessionDaysToLive) {
-        _config__WEBPACK_IMPORTED_MODULE_2__["default"].userSessionDaysToLive = userConfig.userSessionDaysToLive;
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].userSessionDaysToLive = userConfig.userSessionDaysToLive;
+    }
+    if (userConfig.sessionPersister) {
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].sessionPersister = userConfig.sessionPersister;
     }
 }
-function getTest(name) {
-    return tests.filter(function (t) { return t.name === name; })[0];
-}
 function create(name) {
-    var test = new _splitTest__WEBPACK_IMPORTED_MODULE_0__["default"](name, userAgentInfo, _config__WEBPACK_IMPORTED_MODULE_2__["default"]);
-    tests.push(test);
-    return test;
+    return new _splitTest__WEBPACK_IMPORTED_MODULE_0__["default"](name, _config__WEBPACK_IMPORTED_MODULE_1__["default"]);
 }
 
 
@@ -366,7 +358,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
 /* harmony import */ var querystringify__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! querystringify */ "./node_modules/querystringify/index.js");
 /* harmony import */ var querystringify__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(querystringify__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _userSession__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./userSession */ "./src/userSession.ts");
+/* harmony import */ var _userAgent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./userAgent */ "./src/userAgent.ts");
+/* harmony import */ var _userSession__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./userSession */ "./src/userSession.ts");
 var __assign = (undefined && undefined.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -412,6 +405,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 };
 
 
+
 var State;
 (function (State) {
     State["UNINITIALIZED"] = "uninitialized";
@@ -420,15 +414,15 @@ var State;
     State["CANCELED"] = "canceled";
 })(State || (State = {}));
 var SplitTest = /** @class */ (function () {
-    function SplitTest(name, userAgentInfo, config) {
+    function SplitTest(name, config) {
         this._state = State.UNINITIALIZED;
         this._finalStateListeners = [];
         this._variations = [];
         this._name = name;
-        this._userAgentInfo = userAgentInfo;
+        this._userAgentInfo = Object(_userAgent__WEBPACK_IMPORTED_MODULE_1__["getInfo"])();
         this._condition = function () { return Promise.resolve(true); };
         this._config = config;
-        this._userSession = new _userSession__WEBPACK_IMPORTED_MODULE_1__["UserSession"](config);
+        this._userSession = new _userSession__WEBPACK_IMPORTED_MODULE_2__["UserSession"](config);
     }
     Object.defineProperty(SplitTest.prototype, "name", {
         get: function () {
@@ -437,6 +431,20 @@ var SplitTest = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    SplitTest.prototype.getCurrentVariation = function () {
+        return this._currentVariation;
+    };
+    SplitTest.prototype.setCurrentVariation = function (name) {
+        var doesVariationExist = this._variations.some(function (variation) { return variation.name === name; });
+        if (doesVariationExist) {
+            this.transitionState(State.UNINITIALIZED);
+            this._userSession.setTestVariation(this.name, name);
+            return this.setup();
+        }
+        else {
+            return Promise.resolve(false);
+        }
+    };
     Object.defineProperty(SplitTest.prototype, "config", {
         get: function () {
             return this._config;
@@ -484,12 +492,12 @@ var SplitTest = /** @class */ (function () {
                             variation = this.selectRandomVariation();
                             this._userSession.setTestVariation(this.name, variation.name);
                         }
-                        this._selectedVariation = variation;
+                        this._currentVariation = variation;
                         // Step 3: Setup variation
                         if (typeof variation.setup === 'function') {
                             variation.setup.call(this, this._userAgentInfo);
                         }
-                        // Step 4: Publish track event
+                        // Step 4: Publish tracking event
                         if (variation.trackEventAutoPublish !== false) {
                             this.trackViewed();
                         }
@@ -565,12 +573,12 @@ var SplitTest = /** @class */ (function () {
         });
     };
     SplitTest.prototype.internalTrackLink = function (element, event, trackingData) {
-        var extendedTrackingData = __assign({}, trackingData, { experimentName: this._name, browser: this._userAgentInfo.name, browserVersion: this._userAgentInfo.version, isMobile: this._userAgentInfo.isMobile, variationName: this._selectedVariation.name });
-        this._config.trackingHandler.trackLink(element, event, extendedTrackingData);
+        var extendedTrackingData = __assign({}, trackingData, { experimentName: this._name, browser: this._userAgentInfo.name, browserVersion: this._userAgentInfo.version, isMobile: this._userAgentInfo.isMobile, variationName: this._currentVariation.name });
+        this._config.tracking.trackLink(element, event, extendedTrackingData);
     };
     SplitTest.prototype.trackEvent = function (event, trackingData) {
-        var extendedTrackingData = __assign({}, trackingData, { experimentName: this._name, browser: this._userAgentInfo.name, browserVersion: this._userAgentInfo.version, isMobile: this._userAgentInfo.isMobile, variationName: this._selectedVariation.name });
-        this._config.trackingHandler.track(event, extendedTrackingData);
+        var extendedTrackingData = __assign({}, trackingData, { experimentName: this._name, browser: this._userAgentInfo.name, browserVersion: this._userAgentInfo.version, isMobile: this._userAgentInfo.isMobile, variationName: this._currentVariation.name });
+        this._config.tracking.track(event, extendedTrackingData);
     };
     /**
      * Determines whether this test is able to run or not.
@@ -627,26 +635,26 @@ var SplitTest = /** @class */ (function () {
 /*!*************************!*\
   !*** ./src/tracking.ts ***!
   \*************************/
-/*! exports provided: getDefaultTrackingEventHandler */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDefaultTrackingEventHandler", function() { return getDefaultTrackingEventHandler; });
-function log(event, trackingData) {
-    console.log('Split testing event: ' + event, trackingData);
-}
-function clickAndLog(element, event, trackingData) {
-    element.addEventListener('click', function () {
-        log(event, trackingData);
-    });
-}
-function getDefaultTrackingEventHandler() {
-    return {
-        track: log,
-        trackLink: clickAndLog,
+var ConsoleTracking = /** @class */ (function () {
+    function ConsoleTracking() {
+    }
+    ConsoleTracking.prototype.track = function (event, trackingData) {
+        console.log('Split testing event: ' + event, trackingData);
     };
-}
+    ConsoleTracking.prototype.trackLink = function (element, event, trackingData) {
+        var _this = this;
+        element.addEventListener('click', function () {
+            _this.track(event, trackingData);
+        });
+    };
+    return ConsoleTracking;
+}());
+/* harmony default export */ __webpack_exports__["default"] = (new ConsoleTracking());
 
 
 /***/ }),

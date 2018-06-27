@@ -6,9 +6,9 @@ export interface TrackingData {
 }
 
 /**
- * Analytics interface used for tracking in the library
+ * Tracking interface used for tracking in the library
  */
-export interface Analytics {
+export interface Tracking {
     /**
      * Records an action your user performs.
      * @param event The name of the event you’re tracking.
@@ -24,7 +24,7 @@ export interface Analytics {
     trackLink(element: Element, event: TrackingType, trackingData: TrackingData): void;
 }
 
-class ConsoleAnalytics implements Analytics {
+class ConsoleTracking implements Tracking {
     public track(event: TrackingType, trackingData: TrackingData): void {
         console.log('Split testing event: ' + event, trackingData);
     }
@@ -36,4 +36,4 @@ class ConsoleAnalytics implements Analytics {
     }
 }
 
-export default new ConsoleAnalytics();
+export default new ConsoleTracking();

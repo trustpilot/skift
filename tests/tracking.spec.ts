@@ -1,10 +1,10 @@
-import consoleAnalytics from '../src/analytics';
+import consoleAnalytics from '../src/tracking';
 import { BrowserEnv } from './browser';
 
 declare const global: BrowserEnv;
 
-describe('Analytics', () => {
-    describe('ConsoleAnalytics', () => {
+describe('Tracking', () => {
+    describe('ConsoleTracking', () => {
         it('should return default tracking handler', () => {
             console.log = jest.fn();
             consoleAnalytics.track('ExperimentViewed', {});

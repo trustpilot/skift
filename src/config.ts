@@ -1,4 +1,4 @@
-import consoleAnalytics, { Analytics } from './analytics';
+import consoleTracking, { Tracking } from './tracking';
 import userSessionCookiePersister, { SessionPersister } from './cookiePersister';
 import { Condition } from './condition';
 
@@ -6,7 +6,7 @@ export interface UserConfig {
     cookieName?: string;
     globalCondition?: Condition;
     sessionPersister?: SessionPersister;
-    tracking?: Analytics;
+    tracking?: Tracking;
     userSessionDaysToLive?: number;
 }
 
@@ -14,13 +14,13 @@ export interface SkiftConfig {
     cookieName: string;
     globalCondition: Condition;
     sessionPersister: SessionPersister;
-    analytics: Analytics;
+    tracking: Tracking;
     userSessionDaysToLive: number;
 }
 
 class Config {
     private _sessionPersister = userSessionCookiePersister;
-    private _analytics = consoleAnalytics;
+    private _tracking = consoleTracking;
     private _userSessionDaysToLive = 3;
     private _cookieName = 'skiftABTest';
     private _globalCondition: Condition = () => Promise.resolve(true);
@@ -33,12 +33,12 @@ class Config {
         this._sessionPersister = value;
     }
 
-    public get analytics() {
-        return this._analytics;
+    public get tracking() {
+        return this._tracking;
     }
 
-    public set analytics(value: Analytics) {
-        this._analytics = value;
+    public set tracking(value: Tracking) {
+        this._tracking = value;
     }
 
     public get userSessionDaysToLive() {

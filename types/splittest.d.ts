@@ -1,5 +1,5 @@
 import { UserAgentInfo } from './userAgent';
-import { TrackingActionType } from './analytics';
+import { TrackingActionType } from './tracking';
 import { SkiftConfig } from './config';
 import { Condition } from './condition';
 export interface Variation {

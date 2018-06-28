@@ -15,13 +15,15 @@
     "url": "https://github.com/trustpilot/skift/issues"
   },
   "scripts": {
+    "build": "npm run clean && npm run build:dev && npm run build:prod",
     "build:dev": "webpack --config ./config/webpack.dev.js",
     "build:prod": "webpack --config ./config/webpack.prod.js",
+    "clean": "rimraf dist/ yarn-error.log npm-debug.log",
     "cz": "git-cz",
     "lint": "tslint 'src/**/*.ts' --project ./",
     "precz": "npm run lint",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "start": "node examples/serve.js",
+    "start": "webpack-serve --config ./config/webpack.dev.js",
     "test": "jest --config ./config/jest.config.js"
   },
   "dependencies": {
@@ -32,9 +34,10 @@
     "css-loader": "0.28.11",
     "css-to-string-loader": "0.1.3",
     "cz-conventional-changelog": "2.1.0",
-    "express": "4.16.3",
+    "html-webpack-plugin": "3.2.0",
     "jest": "23.2.0",
     "jquery": "3.3.1",
+    "rimraf": "2.6.2",
     "semantic-release": "15.6.0",
     "ts-jest": "22.4.6",
     "ts-loader": "4.4.2",
@@ -42,7 +45,8 @@
     "typescript": "2.9.2",
     "uglifyjs-webpack-plugin": "1.2.7",
     "webpack": "4.12.2",
-    "webpack-command": "0.3.1"
+    "webpack-command": "0.3.1",
+    "webpack-serve": "1.0.4"
   },
   "files": [
     "dist",

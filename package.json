@@ -16,8 +16,8 @@
   },
   "scripts": {
     "build": "npm run clean && npm run build:dev && npm run build:prod",
-    "build:dev": "webpack --config ./config/webpack.dev.js",
-    "build:prod": "webpack --config ./config/webpack.prod.js",
+    "build:dev": "webpack-cli --config ./config/webpack.dev.js",
+    "build:prod": "webpack-cli --config ./config/webpack.prod.js",
     "clean": "rimraf dist/ yarn-error.log npm-debug.log",
     "cz": "git-cz",
     "lint": "tslint 'src/**/*.ts' --project ./",
@@ -45,7 +45,7 @@
     "typescript": "2.9.2",
     "uglifyjs-webpack-plugin": "1.2.7",
     "webpack": "4.12.2",
-    "webpack-command": "0.3.1",
+    "webpack-cli": "3.0.8",
     "webpack-serve": "1.0.4"
   },
   "files": [

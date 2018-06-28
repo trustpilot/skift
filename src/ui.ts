@@ -8,15 +8,15 @@ function getVariationPercentage(variation: InternalVariation): string {
     return Math.round(variation.normalizedWeight * 100) + '%';
 }
 
+let isInitialized = false;
+let container: Element;
+
 export const uiFactory = (
     tests: BehavioralSubject<SplitTest[]>,
     reset: () => void,
     getCurrentTestVariation: (testName: string) => string,
     getUserAgentInfo: () => UserAgentInfo
 ) => {
-    let isInitialized = false;
-    let container: Element;
-
     async function renderTest(test: SplitTest): Promise<string> {
         if (await test.isInitialized()) {
             const variation = getCurrentTestVariation(test.name);
@@ -87,10 +87,15 @@ export const uiFactory = (
             testListEl.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
 
-        container = shadowRoot.querySelector('.ui-container') || document.createElement('div');
-        container.appendChild(testListEl);
-        container.className = 'ui-container';
+        const previousContainer = shadowRoot.querySelector('.ui-container');
 
+        if (previousContainer) {
+            container = previousContainer;
+        } else {
+            container = document.createElement('div');
+            container.appendChild(testListEl);
+            container.className = 'ui-container';
+        }
         const button = document.createElement('button');
 
         button.className = 'reset';

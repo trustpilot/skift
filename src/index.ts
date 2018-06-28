@@ -25,7 +25,14 @@ const ui = uiFactory(
     getUserAgentInfo
 );
 
-document.addEventListener('DOMContentLoaded', () => {
+function domReady(cb: () => void) {
+    if (document.readyState !== 'loading') {
+        return cb();
+    }
+    document.addEventListener('DOMContentLoaded', cb);
+}
+
+domReady(() => {
     setTimeout(async () => {
         if (await shouldShowUI()) {
             ui.show();

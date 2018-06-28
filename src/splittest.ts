@@ -257,9 +257,7 @@ export class SplitTest {
         // tslint:disable:max-line-length no-conditional-assignment no-empty
         for (
             let runningTotal = 0, testSegment = Math.random();
-            i < this._variations.length &&
-            (runningTotal += this._variations[i].normalizedWeight) <
-            testSegment;
+            i < this._variations.length && (runningTotal += this._variations[i].normalizedWeight) < testSegment;
             i++
         ) { }
         // tslint:enable:max-line-length no-conditional-assignment no-empty

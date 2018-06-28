@@ -19,14 +19,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  externals: {
-    jquery: {
-      commonjs: 'jquery',
-      commonjs2: 'jquery',
-      amd: 'jquery',
-      root: 'jQuery'
-    }
-  },
   module: {
     rules: [{
       test: /\.ts$/,

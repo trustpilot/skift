@@ -15,7 +15,6 @@
     "querystringify": "2.0.0"
   },
   "devDependencies": {
-    "@types/jquery": "3.3.4",
     "ajv": "6.5.1",
     "css-loader": "0.28.11",
     "css-to-string-loader": "0.1.3",

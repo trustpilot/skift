@@ -218,16 +218,13 @@ export class SplitTest {
      * @param elements The DOM element to be bound with track method.
      * @param name A human readable name of the link. If left out, the innerText of the element is used
      */
-    trackLink(elements: Element | JQuery, name?: string): void {
+    trackLink(element: Element, name?: string): void {
         const event: TrackEventType = 'ExperimentActionPerformed';
-        const trackingData = this.trackingDataExtender(
-            {
+        const trackingData = this.trackingDataExtender({
                 action: 'Click',
-                actionTarget: name || $(elements).text()
-            },
-            event
-        );
-        config.tracking.trackLink(elements, event, trackingData);
+                actionTarget: name || element.textContent
+        }, event);
+        config.tracking.trackLink(element, event, trackingData);
     }
 
     private condition: ConditionFunction = () => true;

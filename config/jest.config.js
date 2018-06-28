@@ -14,5 +14,8 @@ module.exports = {
   testMatch: [
     '**/?(*.)+(spec|test).(ts|js)'
   ],
-  rootDir: path.resolve(__dirname, '..')
+  rootDir: path.resolve(__dirname, '..'),
+  moduleNameMapper: {
+    '\\.(css|less|sass|scss)$': '<rootDir>/tests/styleMock.js'
+  }
 }

@@ -1,4 +1,3 @@
-/// <reference types="jquery" />
 import { UserAgentInfo } from './useragentinfo';
 import { BehavioralSubject } from './behavioral-subject';
 import { TrackingDataExtender, TrackEventActionType } from './tracking';
@@ -60,7 +59,7 @@ export declare class SplitTest {
      * @param elements The DOM element to be bound with track method.
      * @param name A human readable name of the link. If left out, the innerText of the element is used
      */
-    trackLink(elements: Element | JQuery, name?: string): void;
+    trackLink(element: Element, name?: string): void;
     private condition;
     private normalizeVariationWeights;
     private transitionState;

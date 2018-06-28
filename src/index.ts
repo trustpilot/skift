@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import {
     tests,
     testsObservable,
@@ -11,10 +10,8 @@ import {
     reset,
     SplitTest,
     initialize,
-    UserConfig,
     shouldShowUI
 } from './main';
-import { UserAgentInfo } from './useragentinfo';
 import { uiFactory } from './ui';
 
 initialize();
@@ -26,7 +23,7 @@ const ui = uiFactory(
     getUserAgentInfo
 );
 
-$(() => {
+document.addEventListener('DOMContentLoaded', (event) => {
     setTimeout(async () => {
         if (await shouldShowUI()) {
             ui.show();

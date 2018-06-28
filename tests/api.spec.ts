@@ -37,20 +37,19 @@ describe('Top-level api', () => {
         done();
     });
 
-    it.skip('should be possible to show the UI', () => {
+    it.only('should be possible to show the UI', async () => {
         const testName = 'The test to check out!';
-        skift
+        const test = skift
             .create(testName)
             .addVariation({ name: 'Variation A' })
-            .addVariation({ name: 'Variation B' })
-            .setup();
+            .addVariation({ name: 'Variation B' });
 
+        await test.setup();
         skift.ui.show();
 
-        const div = <HTMLElement>document.querySelector('body');
-        const root = <ShadowRoot>div.shadowRoot;
-
-        expect(root.querySelector('.skift-ui-container')).toBeDefined();
+        const skiftUI = document.querySelector('.skift');
+        expect(skiftUI).toBeDefined();
+        expect(skiftUI.querySelector('.container')).toBeDefined();
     });
 
     describe('when setting a condition', () => {

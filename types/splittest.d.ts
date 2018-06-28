@@ -62,9 +62,9 @@ export declare class SplitTest {
      */
     trackLink(elements: Element | JQuery, name?: string): void;
     private condition;
-    private normalizeVariationWeights();
-    private transitionState(state);
-    private subscribeStateListener(listener);
-    private selectRandomVariation();
-    private trackEvent(event, trackingData?);
+    private normalizeVariationWeights;
+    private transitionState;
+    private subscribeStateListener;
+    private selectRandomVariation;
+    private trackEvent;
 }

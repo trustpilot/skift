@@ -28,7 +28,8 @@ before_script:
   - sleep 3
 
 script:
-  - npm run ci:travis
+  - npm run lint
+  - npm rum test
   - npm run build:prod
 
 after_success:

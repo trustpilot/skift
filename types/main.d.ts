@@ -3,6 +3,7 @@ import { BehavioralSubject } from './behavioral-subject';
 export { SplitTest } from './splittest';
 import { TrackingEventHandler } from './tracking';
 import { ConditionFunction, UserSessionPersister } from './config';
+import { UserAgentInfo } from './useragentinfo';
 export interface UserConfig {
     cookieName?: string;
     globalCondition?: ConditionFunction;
@@ -15,7 +16,7 @@ export declare const tests: SplitTest[];
 export declare const testsObservable: BehavioralSubject<SplitTest[]>;
 export declare function config(userConfig?: UserConfig): void;
 export declare function initialize(): void;
-export declare function getUserAgentInfo(): import("../../../../../Users/tht/Trustpilot/skift/src/useragentinfo").UserAgentInfo;
+export declare function getUserAgentInfo(): UserAgentInfo;
 export declare function getTest(name: string): SplitTest;
 export declare function create(name: string): SplitTest;
 export declare function getCurrentTestVariation(testName: string): string;

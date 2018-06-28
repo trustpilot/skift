@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0]
+### Changed
+- Remove dependency to jquery and use web API instead
+- Update dependencies to fix security issues
+- Replace Karma by Jest
+- Improve development flow by providing hot reload while developing localy 
+
 ## [2.0.0]
 ### Added
 - Support asynchronous conditions.

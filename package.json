@@ -1,15 +1,28 @@
 {
   "name": "skift",
   "description": "Split testing tool for the Web",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "Trustpilot A/S",
+  "main": "dist/skift.js",
+  "types": "types/index.d.ts",
+  "homepage": "https://github.com/trustpilot/skift#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trustpilot/skift.git"
+  },
   "bugs": {
     "url": "https://github.com/trustpilot/skift/issues"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
+  "scripts": {
+    "build:dev": "webpack --config ./config/webpack.dev.js",
+    "build:prod": "webpack --config ./config/webpack.prod.js",
+    "cz": "git-cz",
+    "lint": "tslint 'src/**/*.ts' --project ./",
+    "precz": "npm run lint",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "start": "node examples/serve.js",
+    "test": "jest --config ./config/jest.config.js"
   },
   "dependencies": {
     "querystringify": "2.0.0"
@@ -36,22 +49,9 @@
     "src",
     "types"
   ],
-  "homepage": "https://github.com/trustpilot/skift#readme",
-  "license": "MIT",
-  "main": "dist/skift.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/trustpilot/skift.git"
-  },
-  "scripts": {
-    "build:dev": "webpack --config ./config/webpack.dev.js",
-    "build:prod": "webpack --config ./config/webpack.prod.js",
-    "cz": "git-cz",
-    "lint": "tslint 'src/**/*.ts' --project ./",
-    "precz": "npm run lint",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "start": "node examples/serve.js",
-    "test": "jest --config ./config/jest.config.js"
-  },
-  "types": "types/index.d.ts"
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }

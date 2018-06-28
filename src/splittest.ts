@@ -141,7 +141,7 @@ export class SplitTest {
     }
 
     async isInitialized(): Promise<boolean> {
-        const {state} = this;
+        const { state } = this;
 
         if (state === 'initializing') {
             return await new Promise<boolean>((resolve, reject) => {
@@ -215,19 +215,16 @@ export class SplitTest {
 
     /**
      * Attaches a <code>trackActionPerformed</code> call as a handler to a link.
-     * @param elements The DOM element to be bound with track method.
+     * @param element The DOM element to be bound with track method.
      * @param name A human readable name of the link. If left out, the innerText of the element is used
      */
-    trackLink(elements: Element | JQuery, name?: string): void {
+    trackLink(element: Element, name?: string): void {
         const event: TrackEventType = 'ExperimentActionPerformed';
-        const trackingData = this.trackingDataExtender(
-            {
-                action: 'Click',
-                actionTarget: name || $(elements).text()
-            },
-            event
-        );
-        config.tracking.trackLink(elements, event, trackingData);
+        const trackingData = this.trackingDataExtender({
+            action: 'Click',
+            actionTarget: name || element.textContent
+        }, event);
+        config.tracking.trackLink(element, event, trackingData);
     }
 
     private condition: ConditionFunction = () => true;
@@ -262,9 +259,9 @@ export class SplitTest {
             let runningTotal = 0, testSegment = Math.random();
             i < this._variations.length &&
             (runningTotal += this._variations[i].normalizedWeight) <
-                testSegment;
+            testSegment;
             i++
-        ) {}
+        ) { }
         // tslint:enable:max-line-length no-conditional-assignment no-empty
         return this._variations[i];
     }

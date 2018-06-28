@@ -11,9 +11,7 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "dependencies": {
-    "@types/jquery": "3.3.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jasmine": "2.5.52",
     "cross-env": "5.1.5",

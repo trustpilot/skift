@@ -12,14 +12,6 @@ module.exports = {
     library: 'skift',
     libraryTarget: 'umd'
   },
-  externals: {
-    jquery: {
-      commonjs: 'jquery',
-      commonjs2: 'jquery',
-      amd: 'jquery',
-      root: 'jQuery'
-    }
-  },
   resolve: {
     extensions: ['.ts', '.js'],
     modules: ['node_modules']

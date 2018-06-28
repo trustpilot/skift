@@ -1,9 +1,9 @@
-import { UserAgentInfo } from './useragentinfo';
 import { SplitTest } from './splittest';
 import { BehavioralSubject } from './behavioral-subject';
 export { SplitTest } from './splittest';
 import { TrackingEventHandler } from './tracking';
 import { ConditionFunction, UserSessionPersister } from './config';
+import { UserAgentInfo } from './useragentinfo';
 export interface UserConfig {
     cookieName?: string;
     globalCondition?: ConditionFunction;

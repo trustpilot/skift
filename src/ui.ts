@@ -1,13 +1,8 @@
-import $ from 'jquery';
 import { BehavioralSubject } from './behavioral-subject';
 import { InternalVariation, SplitTest } from './splittest';
 import { UserAgentInfo } from './useragentinfo';
 
 declare const require: any;
-
-const uiClassPrefix = 'skift';
-let isInitialized = false;
-let $abTestContainer: JQuery;
 
 function getVariationPercentage(variation: InternalVariation): string {
     return Math.round(variation.normalizedWeight * 100) + '%';
@@ -19,6 +14,9 @@ export const uiFactory = (
     getCurrentTestVariation: (testName: string) => string,
     getUserAgentInfo: () => UserAgentInfo
 ) => {
+    let isInitialized = false;
+    let container: Element;
+
     async function renderTest(test: SplitTest): Promise<string> {
         if (await test.isInitialized()) {
             const variation = getCurrentTestVariation(test.name);
@@ -67,17 +65,11 @@ export const uiFactory = (
     }
 
     function showSplitTestUi() {
-        if (!document.head.attachShadow) {
-            console.warn(
-                `Skift: Sorry, we don't support the UI in the browsers without Shadow DOM for now`
-            );
-            return;
-        }
+        const skift = document.createElement('div');
+        skift.className = 'skift';
 
-        const containerElement = document.createElement('div');
-        const shadowRoot = containerElement.attachShadow({ mode: 'open' });
         const style = document.createElement('style');
-        style.innerHTML = require('./main.css');
+        style.innerHTML = require('./ui.css');
 
         const testListEl = document.createElement('div');
         testListEl.className = 'test-list';
@@ -89,36 +81,46 @@ export const uiFactory = (
             testListEl.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
 
-        $abTestContainer = $(`<div class="ui-container hideme"></div>`).append(
-            testListEl
-        );
+        container = document.querySelector('.skift .container') || document.createElement('div');
+        container.className = 'container hideme';
+        container.appendChild(testListEl);
 
-        $(`<button type="button" class="reset">Reset all</button>`)
-            .on('click', reset)
-            .appendTo($abTestContainer);
+        const button = document.createElement('button');
+        button.className = 'reset';
+        button.textContent = 'Reset all';
+        button.setAttribute('type', 'button');
+        button.addEventListener('click', () => {
+            reset();
+        });
+        container.appendChild(button);
 
-        $(`<div class="close">X</div>`)
-            .on('click', hide)
-            .appendTo($abTestContainer);
+        const close = document.createElement('div');
+        close.className = 'close';
+        close.textContent = 'X';
+        close.addEventListener('click', () => {
+            hide();
+        });
+        container.appendChild(close);
 
         // Make UI fadein
-        $abTestContainer.removeClass('hideme');
-        shadowRoot.appendChild(style);
-        shadowRoot.appendChild($abTestContainer[0]);
-        document.body.appendChild(containerElement);
+        container.className = 'container';
+        skift.appendChild(style);
+        skift.appendChild(container);
+        document.body.appendChild(skift);
+
         isInitialized = true;
     }
 
     function show() {
         if (isInitialized) {
-            $abTestContainer.removeClass('hideme');
+            container.className = 'container';
         } else {
             showSplitTestUi();
         }
     }
 
     function hide() {
-        $abTestContainer.addClass('hideme');
+        container.className = 'container hideme';
     }
 
     return {

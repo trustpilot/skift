@@ -15,11 +15,11 @@ export interface TrackingEventHandler {
 
     /**
      * A helper method that attaches the track call as a handler to a link
-     * @param elements DOM element to be bound with track method
+     * @param element DOM element to be bound with track method
      * @param event The name of the event, passed to the track method
      * @param trackingData A dictionary of properties to pass with the track method.
      */
-    trackLink(elements: Element | JQuery, event: TrackEventType, trackingData: TrackingData): void;
+    trackLink(element: Element, event: TrackEventType, trackingData: TrackingData): void;
 }
 
 /**

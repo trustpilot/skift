@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { TrackingEventHandler, TrackEventType, TrackingData } from './tracking';
 import usersessioncookiepersister from './usersessioncookiepersister';
 import { UserAgentInfo } from './useragentinfo';
@@ -29,11 +28,11 @@ const defaultTrackingEventHandler: TrackingEventHandler = (() => {
     return {
         track: log,
         trackLink(
-            elements: Element | JQuery,
+            element: Element,
             event: TrackEventType,
             trackingData: TrackingData
         ) {
-            $(elements).on('click', () => {
+            element.addEventListener('click', () => {
                 log(event, trackingData);
             });
         }

@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.0]
+###Changed
+- Replace jquery by webb API. Functions that used to accept web API element and jquery element are now only accepting web API element.
+
 ## [2.0.0]
 ### Added
 - Support asynchronous conditions.

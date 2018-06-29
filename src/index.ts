@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import {
     tests,
     testsObservable,
@@ -26,7 +25,14 @@ const ui = uiFactory(
     getUserAgentInfo
 );
 
-$(() => {
+function domReady(cb: () => void) {
+    if (document.readyState !== 'loading') {
+        return cb();
+    }
+    document.addEventListener('DOMContentLoaded', cb);
+}
+
+domReady(() => {
     setTimeout(async () => {
         if (await shouldShowUI()) {
             ui.show();

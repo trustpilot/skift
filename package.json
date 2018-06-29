@@ -1,7 +1,7 @@
 {
   "name": "skift",
   "description": "Split testing tool for the Web",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": "Trustpilot A/S",
   "bugs": {
     "url": "https://github.com/trustpilot/skift/issues"
@@ -11,9 +11,7 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "dependencies": {
-    "@types/jquery": "3.3.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jasmine": "2.5.52",
     "cross-env": "5.1.5",

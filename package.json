@@ -28,7 +28,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-webpack": "2.0.3",
     "querystringify": "1.0.0",
-    "semantic-release": "6.3.6",
+    "semantic-release": "15.6.0",
     "ts-loader": "2.2.2",
     "tslib": "1.9.0",
     "tslint": "5.10.0",
@@ -54,7 +54,6 @@
     "cz": "git-cz",
     "lint": "tslint 'src/**/*.ts' --type-check --project ./",
     "precz": "npm run lint",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "node examples/serve.js",
     "test": "karma start",
     "ts": "tsc"

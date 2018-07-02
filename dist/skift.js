@@ -1035,29 +1035,21 @@ var uiFactory = function (tests, reset, getCurrentTestVariation, getUserAgentInf
                             'Mobile device': getUserAgentInfo().isMobile
                         };
                         variationHtml = test.variations.map(function (variant) {
-                            return "<a href=\"" + test.getVariationUrl(variant.name) + "\" title=\"Segment: " + getVariationPercentage(variant) + "\">" + variant.name + "</a>";
+                            return "\n                    <a\n                        href=\"" + test.getVariationUrl(variant.name) + "\"\n                        title=\"Segment: " + getVariationPercentage(variant) + "\"\n                    >\n                        " + variant.name + "\n                    </a>\n                ";
                         });
-                        return [2 /*return*/, "\n            <div class=\"test\">\n              <div class=\"header\">\n                Viewing: <span class=\"abtest-variant\">" + variation + "</span>\n              </div>" + Object.keys(data_1)
-                                .map(function (key) {
-                                return "<div><span class=\"data-label\">" + key + "</span><span class=\"data-value\">" + data_1[key] + "</span></div>";
-                            })
-                                .join('') + "\n            " + variationHtml.join('&nbsp;&bull;&nbsp;') + "</div>"];
+                        return [2 /*return*/, "\n                <div class=\"test\">\n                    <div class=\"header\">\n                        Viewing: <span class=\"abtest-variant\">" + variation + "</span>\n                    </div>\n                    " + Object.keys(data_1).map(function (key) { return "\n                        <div>\n                            <span class=\"data-label\">" + key + "</span>\n                            <span class=\"data-value\">" + data_1[key] + "</span>\n                        </div>\n                    "; }).join('') + "\n                    " + variationHtml.join('&nbsp;&bull;&nbsp;') + "\n                </div>\n            "];
                     case 2: return [4 /*yield*/, test.shouldRun(getUserAgentInfo())];
                     case 3:
                         canRun = _a.sent();
-                        return [2 /*return*/, "<div class=\"test\">\n                    <div class=\"header\">\n                      Viewing: <span class=\"abtest-variant\">Not initialized</span>\n                    </div>\n                    <div>Test <span class=\"data-value\">" + test.name + "</span> is not initialized</div>\n                    <div><span class=\"data-label\">Can run</span><span class=\"data-value\">" + canRun + "</span></div>\n                </div>"];
+                        return [2 /*return*/, "\n                <div class=\"test\">\n                    <div class=\"header\">\n                        Viewing: <span class=\"abtest-variant\">Not initialized</span>\n                    </div>\n                    <div>Test <span class=\"data-value\">" + test.name + "</span> is not initialized</div>\n                    <div>\n                        <span class=\"data-label\">Can run</span>\n                        <span class=\"data-value\">" + canRun + "</span>\n                    </div>\n                </div>\n            "];
                 }
             });
         });
     }
     function showSplitTestUi() {
         var _this = this;
-        if (!document.head.attachShadow) {
-            console.warn("Skift: Sorry, we don't support the UI in the browsers without Shadow DOM for now");
-            return;
-        }
-        var containerElement = document.createElement('div');
-        var shadowRoot = containerElement.attachShadow({ mode: 'open' });
+        var skift = document.createElement('div');
+        skift.className = 'skift';
         var style = document.createElement('style');
         style.innerHTML = __webpack_require__(12);
         var testListEl = document.createElement('div');
@@ -1078,14 +1070,14 @@ var uiFactory = function (tests, reset, getCurrentTestVariation, getUserAgentInf
                 }
             });
         }); });
-        var previousContainer = shadowRoot.querySelector('.ui-container');
+        var previousContainer = document.querySelector('.skift .container');
         if (previousContainer) {
             container = previousContainer;
         }
         else {
             container = document.createElement('div');
             container.appendChild(testListEl);
-            container.className = 'ui-container';
+            container.className = 'container';
         }
         var button = document.createElement('button');
         button.className = 'reset';
@@ -1102,21 +1094,21 @@ var uiFactory = function (tests, reset, getCurrentTestVariation, getUserAgentInf
             hide();
         });
         container.appendChild(close);
-        shadowRoot.appendChild(style);
-        shadowRoot.appendChild(container);
-        document.body.appendChild(containerElement);
+        skift.appendChild(style);
+        skift.appendChild(container);
+        document.body.appendChild(skift);
         isInitialized = true;
     }
     function show() {
         if (isInitialized) {
-            container.className = 'ui-container';
+            container.className = 'container';
         }
         else {
             showSplitTestUi();
         }
     }
     function hide() {
-        container.className = 'ui-container hideme';
+        container.className = 'container hideme';
     }
     return {
         show: show,
@@ -1151,7 +1143,7 @@ exports = module.exports = __webpack_require__(14)(false);
 
 
 // module
-exports.push([module.i, "* {\n  box-sizing: border-box;\n  font-family: Helvetica Neue, serif;\n}\n\n.ui-container {\n  position: fixed;\n  bottom: 15px;\n  right: 15px;\n  width: 300px;\n  height: 300px;\n  color: #292929;\n  z-index: 999;\n  background-color: #FFFFFF;\n  border: 1px solid #f2800d;\n  box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.2);\n  transition: all .5s ease-out;\n  opacity: 1;\n}\n.ui-container.hideme {\n  bottom: -350px;\n  opacity: 0;\n}\n.test-list {\n  overflow-y: scroll;\n  height: 250px;\n}\n.test {\n  padding: 10px;\n}\n.header {\n  position: relative;\n  top: 0;\n  left: 0;\n  padding: 10px;\n  margin-bottom: 10px;\n  background-color: #292929;\n  color: #FFFFFF;\n  font-size: 16px;\n  font-weight: bold;\n}\n.data-label {\n  display: inline-block;\n  margin-bottom: 2px;\n  margin-right: 5px;\n  color: #292929;\n}\n.data-label:after {\n  content: \":\";\n}\n.data-value {\n  color: #000;\n  font-weight: bold;\n  text-transform: capitalize;\n}\n.variant {\n  text-transform: uppercase;\n  color: #66ff33;\n}\n.close {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: absolute;\n  top: -8px;\n  right: -8px;\n  background-color: #f2800d;\n  color: #000;\n  height: 20px;\n  width: 20px;\n  border-radius: 5px;\n  cursor: pointer;\n}\n.reset {\n  display: block;\n  margin: 10px auto;\n  padding: 5px 10px;\n  background-color: #f2800d;\n  font-size: 18px;\n  color: #FFFFFF;\n  border: 0;\n}\n", ""]);
+exports.push([module.i, ".skift .container {\n  position: fixed;\n  bottom: 15px;\n  right: 15px;\n  width: 300px;\n  height: 300px;\n  color: #292929;\n  z-index: 999;\n  background-color: #FFFFFF;\n  border: 1px solid #f2800d;\n  box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.2);\n  transition: all .5s ease-out;\n  opacity: 1;\n}\n.skift  .container.hideme {\n  bottom: -350px;\n  opacity: 0;\n}\n.skift .test-list {\n  overflow-y: scroll;\n  height: 250px;\n}\n.skift .test {\n  padding: 10px;\n}\n.skift .header {\n  position: relative;\n  top: 0;\n  left: 0;\n  padding: 10px;\n  margin-bottom: 10px;\n  background-color: #292929;\n  color: #FFFFFF;\n  font-size: 16px;\n  font-weight: bold;\n}\n.skift .data-label {\n  display: inline-block;\n  margin-bottom: 2px;\n  margin-right: 5px;\n  color: #292929;\n}\n.skift .data-label:after {\n  content: \":\";\n}\n.skift .data-value {\n  color: #000;\n  font-weight: bold;\n  text-transform: capitalize;\n}\n.skift .variant {\n  text-transform: uppercase;\n  color: #66ff33;\n}\n.skift .close {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: absolute;\n  top: -8px;\n  right: -8px;\n  background-color: #f2800d;\n  color: #000;\n  height: 20px;\n  width: 20px;\n  border-radius: 5px;\n  cursor: pointer;\n}\n.skift .reset {\n  display: block;\n  margin: 10px auto;\n  padding: 5px 10px;\n  background-color: #f2800d;\n  font-size: 18px;\n  color: #FFFFFF;\n  border: 0;\n}\n", ""]);
 
 // exports
 

@@ -32,50 +32,53 @@ export const uiFactory = (
             };
 
             const variationHtml = test.variations.map(variant => {
-                return `<a href="${test.getVariationUrl(
-                    variant.name
-                )}" title="Segment: ${getVariationPercentage(
-                    variant as InternalVariation
-                )}">${variant.name}</a>`;
+                return `
+                    <a
+                        href="${test.getVariationUrl(variant.name)}"
+                        title="Segment: ${getVariationPercentage(variant as InternalVariation)}"
+                    >
+                        ${variant.name}
+                    </a>
+                `;
             });
 
             return `
-            <div class="test">
-              <div class="header">
-                Viewing: <span class="abtest-variant">${variation}</span>
-              </div>${Object.keys(data)
-                  .map(
-                      key =>
-                          `<div><span class="data-label">${key}</span><span class="data-value">${data[
-                              key
-                          ]}</span></div>`
-                  )
-                  .join('')}
-            ${variationHtml.join('&nbsp;&bull;&nbsp;')}</div>`;
+                <div class="test">
+                    <div class="header">
+                        Viewing: <span class="abtest-variant">${variation}</span>
+                    </div>
+                    ${Object.keys(data).map(key => `
+                        <div>
+                            <span class="data-label">${key}</span>
+                            <span class="data-value">${data[key]}</span>
+                        </div>
+                    `).join('')}
+                    ${variationHtml.join('&nbsp;&bull;&nbsp;')}
+                </div>
+            `;
         } else {
             const canRun = await test.shouldRun(getUserAgentInfo());
-            return `<div class="test">
+            return `
+                <div class="test">
                     <div class="header">
-                      Viewing: <span class="abtest-variant">Not initialized</span>
+                        Viewing: <span class="abtest-variant">Not initialized</span>
                     </div>
                     <div>Test <span class="data-value">${test.name}</span> is not initialized</div>
-                    <div><span class="data-label">Can run</span><span class="data-value">${canRun}</span></div>
-                </div>`;
+                    <div>
+                        <span class="data-label">Can run</span>
+                        <span class="data-value">${canRun}</span>
+                    </div>
+                </div>
+            `;
         }
     }
 
     function showSplitTestUi() {
-        if (!document.head.attachShadow) {
-            console.warn(
-                `Skift: Sorry, we don't support the UI in the browsers without Shadow DOM for now`
-            );
-            return;
-        }
+        const skift = document.createElement('div');
+        skift.className = 'skift';
 
-        const containerElement = document.createElement('div');
-        const shadowRoot = containerElement.attachShadow({ mode: 'open' });
         const style = document.createElement('style');
-        style.innerHTML = require('./main.css');
+        style.innerHTML = require('./ui.css');
 
         const testListEl = document.createElement('div');
         testListEl.className = 'test-list';
@@ -87,14 +90,14 @@ export const uiFactory = (
             testListEl.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
 
-        const previousContainer = shadowRoot.querySelector('.ui-container');
+        const previousContainer = document.querySelector('.skift .container');
 
         if (previousContainer) {
             container = previousContainer;
         } else {
             container = document.createElement('div');
             container.appendChild(testListEl);
-            container.className = 'ui-container';
+            container.className = 'container';
         }
         const button = document.createElement('button');
 
@@ -114,22 +117,22 @@ export const uiFactory = (
         });
         container.appendChild(close);
 
-        shadowRoot.appendChild(style);
-        shadowRoot.appendChild(container);
-        document.body.appendChild(containerElement);
+        skift.appendChild(style);
+        skift.appendChild(container);
+        document.body.appendChild(skift);
         isInitialized = true;
     }
 
     function show() {
         if (isInitialized) {
-            container.className = 'ui-container';
+            container.className = 'container';
         } else {
             showSplitTestUi();
         }
     }
 
     function hide() {
-        container.className = 'ui-container hideme';
+        container.className = 'container hideme';
     }
 
     return {

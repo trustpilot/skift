@@ -47,10 +47,8 @@ describe('Top-level api', () => {
 
         skift.ui.show();
 
-        const div = <HTMLElement>document.querySelector('div');
-        const root = <ShadowRoot>div.shadowRoot;
-
-        expect(root.querySelector('.skift-ui-container')).toBeDefined();
+        const skiftUI = document.querySelector('.skift .container');
+        expect(skiftUI).toBeTruthy();
     });
 
     describe('when setting a condition', () => {

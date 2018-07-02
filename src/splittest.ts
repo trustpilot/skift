@@ -8,7 +8,7 @@ import {
     TrackEventType,
     TrackEventActionType
 } from './tracking';
-import qs from 'querystringify';
+import * as qs from 'querystringify';
 import config, { ConditionFunction } from './config';
 import { alwaysPromise } from './alwaysPromise';
 

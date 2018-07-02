@@ -8,7 +8,7 @@ import {
     trackingDataExtenderFactory,
     TrackingEventHandler
 } from './tracking';
-import qs from 'querystringify';
+import * as  qs from 'querystringify';
 import _config, { ConditionFunction, UserSessionPersister } from './config';
 import { alwaysPromise } from './alwaysPromise';
 

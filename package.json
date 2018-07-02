@@ -8,6 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@semantic-release/git": "6.0.1",
     "@types/jasmine": "2.5.52",
     "cross-env": "5.1.5",
     "css-loader": "0.28.11",
@@ -57,10 +58,17 @@
       "@semantic-release/npm",
       {
         "path": "@semantic-release/git",
-        "assets": ["package.json", "package-lock.json", "dist/**/*.{js|css|map}", "types"],
+        "assets": [
+          "package.json",
+          "package-lock.json",
+          "dist/**/*.{js|css|map}",
+          "types"
+        ],
         "message": "chore: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    "publish": ["@semantic-release/github"]
+    "publish": [
+      "@semantic-release/github"
+    ]
   }
 }

@@ -21,10 +21,12 @@
     "querystringify": "1.0.0",
     "semantic-release": "15.6.0",
     "ts-jest": "22.4.6",
-    "ts-loader": "2.2.2",
+    "ts-loader": "4.4.2",
     "tslint": "5.10.0",
     "typescript": "2.8.3",
-    "webpack": "3.0.0"
+    "uglifyjs-webpack-plugin": "1.2.7",
+    "webpack": "4.14.0",
+    "webpack-cli": "3.0.8"
   },
   "files": [
     "dist",
@@ -39,8 +41,8 @@
     "url": "https://github.com/trustpilot/skift.git"
   },
   "scripts": {
-    "build:dev": "cross-env NODE_ENV=development webpack",
-    "build:prod": "cross-env NODE_ENV=production webpack",
+    "build:dev": "webpack-cli --config ./config/webpack.dev.js",
+    "build:prod": "webpack-cli --config ./config/webpack.prod.js",
     "ci:travis": "npm run lint && npm run test",
     "commitmsg": "commitlint -E GIT_PARAMS",
     "lint": "tslint 'src/**/*.ts' --type-check --project ./",

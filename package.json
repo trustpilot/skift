@@ -60,11 +60,8 @@
       {
         "path": "@semantic-release/git",
         "assets": [
-          ".gitignore",
           "package.json",
-          "package-lock.json",
-          "dist",
-          "types"
+          "package-lock.json"
         ],
         "message": "chore: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }

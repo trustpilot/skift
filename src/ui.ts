@@ -9,7 +9,7 @@ function getVariationPercentage(variation: InternalVariation): string {
 }
 
 let isInitialized = false;
-let container: Element;
+let skift: Element;
 
 export const uiFactory = (
     tests: BehavioralSubject<SplitTest[]>,
@@ -31,38 +31,43 @@ export const uiFactory = (
                 'Mobile device': getUserAgentInfo().isMobile
             };
 
-            const variationHtml = test.variations.map(variant => {
-                return `
-                    <a
-                        href="${test.getVariationUrl(variant.name)}"
-                        title="Segment: ${getVariationPercentage(variant as InternalVariation)}"
-                    >
-                        ${variant.name}
-                    </a>
-                `;
-            });
-
             return `
                 <div class="test">
-                    <div class="header">
-                        Viewing: <span class="abtest-variant">${variation}</span>
-                    </div>
                     ${Object.keys(data).map(key => `
                         <div>
                             <span class="data-label">${key}</span>
                             <span class="data-value">${data[key]}</span>
                         </div>
                     `).join('')}
-                    ${variationHtml.join('&nbsp;&bull;&nbsp;')}
+                </div>
+                <div class="variations">
+                    <span class="legend">Variations available:</span>
+                    <ul>
+                        ${test.variations.map(variant => {
+                            if (variation === variant.name) {
+                                return `
+                                    <li class="selected">${variant.name}</li>
+                                `;
+                            }
+
+                            return `
+                                <li>
+                                    <a
+                                        href="${test.getVariationUrl(variant.name)}"
+                                        title="Segment: ${getVariationPercentage(variant as InternalVariation)}"
+                                    >
+                                        ${variant.name}
+                                    </a>
+                                </li>
+                            `;
+                        }).join('')}
+                    </ul>
                 </div>
             `;
         } else {
             const canRun = await test.shouldRun(getUserAgentInfo());
             return `
                 <div class="test">
-                    <div class="header">
-                        Viewing: <span class="abtest-variant">Not initialized</span>
-                    </div>
                     <div>Test <span class="data-value">${test.name}</span> is not initialized</div>
                     <div>
                         <span class="data-label">Can run</span>
@@ -74,31 +79,31 @@ export const uiFactory = (
     }
 
     function showSplitTestUi() {
-        const skift = document.createElement('div');
-        skift.className = 'skift';
+        const previousContainer = document.querySelector('.skift');
+
+        if (previousContainer) {
+            skift = previousContainer;
+        } else {
+            skift = document.createElement('div');
+            skift.className = 'skift';
+        }
 
         const style = document.createElement('style');
         style.innerHTML = require('./ui.css');
 
-        const testListEl = document.createElement('div');
-        testListEl.className = 'test-list';
+        const header = document.createElement('div');
+        header.className = 'header';
+        header.textContent = 'Skift';
+
+        const testList = document.createElement('div');
+        testList.className = 'tests';
 
         tests.subscribe(async list => {
-            while (testListEl.hasChildNodes()) {
-                testListEl.removeChild(testListEl.lastChild as Node);
+            while (testList.hasChildNodes()) {
+                testList.removeChild(testList.lastChild as Node);
             }
-            testListEl.innerHTML = (await Promise.all(list.map(renderTest))).join('');
+            testList.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
-
-        const previousContainer = document.querySelector('.skift .container');
-
-        if (previousContainer) {
-            container = previousContainer;
-        } else {
-            container = document.createElement('div');
-            container.appendChild(testListEl);
-            container.className = 'container';
-        }
         const button = document.createElement('button');
 
         button.className = 'reset';
@@ -107,32 +112,33 @@ export const uiFactory = (
         button.addEventListener('click', () => {
             reset();
         });
-        container.appendChild(button);
 
-        const close = document.createElement('div');
+        const close = document.createElement('span');
         close.className = 'close';
         close.textContent = 'X';
         close.addEventListener('click', () => {
             hide();
         });
-        container.appendChild(close);
+        header.appendChild(close);
 
+        skift.appendChild(header);
         skift.appendChild(style);
-        skift.appendChild(container);
+        skift.appendChild(testList);
+        skift.appendChild(button);
         document.body.appendChild(skift);
         isInitialized = true;
     }
 
     function show() {
         if (isInitialized) {
-            container.className = 'container';
+            skift.className = 'skift';
         } else {
             showSplitTestUi();
         }
     }
 
     function hide() {
-        container.className = 'container hideme';
+        skift.className = 'skift hideme';
     }
 
     return {

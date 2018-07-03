@@ -44,6 +44,17 @@
       document.getElementById('test-button').style.backgroundColor = '#ffcc00';
     }
   }).setup();
+
+  skift.create('another-test').setCondition(() => {
+    return true;
+  }).addVariation({
+    name: 'control' // No setup required.
+  }).addVariation({
+    name: 'bigger-button',
+    setup() {
+      document.getElementById('test-button').style.width = '300px';
+    }
+  }).setup();
 </script>
 </body>
 </html>

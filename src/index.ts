@@ -50,7 +50,8 @@ export {
     setCurrentTestVariation,
     reset,
     ui,
-    SplitTest
+    SplitTest,
+    initialize
 };
 
 export default {

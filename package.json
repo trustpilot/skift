@@ -11,6 +11,7 @@
     "@commitlint/cli": "7.0.0",
     "@commitlint/config-conventional": "7.0.1",
     "@semantic-release/git": "6.0.1",
+    "@types/jest": "23.1.4",
     "ajv": "6.5.2",
     "css-loader": "0.28.11",
     "css-to-string-loader": "0.1.3",

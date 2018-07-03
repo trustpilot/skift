@@ -10,10 +10,8 @@ import {
     reset,
     SplitTest,
     initialize,
-    UserConfig,
     shouldShowUI
 } from './main';
-import { UserAgentInfo } from './useragentinfo';
 import { uiFactory } from './ui';
 
 initialize();

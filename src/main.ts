@@ -9,17 +9,8 @@ import {
     TrackingEventHandler
 } from './tracking';
 import * as  qs from 'querystringify';
-import _config, { ConditionFunction, UserSessionPersister } from './config';
+import _config, { ConditionFunction, UserSessionPersister, SplitTestConfig } from './config';
 import { alwaysPromise } from './alwaysPromise';
-
-export interface UserConfig {
-    cookieName?: string;
-    globalCondition?: ConditionFunction;
-    sessionPersister?: UserSessionPersister;
-    tracking?: TrackingEventHandler;
-    uiCondition?: ConditionFunction;
-    userSessionDaysToLive?: number;
-}
 
 const userAgentInfo = _getUserAgentInfo();
 export const tests: SplitTest[] = [];
@@ -27,7 +18,7 @@ export const testsObservable: BehavioralSubject<
     SplitTest[]
 > = new BehavioralSubject(tests);
 
-export function config(userConfig: UserConfig = {}) {
+export function config(userConfig: Partial<SplitTestConfig> = {}) {
     if (userConfig.cookieName) {
         _config.cookieName = userConfig.cookieName;
     }

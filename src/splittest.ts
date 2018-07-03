@@ -169,8 +169,8 @@ export class SplitTest {
                 '//' +
                 location.host +
                 location.pathname +
-                qs.stringify(query, true) +
-                location.hash
+                location.hash +
+                qs.stringify(query, true)
             );
         } catch (e) {
             return location.href;

@@ -47,7 +47,7 @@ describe('Top-level api', () => {
 
         skift.ui.show();
 
-        const skiftUI = document.querySelector('.skift .container');
+        const skiftUI = document.querySelector('.skift');
         expect(skiftUI).toBeTruthy();
     });
 

@@ -5,7 +5,6 @@ interface TestVariationsMap {
 }
 
 export class UserSession {
-
     public setTestVariation(testName: string, variationName: string): void {
         const variationsMap = this.loadVariations();
         variationsMap[testName] = variationName;
@@ -31,5 +30,4 @@ export class UserSession {
     }
 }
 
-const userSession = new UserSession();
-export default userSession;
+export default new UserSession();

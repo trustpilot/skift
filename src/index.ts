@@ -8,10 +8,10 @@ import {
     reset,
     setCurrentTestVariation,
     shouldShowUI,
-    SplitTest,
     tests,
     testsObservable,
 } from './main';
+import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
 
 initialize();

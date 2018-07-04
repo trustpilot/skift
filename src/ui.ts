@@ -1,6 +1,6 @@
-import { BehavioralSubject } from './behavioral-subject';
-import { InternalVariation, SplitTest } from './splittest';
-import { UserAgentInfo } from './useragentinfo';
+import { BehavioralSubject } from './behavioralSubject';
+import { InternalVariation, SplitTest } from './splitTest';
+import { UserAgentInfo } from './userAgentInfo';
 
 declare const require: any;
 

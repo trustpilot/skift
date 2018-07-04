@@ -1,47 +1,21 @@
-import { TrackEventType, TrackingData, TrackingEventHandler } from './tracking';
-import { UserAgentInfo } from './useragentinfo';
-import usersessioncookiepersister from './usersessioncookiepersister';
+import { Condition } from './condition';
+import { ConsoleTracking, Tracking } from './tracking';
+import { CookiePersister, UserSessionPersister } from './userSessionPersister';
 
-export interface UserSessionPersister {
-    loadUserSession(): string | null;
-    saveUserSession(userSession: string, daysToLive: number): void;
-}
-
-export type ConditionFunction = (userAgentInfo: UserAgentInfo) => boolean | Promise<boolean>;
-
-export interface SplitTestConfig {
+export interface Config {
     cookieName: string;
-    globalCondition: ConditionFunction;
+    globalCondition: Condition;
     sessionPersister: UserSessionPersister;
-    tracking: TrackingEventHandler;
-    uiCondition: ConditionFunction;
+    tracking: Tracking;
+    uiCondition: Condition;
     userSessionDaysToLive: number;
 }
 
-const defaultTrackingEventHandler: TrackingEventHandler = (() => {
-    function log(event: TrackEventType, trackingData: TrackingData) {
-        console.log('Split testing event: ' + event, trackingData);
-    }
-
-    return {
-        track: log,
-        trackLink(
-            element: Element,
-            event: TrackEventType,
-            trackingData: TrackingData,
-        ) {
-            element.addEventListener('click', () => {
-                log(event, trackingData);
-            });
-        },
-    };
-})();
-
-const config: SplitTestConfig = {
+const config: Config = {
     cookieName: 'skiftABTest',
     globalCondition: () => true,
-    sessionPersister: usersessioncookiepersister,
-    tracking: defaultTrackingEventHandler,
+    sessionPersister: new CookiePersister(),
+    tracking: new ConsoleTracking(),
     uiCondition: () => false,
     userSessionDaysToLive: 3,
 };

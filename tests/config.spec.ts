@@ -14,7 +14,7 @@ describe('Config', () => {
 
     it('should override default config', () => {
         skift.config({
-            cookieName: 'Test'
+            cookieName: 'Test',
         });
 
         expect(config).toBeDefined();
@@ -23,7 +23,7 @@ describe('Config', () => {
 
     it('should keep configuration after multiple initialization', () => {
         skift.config({
-            cookieName: 'Test'
+            cookieName: 'Test',
         });
 
         skift.initialize();

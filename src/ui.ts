@@ -26,9 +26,6 @@ export const uiFactory = (
                 Variation: `${variation} (${getVariationPercentage(
                     test.getVariation(variation) as InternalVariation,
                 )})`,
-                Browser:
-                    getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
-                'Mobile device': getUserAgentInfo().isMobile
             };
 
             return `
@@ -104,6 +101,7 @@ export const uiFactory = (
             }
             testList.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
+
         const button = document.createElement('button');
 
         button.className = 'reset';

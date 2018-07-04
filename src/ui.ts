@@ -22,10 +22,8 @@ export const uiFactory = (
             const variation = getCurrentTestVariation(test.name);
 
             const data: { [key: string]: any } = {
-                'Browser': getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
-                'Mobile device': getUserAgentInfo().isMobile,
-                'Test': test.name,
-                'Variation': `${variation} (${getVariationPercentage(
+                Test: test.name,
+                Variation: `${variation} (${getVariationPercentage(
                     test.getVariation(variation) as InternalVariation,
                 )})`,
             };

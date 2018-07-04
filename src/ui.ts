@@ -22,13 +22,12 @@ export const uiFactory = (
             const variation = getCurrentTestVariation(test.name);
 
             const data: { [key: string]: any } = {
-                Test: test.name,
-                Variation: `${variation} (${getVariationPercentage(
+                'Browser': getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
+                'Mobile device': getUserAgentInfo().isMobile,
+                'Test': test.name,
+                'Variation': `${variation} (${getVariationPercentage(
                     test.getVariation(variation) as InternalVariation,
                 )})`,
-                Browser:
-                    getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
-                'Mobile device': getUserAgentInfo().isMobile
             };
 
             return `

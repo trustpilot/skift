@@ -1,23 +1,18 @@
-import { BehavioralSubject } from './behavioral-subject';
-import { SplitTest } from './splittest';
-import _getUserAgentInfo from './useragentinfo';
-import userSession, { UserSession } from './usersession';
-export { SplitTest } from './splittest';
 import * as  qs from 'querystringify';
+
 import { alwaysPromise } from './alwaysPromise';
-import _config, { SplitTestConfig } from './config';
-import {
-    TrackingDataExtender,
-    trackingDataExtenderFactory,
-} from './tracking';
+import { BehavioralSubject } from './behavioralSubject';
+import _config, { Config } from './config';
+import { SplitTest } from './splitTest';
+import { TrackingDataExtender, trackingDataExtenderFactory } from './tracking';
+import _getUserAgentInfo from './userAgentInfo';
+import userSession, { UserSession } from './userSession';
 
 const userAgentInfo = _getUserAgentInfo();
 export const tests: SplitTest[] = [];
-export const testsObservable: BehavioralSubject<
-    SplitTest[]
-> = new BehavioralSubject(tests);
+export const testsObservable: BehavioralSubject<SplitTest[]> = new BehavioralSubject(tests);
 
-export function config(userConfig: Partial<SplitTestConfig> = {}) {
+export function config(userConfig: Partial<Config> = {}) {
     if (userConfig.cookieName) {
         _config.cookieName = userConfig.cookieName;
     }

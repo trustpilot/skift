@@ -5,7 +5,7 @@ export interface TrackingData {
 /**
  * Describing a handler for A/B test events
  */
-export interface TrackingEventHandler {
+export interface Tracking {
     /**
      * Records an action your user performs.
      * @param event The name of the event you’re tracking.
@@ -39,4 +39,16 @@ export function trackingDataExtenderFactory(newTrackingData: TrackingData): Trac
         ...trackingData,
         ...newTrackingData,
     });
+}
+
+export class ConsoleTracking implements Tracking {
+    public track(event: TrackEventType, trackingData: TrackingData) {
+        console.log('Split testing event: ' + event, trackingData);
+    }
+
+    public trackLink(element: Element, event: TrackEventType, trackingData: TrackingData) {
+        element.addEventListener('click', () => {
+            this.track(event, trackingData);
+        });
+    }
 }

@@ -1,5 +1,5 @@
 import skift from '../src/index';
-import { SplitTest } from '../src/splittest';
+import { SplitTest } from '../src/splitTest';
 
 describe('Top-level api', () => {
     it('should export the object', () => {

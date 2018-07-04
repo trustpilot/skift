@@ -1,7 +1,9 @@
 import * as qs from 'querystringify';
+
 import { alwaysPromise } from './alwaysPromise';
-import { BehavioralSubject } from './behavioral-subject';
-import config, { ConditionFunction } from './config';
+import { BehavioralSubject } from './behavioralSubject';
+import { Condition } from './condition';
+import config from './config';
 import {
     TrackEventActionType,
     TrackEventType,
@@ -9,8 +11,8 @@ import {
     TrackingDataExtender,
     trackingDataExtenderFactory,
 } from './tracking';
-import { UserAgentInfo } from './useragentinfo';
-import userSession from './usersession';
+import { UserAgentInfo } from './userAgentInfo';
+import userSession from './userSession';
 
 export interface Variation {
     /** A descriptive unique name of this variation */
@@ -67,7 +69,7 @@ export class SplitTest {
         return (await Promise.all(conditionPromises)).every((a) => a);
     }
 
-    public setCondition(condition: ConditionFunction): SplitTest {
+    public setCondition(condition: Condition): SplitTest {
         this.condition = condition;
         return this;
     }
@@ -227,7 +229,7 @@ export class SplitTest {
         config.tracking.trackLink(element, event, trackingData);
     }
 
-    private condition: ConditionFunction = () => true;
+    private condition: Condition = () => true;
 
     private normalizeVariationWeights(): void {
         const weightsSum = this._variations.reduce(

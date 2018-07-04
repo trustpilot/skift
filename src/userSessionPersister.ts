@@ -1,4 +1,9 @@
-import config, {UserSessionPersister} from './config';
+import config from './config';
+
+export interface UserSessionPersister {
+    loadUserSession(): string | null;
+    saveUserSession(userSession: string, daysToLive: number): void;
+}
 
 function createCookie(name: string, value: string, days: number): void {
     let expires = '';
@@ -24,13 +29,12 @@ function readCookie(name: string): string | null {
     return null;
 }
 
-const persister: UserSessionPersister = {
-    loadUserSession(): string | null {
+export class CookiePersister implements UserSessionPersister {
+    public loadUserSession() {
         return readCookie(config.cookieName);
-    },
+    }
 
-    saveUserSession(userSession: string, daysToLive: number): void {
+    public saveUserSession(userSession: string, daysToLive: number) {
         createCookie(config.cookieName, userSession, daysToLive);
-    },
-};
-export default persister;
+    }
+}

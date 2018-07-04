@@ -1,15 +1,14 @@
 import { BehavioralSubject } from './behavioral-subject';
-import { InternalVariation, SplitTest } from './splittest';
-import _getUserAgentInfo, { UserAgentInfo } from './useragentinfo';
+import { SplitTest } from './splittest';
+import _getUserAgentInfo from './useragentinfo';
 import userSession, { UserSession } from './usersession';
 export { SplitTest } from './splittest';
 import * as  qs from 'querystringify';
 import { alwaysPromise } from './alwaysPromise';
-import _config, { ConditionFunction, SplitTestConfig, UserSessionPersister } from './config';
+import _config, { SplitTestConfig } from './config';
 import {
     TrackingDataExtender,
     trackingDataExtenderFactory,
-    TrackingEventHandler,
 } from './tracking';
 
 const userAgentInfo = _getUserAgentInfo();

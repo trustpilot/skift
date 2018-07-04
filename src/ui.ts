@@ -103,6 +103,7 @@ export const uiFactory = (
             }
             testList.innerHTML = (await Promise.all(list.map(renderTest))).join('');
         });
+
         const button = document.createElement('button');
 
         button.className = 'reset';

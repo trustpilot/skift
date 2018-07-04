@@ -25,9 +25,7 @@ export interface TrackingEventHandler {
 /**
  * A function that extends a tracking data object with even more data
  */
-export interface TrackingDataExtender {
-    (trackingData: TrackingData, event: string): TrackingData;
-}
+export type TrackingDataExtender = (trackingData: TrackingData, event: string) => TrackingData;
 
 export declare type TrackEventType = 'ExperimentViewed' | 'ExperimentActionPerformed';
 export declare type TrackEventActionType = 'Click' | 'Type';
@@ -39,6 +37,6 @@ export declare type TrackEventActionType = 'Click' | 'Type';
 export function trackingDataExtenderFactory(newTrackingData: TrackingData): TrackingDataExtender {
     return (trackingData: TrackingData) => ({
         ...trackingData,
-        ...newTrackingData
+        ...newTrackingData,
     });
 }

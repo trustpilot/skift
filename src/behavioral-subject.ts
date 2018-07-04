@@ -6,12 +6,12 @@ export class BehavioralSubject<A> {
         this._value = value;
     }
 
-    next(value: A) {
+    public next(value: A) {
         this._value = value;
-        this.subscribers.forEach(observer => observer(this._value));
+        this.subscribers.forEach((observer) => observer(this._value));
     }
 
-    subscribe(observer: (value: A) => void) {
+    public subscribe(observer: (value: A) => void) {
         observer(this._value);
         this.subscribers.push(observer);
     }

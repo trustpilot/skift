@@ -1,16 +1,16 @@
 import {
-    tests,
-    testsObservable,
     config,
-    getUserAgentInfo,
-    getTest,
     create,
     getCurrentTestVariation,
-    setCurrentTestVariation,
-    reset,
-    SplitTest,
+    getTest,
+    getUserAgentInfo,
     initialize,
-    shouldShowUI
+    reset,
+    setCurrentTestVariation,
+    shouldShowUI,
+    SplitTest,
+    tests,
+    testsObservable,
 } from './main';
 import { uiFactory } from './ui';
 
@@ -20,7 +20,7 @@ const ui = uiFactory(
     testsObservable,
     reset,
     getCurrentTestVariation,
-    getUserAgentInfo
+    getUserAgentInfo,
 );
 
 function domReady(cb: () => void) {
@@ -49,19 +49,19 @@ export {
     reset,
     ui,
     SplitTest,
-    initialize
+    initialize,
 };
 
 export default {
-    tests,
+    SplitTest,
     config,
-    getUserAgentInfo,
-    getTest,
     create,
     getCurrentTestVariation,
-    setCurrentTestVariation,
+    getTest,
+    getUserAgentInfo,
+    initialize,
     reset,
+    setCurrentTestVariation,
+    tests,
     ui,
-    SplitTest,
-    initialize
 };

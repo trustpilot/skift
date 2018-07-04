@@ -1,15 +1,13 @@
-import { TrackingEventHandler, TrackEventType, TrackingData } from './tracking';
-import usersessioncookiepersister from './usersessioncookiepersister';
+import { TrackEventType, TrackingData, TrackingEventHandler } from './tracking';
 import { UserAgentInfo } from './useragentinfo';
+import usersessioncookiepersister from './usersessioncookiepersister';
 
 export interface UserSessionPersister {
     loadUserSession(): string | null;
     saveUserSession(userSession: string, daysToLive: number): void;
 }
 
-export interface ConditionFunction {
-    (userAgentInfo: UserAgentInfo): boolean | Promise<boolean>;
-}
+export type ConditionFunction = (userAgentInfo: UserAgentInfo) => boolean | Promise<boolean>;
 
 export interface SplitTestConfig {
     cookieName: string;
@@ -30,12 +28,12 @@ const defaultTrackingEventHandler: TrackingEventHandler = (() => {
         trackLink(
             element: Element,
             event: TrackEventType,
-            trackingData: TrackingData
+            trackingData: TrackingData,
         ) {
             element.addEventListener('click', () => {
                 log(event, trackingData);
             });
-        }
+        },
     };
 })();
 
@@ -44,8 +42,8 @@ const config: SplitTestConfig = {
     globalCondition: () => true,
     sessionPersister: usersessioncookiepersister,
     tracking: defaultTrackingEventHandler,
+    uiCondition: () => false,
     userSessionDaysToLive: 3,
-    uiCondition: () => false
 };
 
 export default config;

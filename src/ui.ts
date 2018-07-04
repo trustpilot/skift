@@ -15,7 +15,7 @@ export const uiFactory = (
     tests: BehavioralSubject<SplitTest[]>,
     reset: () => void,
     getCurrentTestVariation: (testName: string) => string,
-    getUserAgentInfo: () => UserAgentInfo
+    getUserAgentInfo: () => UserAgentInfo,
 ) => {
     async function renderTest(test: SplitTest): Promise<string> {
         if (await test.isInitialized()) {
@@ -24,7 +24,7 @@ export const uiFactory = (
             const data: { [key: string]: any } = {
                 Test: test.name,
                 Variation: `${variation} (${getVariationPercentage(
-                    test.getVariation(variation) as InternalVariation
+                    test.getVariation(variation) as InternalVariation,
                 )})`,
                 Browser:
                     getUserAgentInfo().name + ' ' + getUserAgentInfo().version,
@@ -33,7 +33,7 @@ export const uiFactory = (
 
             return `
                 <div class="test">
-                    ${Object.keys(data).map(key => `
+                    ${Object.keys(data).map((key) => `
                         <div>
                             <span class="data-label">${key}</span>
                             <span class="data-value">${data[key]}</span>
@@ -43,7 +43,7 @@ export const uiFactory = (
                 <div class="variations">
                     <span class="legend">Variations available:</span>
                     <ul>
-                        ${test.variations.map(variant => {
+                        ${test.variations.map((variant) => {
                             if (variation === variant.name) {
                                 return `
                                     <li class="selected">${variant.name}</li>
@@ -98,7 +98,7 @@ export const uiFactory = (
         const testList = document.createElement('div');
         testList.className = 'tests';
 
-        tests.subscribe(async list => {
+        tests.subscribe(async (list) => {
             while (testList.hasChildNodes()) {
                 testList.removeChild(testList.lastChild as Node);
             }
@@ -142,7 +142,7 @@ export const uiFactory = (
     }
 
     return {
+        hide,
         show,
-        hide
     };
 };

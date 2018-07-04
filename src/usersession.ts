@@ -6,18 +6,18 @@ interface TestVariationsMap {
 
 export class UserSession {
 
-    setTestVariation(testName: string, variationName: string): void {
+    public setTestVariation(testName: string, variationName: string): void {
         const variationsMap = this.loadVariations();
         variationsMap[testName] = variationName;
         this.saveVariations(variationsMap);
     }
 
-    getTestVariation(testName: string): string {
+    public getTestVariation(testName: string): string {
         const variationsMap = this.loadVariations();
         return variationsMap[testName];
     }
 
-    reset() {
+    public reset() {
         this.saveVariations({});
     }
 

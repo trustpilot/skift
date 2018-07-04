@@ -1,16 +1,16 @@
+import { BehavioralSubject } from './behavioral-subject';
+import { InternalVariation, SplitTest } from './splittest';
 import _getUserAgentInfo, { UserAgentInfo } from './useragentinfo';
 import userSession, { UserSession } from './usersession';
-import { SplitTest, InternalVariation } from './splittest';
-import { BehavioralSubject } from './behavioral-subject';
 export { SplitTest } from './splittest';
+import * as  qs from 'querystringify';
+import { alwaysPromise } from './alwaysPromise';
+import _config, { ConditionFunction, SplitTestConfig, UserSessionPersister } from './config';
 import {
     TrackingDataExtender,
     trackingDataExtenderFactory,
-    TrackingEventHandler
+    TrackingEventHandler,
 } from './tracking';
-import * as  qs from 'querystringify';
-import _config, { ConditionFunction, UserSessionPersister, SplitTestConfig } from './config';
-import { alwaysPromise } from './alwaysPromise';
 
 const userAgentInfo = _getUserAgentInfo();
 export const tests: SplitTest[] = [];
@@ -43,13 +43,13 @@ function baseTrackingDataExtenderFactory(): TrackingDataExtender {
     return trackingDataExtenderFactory({
         browser: userAgentInfo.name,
         browserVersion: userAgentInfo.version,
-        isMobile: userAgentInfo.isMobile
+        isMobile: userAgentInfo.isMobile,
     });
 }
 
 function initializeFromQueryString(session: UserSession): void {
     const query = qs.parse(location.search);
-    const abtestParam = query['abtest'];
+    const abtestParam = query.abtest;
 
     if (typeof abtestParam === 'string') {
         try {
@@ -80,7 +80,7 @@ function validateTestName(testName: string) {
 
 function reloadWithoutAbTestParameter() {
     const query = qs.parse(location.search);
-    delete query['abtest'];
+    delete query.abtest;
     location.href =
         location.href.replace(location.search, '').replace(location.hash, '') +
         qs.stringify(query, Object.keys(query).length > 0) +
@@ -92,14 +92,14 @@ export function getUserAgentInfo() {
 }
 
 export function getTest(name: string) {
-    return tests.filter(t => t.name === name)[0];
+    return tests.filter((t) => t.name === name)[0];
 }
 
 export function create(name: string): SplitTest {
     const test = new SplitTest(
         name,
         userAgentInfo,
-        baseTrackingDataExtenderFactory()
+        baseTrackingDataExtenderFactory(),
     );
     tests.push(test);
     test.changes.subscribe(() => testsObservable.next(tests));
@@ -114,7 +114,7 @@ export function getCurrentTestVariation(testName: string): string {
 
 export function setCurrentTestVariation(
     testName: string,
-    variation: string
+    variation: string,
 ): void {
     validateTestName(testName);
     validateInitialized(getTest(testName));
@@ -131,8 +131,8 @@ export function reset(): void {
 export async function shouldShowUI() {
     const promises = [
         _config.globalCondition(userAgentInfo),
-        _config.uiCondition(userAgentInfo)
+        _config.uiCondition(userAgentInfo),
     ].map(alwaysPromise);
 
-    return (await Promise.all(promises)).every(a => a);
+    return (await Promise.all(promises)).every((a) => a);
 }

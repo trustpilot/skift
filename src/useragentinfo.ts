@@ -6,7 +6,7 @@ function getNameAndVersion() {
         tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
         return {
             name: 'IE',
-            version: (tem[1] || '')
+            version: (tem[1] || ''),
         };
     }
     if (match[1] === 'Chrome') {
@@ -14,7 +14,7 @@ function getNameAndVersion() {
         if (tem != null) {
             return {
                 name: 'Opera',
-                version: tem[1]
+                version: tem[1],
             };
         }
     }
@@ -25,7 +25,7 @@ function getNameAndVersion() {
     }
     return {
         name: match[0],
-        version: match[1]
+        version: match[1],
     };
 }
 
@@ -45,6 +45,6 @@ export interface UserAgentInfo {
 export default function getUserAgentInfo(): UserAgentInfo {
     return {
         ...getNameAndVersion(),
-        isMobile: isMobile()
+        isMobile: isMobile(),
     };
 }

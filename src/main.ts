@@ -95,6 +95,10 @@ export function create(name: string): SplitTest {
         userAgentInfo,
         baseTrackingDataExtenderFactory(),
     );
+
+    // Initialize test from query params if available
+    initialize();
+
     tests.push(test);
     test.changes.subscribe(() => testsObservable.next(tests));
     return test;

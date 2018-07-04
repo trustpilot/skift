@@ -14,8 +14,6 @@ import {
 import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
 
-initialize();
-
 const ui = uiFactory(
     testsObservable,
     reset,

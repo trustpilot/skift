@@ -4,7 +4,6 @@ import {
     getCurrentTestVariation,
     getTest,
     getUserAgentInfo,
-    initialize,
     reset,
     setCurrentTestVariation,
     shouldShowUI,
@@ -47,7 +46,6 @@ export {
     reset,
     ui,
     SplitTest,
-    initialize,
 };
 
 export default {
@@ -57,7 +55,6 @@ export default {
     getCurrentTestVariation,
     getTest,
     getUserAgentInfo,
-    initialize,
     reset,
     setCurrentTestVariation,
     tests,

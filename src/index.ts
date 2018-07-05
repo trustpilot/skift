@@ -18,6 +18,7 @@ const ui = uiFactory(
     reset,
     getCurrentTestVariation,
     getUserAgentInfo,
+    setCurrentTestVariation,
 );
 
 function domReady(cb: () => void) {

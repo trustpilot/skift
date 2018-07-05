@@ -36,6 +36,9 @@ module.exports = {
           minimize: true
         }
       }]
+    }, {
+      test: /\.svg$/,
+      loader: 'svg-inline-loader'
     }]
   },
   plugins: [

@@ -5,9 +5,10 @@
     "target": "ES5",
     "module": "es2015",
     "declaration": true,
-    "declarationDir": "../types",
+    "declarationDir": "types",
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "outDir": "lib"
   },
   "include": [
     "./src/**/*.ts"

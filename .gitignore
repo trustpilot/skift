@@ -42,3 +42,4 @@ jspm_packages
 temp
 dist
 types
+lib

@@ -7,7 +7,7 @@ module.exports = {
   devtool: 'cheap-source-map',
   mode: 'production',
   entry: {
-    skift: './src/index.ts'
+    skift: './lib/index.js'
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -21,12 +21,6 @@ module.exports = {
   },
   module: {
     rules: [{
-      test: /\.ts$/,
-      use: [{
-        loader: 'ts-loader'
-      }],
-      exclude: [/\.e2e\.ts$/]
-    }, {
       test: /\.css$/,
       use: [{
         loader: 'css-to-string-loader'

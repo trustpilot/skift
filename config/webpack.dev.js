@@ -26,7 +26,7 @@ module.exports = {
         loader: 'ts-loader'
       }],
       exclude: [/\.e2e\.ts$/]
-    }, {
+     }, {
       test: /\.css$/,
       use: [{
         loader: 'css-to-string-loader'

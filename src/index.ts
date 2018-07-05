@@ -4,7 +4,6 @@ import {
     getCurrentTestVariation,
     getTest,
     getUserAgentInfo,
-    initialize,
     reset,
     setCurrentTestVariation,
     shouldShowUI,
@@ -13,8 +12,6 @@ import {
 } from './main';
 import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
-
-initialize();
 
 const ui = uiFactory(
     testsObservable,
@@ -49,7 +46,6 @@ export {
     reset,
     ui,
     SplitTest,
-    initialize,
 };
 
 export default {
@@ -59,7 +55,6 @@ export default {
     getCurrentTestVariation,
     getTest,
     getUserAgentInfo,
-    initialize,
     reset,
     setCurrentTestVariation,
     tests,

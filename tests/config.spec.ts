@@ -20,15 +20,4 @@ describe('Config', () => {
         expect(config).toBeDefined();
         expect(config.cookieName).toEqual('Test');
     });
-
-    it('should keep configuration after multiple initialization', () => {
-        skift.config({
-            cookieName: 'Test',
-        });
-
-        skift.initialize();
-        skift.initialize();
-        expect(config).toBeDefined();
-        expect(config.cookieName).toEqual('Test');
-    });
 });

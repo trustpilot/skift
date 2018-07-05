@@ -1,9 +1,8 @@
-import * as qs from 'querystringify';
-
 import { alwaysPromise } from './alwaysPromise';
 import { BehavioralSubject } from './behavioralSubject';
 import { Condition } from './condition';
 import config from './config';
+import { setAbTestParameter } from './query';
 import {
     TrackEventActionType,
     TrackEventType,
@@ -41,7 +40,7 @@ export class SplitTest {
     private finalStateListeners: Array<() => void> = [];
     private readonly _variations: InternalVariation[] = [];
 
-    get variations(): Variation[] {
+    get variations(): InternalVariation[] {
         return this._variations;
     }
 
@@ -156,22 +155,20 @@ export class SplitTest {
         return this.state === 'initialized';
     }
 
-    public getVariation(name: string): Variation {
+    public getVariation(name: string): InternalVariation {
         return this._variations.filter((v) => v.name === name)[0];
     }
 
     public getVariationUrl(variationName: string | null): string {
         const param = `${this.name}=${variationName}`;
-        const query = qs.parse(location.search);
 
         try {
-            query.abtest = btoa(param);
             return (
                 location.protocol +
                 '//' +
                 location.host +
                 location.pathname +
-                qs.stringify(query, true) +
+                setAbTestParameter(location.search, btoa(param)) +
                 location.hash
             );
         } catch (e) {
@@ -253,7 +250,7 @@ export class SplitTest {
         this.finalStateListeners.push(listener);
     }
 
-    private selectRandomVariation(): Variation {
+    private selectRandomVariation(): InternalVariation {
         let i = 0;
         // Disable the rule for now and refactor this, when covered by a test.
         // tslint:disable:max-line-length no-conditional-assignment no-empty

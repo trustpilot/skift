@@ -17,10 +17,6 @@
   font-weight: bold;
 }
 
-.skift li a {
-  color: #0c59f2;
-}
-
 .skift .variations .legend {
   font-size: 12px;
 }
@@ -96,4 +92,18 @@
   color: #FFFFFF;
   border: 0;
   cursor: pointer;
+}
+
+.skift .icon {
+  height: 16px;
+  width: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 4px;
+  cursor: pointer;
+  color: #0c59f2;
+}
+
+.skift .icon:nth-child(2) {
+  margin-left: 8px;
 }

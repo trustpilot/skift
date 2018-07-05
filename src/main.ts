@@ -1,8 +1,7 @@
-import * as  qs from 'querystringify';
-
 import { alwaysPromise } from './alwaysPromise';
 import { BehavioralSubject } from './behavioralSubject';
 import _config, { Config } from './config';
+import { getAbTestParameter } from './query';
 import { SplitTest } from './splitTest';
 import { TrackingDataExtender, trackingDataExtenderFactory } from './tracking';
 import _getUserAgentInfo from './userAgentInfo';
@@ -28,6 +27,9 @@ export function config(userConfig: Partial<Config> = {}) {
     if (userConfig.userSessionDaysToLive) {
         _config.userSessionDaysToLive = userConfig.userSessionDaysToLive;
     }
+    if (userConfig.onVariationChange) {
+        _config.onVariationChange = userConfig.onVariationChange;
+    }
 }
 
 /**
@@ -42,12 +44,11 @@ function baseTrackingDataExtenderFactory(): TrackingDataExtender {
 }
 
 function initializeFromQueryString(session: UserSession): void {
-    const query = qs.parse(location.search);
-    const abtestParam = query.abtest;
+    const abTest = getAbTestParameter(location.search);
 
-    if (typeof abtestParam === 'string') {
+    if (abTest) {
         try {
-            const [test, variant] = atob(abtestParam).split('=');
+            const [test, variant] = atob(abTest).split('=');
             session.setTestVariation(test, variant);
         } catch (e) {
             // TODO: Handle error.
@@ -70,15 +71,6 @@ function validateTestName(testName: string) {
     if (!getTest(testName)) {
         throw new Error(`Skift: Unknown test "${testName}"`);
     }
-}
-
-function reloadWithoutAbTestParameter() {
-    const query = qs.parse(location.search);
-    delete query.abtest;
-    location.href =
-        location.href.replace(location.search, '').replace(location.hash, '') +
-        qs.stringify(query, Object.keys(query).length > 0) +
-        location.hash;
 }
 
 export function getUserAgentInfo() {
@@ -118,12 +110,12 @@ export function setCurrentTestVariation(
     validateInitialized(getTest(testName));
 
     userSession.setTestVariation(testName, variation);
-    reloadWithoutAbTestParameter();
+    _config.onVariationChange(testName, variation);
 }
 
 export function reset(): void {
     userSession.reset();
-    reloadWithoutAbTestParameter();
+    _config.onVariationChange();
 }
 
 export async function shouldShowUI() {

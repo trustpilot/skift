@@ -16,62 +16,108 @@ export const uiFactory = (
     reset: () => void,
     getCurrentTestVariation: (testName: string) => string,
     getUserAgentInfo: () => UserAgentInfo,
+    setCurrentTestVariation: (testName: string, variation: string) => void,
 ) => {
-    async function renderTest(test: SplitTest): Promise<string> {
-        if (await test.isInitialized()) {
-            const variation = getCurrentTestVariation(test.name);
+    function renderLink(splitTest: SplitTest, variation: InternalVariation) {
+        const link = document.createElement('span');
+        link.className = 'icon';
+        link.innerHTML = require('./link.svg');
+        link.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.value = splitTest.getVariationUrl(variation.name);
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+        });
+
+        return link;
+    }
+
+    function renderSelectedVaraition(splitTest: SplitTest, variation: InternalVariation) {
+        const item = document.createElement('li');
+        item.className = 'selected';
+        item.textContent = variation.name;
+
+        const link = renderLink(splitTest, variation);
+
+        item.appendChild(link);
+        return item;
+    }
+
+    function renderUnselectedVariation(splitTest: SplitTest, variation: InternalVariation) {
+        const item = document.createElement('li');
+        item.textContent = variation.name;
+
+        const open = document.createElement('span');
+        open.className = 'icon';
+        open.innerHTML = require('./open.svg');
+        open.addEventListener('click', (event) => {
+            event.preventDefault();
+            setCurrentTestVariation(splitTest.name, variation.name);
+        });
+
+        const link = renderLink(splitTest, variation);
+
+        item.appendChild(open);
+        item.appendChild(link);
+
+        return item;
+    }
+
+    async function renderTest(splitTest: SplitTest) {
+        if (await splitTest.isInitialized()) {
+            const currentVariation = splitTest.getVariation(getCurrentTestVariation(splitTest.name));
 
             const data: { [key: string]: any } = {
-                Test: test.name,
-                Variation: `${variation} (${getVariationPercentage(
-                    test.getVariation(variation) as InternalVariation,
-                )})`,
+                Test: splitTest.name,
+                Variation: `${currentVariation.name} (${getVariationPercentage(currentVariation)})`,
             };
 
-            return `
-                <div class="test">
-                    ${Object.keys(data).map((key) => `
-                        <div>
-                            <span class="data-label">${key}</span>
-                            <span class="data-value">${data[key]}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="variations">
-                    <span class="legend">Variations available:</span>
-                    <ul>
-                        ${test.variations.map((variant) => {
-                            if (variation === variant.name) {
-                                return `
-                                    <li class="selected">${variant.name}</li>
-                                `;
-                            }
-
-                            return `
-                                <li>
-                                    <a
-                                        href="${test.getVariationUrl(variant.name)}"
-                                        title="Segment: ${getVariationPercentage(variant as InternalVariation)}"
-                                    >
-                                        ${variant.name}
-                                    </a>
-                                </li>
-                            `;
-                        }).join('')}
-                    </ul>
-                </div>
-            `;
-        } else {
-            const canRun = await test.shouldRun(getUserAgentInfo());
-            return `
-                <div class="test">
-                    <div>Test <span class="data-value">${test.name}</span> is not initialized</div>
+            const test = document.createElement('div');
+            test.className = 'test';
+            test.innerHTML = `
+                ${Object.keys(data).map((key) => `
                     <div>
-                        <span class="data-label">Can run</span>
-                        <span class="data-value">${canRun}</span>
+                        <span class="data-label">${key}</span>
+                        <span class="data-value">${data[key]}</span>
                     </div>
+                `).join('')}
+            `;
+
+            const variations = document.createElement('div');
+            variations.className = 'variations';
+
+            const legend = document.createElement('span');
+            legend.className = 'legend';
+            legend.textContent = 'Variations available:';
+
+            const list = document.createElement('ul');
+            splitTest.variations.forEach((variation) => {
+                if (currentVariation.name === variation.name) {
+                    return list.appendChild(renderSelectedVaraition(splitTest, variation));
+                } else {
+                    return list.appendChild(renderUnselectedVariation(splitTest, variation));
+                }
+            });
+
+            variations.appendChild(legend);
+            variations.appendChild(list);
+
+            return [test, variations];
+        } else {
+            const canRun = await splitTest.shouldRun(getUserAgentInfo());
+            const test = document.createElement('div');
+            test.className = 'test';
+            test.innerHTML = `
+                <div>Test <span class="data-value">${splitTest.name}</span> is not initialized</div>
+                <div>
+                    <span class="data-label">Can run</span>
+                    <span class="data-value">${canRun}</span>
                 </div>
             `;
+
+            return [test];
         }
     }
 
@@ -99,7 +145,15 @@ export const uiFactory = (
             while (testList.hasChildNodes()) {
                 testList.removeChild(testList.lastChild as Node);
             }
-            testList.innerHTML = (await Promise.all(list.map(renderTest))).join('');
+            const test = await list.map(renderTest).reduce((promise, futureElement) => {
+                return promise.then((elements) => {
+                    return futureElement.then((element) => {
+                        elements.push(...element);
+                        return elements;
+                    });
+                });
+            }, Promise.resolve([]));
+            test.forEach((x) => testList.appendChild(x));
         });
 
         const button = document.createElement('button');

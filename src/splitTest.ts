@@ -5,12 +5,10 @@ import config from './config';
 import { setAbTestParameter } from './query';
 import {
     TrackEventActionType,
+    TrackEventData,
     TrackEventType,
-    TrackingData,
-    TrackingDataExtender,
-    trackingDataExtenderFactory,
 } from './tracking';
-import { UserAgentInfo } from './userAgentInfo';
+import getUserAgentInfo, { UserAgentInfo } from './userAgentInfo';
 import userSession from './userSession';
 
 export interface Variation {
@@ -38,22 +36,17 @@ export class SplitTest {
     public state: State = 'uninitialized';
     public changes = new BehavioralSubject(this);
     private finalStateListeners: Array<() => void> = [];
-    private readonly _variations: InternalVariation[] = [];
+    private _variations: InternalVariation[] = [];
+    private _userAgentInfo: UserAgentInfo;
+    private _name: string;
+    private _condition: Condition;
+    private _variationName: string;
 
-    get variations(): InternalVariation[] {
-        return this._variations;
-    }
-
-    constructor(
-        public name: string,
-        private userAgentInfo: UserAgentInfo,
-        private trackingDataExtender: TrackingDataExtender,
-    ) {
-        this.extendTrackingData(
-            trackingDataExtenderFactory({
-                experimentName: name,
-            }),
-        );
+    constructor(name: string) {
+        this._condition = () => true;
+        this._name = name;
+        this._userAgentInfo = getUserAgentInfo();
+        this._variationName = 'none';
     }
 
     /**
@@ -62,14 +55,14 @@ export class SplitTest {
     public async shouldRun(userAgentInfo: UserAgentInfo): Promise<boolean> {
         const conditionPromises = [
             config.globalCondition(userAgentInfo),
-            this.condition(userAgentInfo),
+            this._condition(userAgentInfo),
         ].map(alwaysPromise);
 
         return (await Promise.all(conditionPromises)).every((a) => a);
     }
 
     public setCondition(condition: Condition): SplitTest {
-        this.condition = condition;
+        this._condition = condition;
         return this;
     }
 
@@ -80,8 +73,7 @@ export class SplitTest {
             this.getVariation(variation.name)
         ) {
             throw new Error(
-                `Split test "${this
-                    .name}": Variation must have a unique name. Was "${variation.name}"`,
+                `Split test "${this._name}": Variation must have a unique name. Was "${variation.name}"`,
             );
         }
         this._variations.push({
@@ -107,7 +99,7 @@ export class SplitTest {
         this.transitionState('initializing');
 
         // Step 1: Run condition function, if any
-        const passesConditions = await this.shouldRun(this.userAgentInfo);
+        const passesConditions = await this.shouldRun(this._userAgentInfo);
         if (!passesConditions) {
             this.transitionState('canceled');
             return false;
@@ -115,21 +107,17 @@ export class SplitTest {
 
         // Step 2: Select variation
         let variation = this.getVariation(
-            userSession.getTestVariation(this.name),
+            userSession.getTestVariation(this._name),
         );
         if (!variation) {
             variation = this.selectRandomVariation();
-            userSession.setTestVariation(this.name, variation.name);
+            userSession.setTestVariation(this._name, variation.name);
         }
-        this.extendTrackingData(
-            trackingDataExtenderFactory({
-                variationName: variation.name,
-            }),
-        );
+        this._variationName = variation.name;
 
         // Step 3: Setup variation
         if (typeof variation.setup === 'function') {
-            variation.setup.call(this, this.userAgentInfo);
+            variation.setup.call(this, this._userAgentInfo);
         }
 
         // Step 4: Publish track event
@@ -160,7 +148,7 @@ export class SplitTest {
     }
 
     public getVariationUrl(variationName: string | null): string {
-        const param = `${this.name}=${variationName}`;
+        const param = `${this._name}=${variationName}`;
 
         try {
             return (
@@ -177,27 +165,10 @@ export class SplitTest {
     }
 
     /**
-     * The tracking data extenders are called just before any event is published to the event handler.
-     */
-    public extendTrackingData(trackingDataExtender: TrackingDataExtender): SplitTest {
-        const currentExtender = this.trackingDataExtender;
-        this.trackingDataExtender = (
-            trackingData: TrackingData,
-            eventName: string,
-        ) => {
-            return trackingDataExtender(
-                currentExtender(trackingData, eventName),
-                eventName,
-            );
-        };
-        return this;
-    }
-
-    /**
      * Emits an "Experiment Viewed" tracking event
      */
     public trackViewed(): void {
-        this.trackEvent('ExperimentViewed');
+        this.trackEvent('ExperimentViewed', {});
     }
 
     /**
@@ -215,18 +186,24 @@ export class SplitTest {
     /**
      * Attaches a <code>trackActionPerformed</code> call as a handler to a link.
      * @param element The DOM element to be bound with track method.
-     * @param name A human readable name of the link. If left out, the innerText of the element is used
+     * @param name A human readable name of the link. If left out, the textContent of the element is used
      */
     public trackLink(element: Element, name?: string): void {
-        const event: TrackEventType = 'ExperimentActionPerformed';
-        const trackingData = this.trackingDataExtender({
+        config.tracking.trackLink(element, 'ExperimentActionPerformed', {
             action: 'Click',
             actionTarget: name || element.textContent,
-        }, event);
-        config.tracking.trackLink(element, event, trackingData);
+        }, {
+            experimentName: this._name,
+            variationName: this._variationName,
+        }, this._userAgentInfo);
     }
 
-    private condition: Condition = () => true;
+    private trackEvent(event: TrackEventType, eventData: TrackEventData): void {
+        config.tracking.track(event, eventData, {
+            experimentName: this._name,
+            variationName: this._variationName,
+        }, this._userAgentInfo);
+    }
 
     private normalizeVariationWeights(): void {
         const weightsSum = this._variations.reduce(
@@ -263,14 +240,11 @@ export class SplitTest {
         return this._variations[i];
     }
 
-    private trackEvent(
-        event: TrackEventType,
-        trackingData?: TrackingData,
-    ): void {
-        const allTrackingData = this.trackingDataExtender(
-            trackingData || {},
-            event,
-        );
-        config.tracking.track(event, allTrackingData);
+    get variations(): InternalVariation[] {
+        return this._variations;
+    }
+
+    get name() {
+        return this._name;
     }
 }

@@ -3,11 +3,9 @@ import { BehavioralSubject } from './behavioralSubject';
 import _config, { Config } from './config';
 import { getAbTestParameter } from './query';
 import { SplitTest } from './splitTest';
-import { TrackingDataExtender, trackingDataExtenderFactory } from './tracking';
-import _getUserAgentInfo from './userAgentInfo';
+import getUserAgentInfo from './userAgentInfo';
 import userSession, { UserSession } from './userSession';
 
-const userAgentInfo = _getUserAgentInfo();
 export const tests: SplitTest[] = [];
 export const testsObservable: BehavioralSubject<SplitTest[]> = new BehavioralSubject(tests);
 
@@ -30,17 +28,6 @@ export function config(userConfig: Partial<Config> = {}) {
     if (userConfig.onVariationChange) {
         _config.onVariationChange = userConfig.onVariationChange;
     }
-}
-
-/**
- * The base tracking data extender supplying general tracking data
- */
-function baseTrackingDataExtenderFactory(): TrackingDataExtender {
-    return trackingDataExtenderFactory({
-        browser: userAgentInfo.name,
-        browserVersion: userAgentInfo.version,
-        isMobile: userAgentInfo.isMobile,
-    });
 }
 
 function initializeFromQueryString(session: UserSession): void {
@@ -73,20 +60,12 @@ function validateTestName(testName: string) {
     }
 }
 
-export function getUserAgentInfo() {
-    return userAgentInfo;
-}
-
 export function getTest(name: string) {
     return tests.filter((t) => t.name === name)[0];
 }
 
 export function create(name: string): SplitTest {
-    const test = new SplitTest(
-        name,
-        userAgentInfo,
-        baseTrackingDataExtenderFactory(),
-    );
+    const test = new SplitTest(name);
 
     // Initialize test from query params if available
     initialize();
@@ -119,6 +98,7 @@ export function reset(): void {
 }
 
 export async function shouldShowUI() {
+    const userAgentInfo = getUserAgentInfo();
     const promises = [
         _config.globalCondition(userAgentInfo),
         _config.uiCondition(userAgentInfo),

@@ -3,7 +3,7 @@
     "sourceMap": false,
     "lib": ["es2015", "dom"],
     "target": "ES5",
-    "module": "es2015",
+    "module": "commonjs",
     "declaration": true,
     "declarationDir": "types",
     "allowSyntheticDefaultImports": true,

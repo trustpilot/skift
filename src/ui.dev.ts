@@ -19,9 +19,9 @@ export const uiFactory = (
     setCurrentTestVariation: (testName: string, variation: string) => void,
 ) => {
     function renderLink(splitTest: SplitTest, variation: InternalVariation) {
-        const link = document.createElement('span');
+        const link = document.createElement('img');
         link.className = 'icon';
-        link.innerHTML = require('../images/link.svg');
+        link.src = require('../images/link.svg');
         link.addEventListener('click', () => {
             const input = document.createElement('input');
             input.value = splitTest.getVariationUrl(variation.name);
@@ -49,9 +49,9 @@ export const uiFactory = (
         const item = document.createElement('li');
         item.textContent = variation.name;
 
-        const open = document.createElement('span');
+        const open = document.createElement('img');
         open.className = 'icon';
-        open.innerHTML = require('../images/open.svg');
+        open.src = require('../images/open.svg');
         open.addEventListener('click', (event) => {
             event.preventDefault();
             setCurrentTestVariation(splitTest.name, variation.name);

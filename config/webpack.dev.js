@@ -40,7 +40,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development'),
+      'process.env.PRODUCTION': false,
     }),
     new HtmlWebpackPlugin({
       template: 'examples/index.html',

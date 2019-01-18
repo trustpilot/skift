@@ -10,11 +10,11 @@ export const uiFactory = (
     setCurrentTestVariation: (testName: string, variation: string) => void,
 ) => {
     function show() {
-        console.log('[Skift] Running in production, UI is disabled');
+        console.log('[Skift] UI is disabled');
     }
 
     function hide() {
-        console.log('[Skift] Running in production, UI is disabled');
+        console.log('[Skift] UI is disabled');
     }
 
     return {

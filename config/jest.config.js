@@ -11,6 +11,7 @@ module.exports = {
   ],
   rootDir: path.resolve(__dirname, '..'),
   moduleNameMapper: {
-    '\\.(css|less|sass|scss)$': '<rootDir>/tests/styleMock.js'
+    '\\.(css|less|sass|scss)$': '<rootDir>/tests/styleMock.js',
+    "\\.(svg)$": "<rootDir>/tests/svgMock.js"
   }
 }

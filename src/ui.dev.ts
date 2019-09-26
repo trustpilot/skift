@@ -21,7 +21,7 @@ export const uiFactory = (
     function renderLink(splitTest: SplitTest, variation: InternalVariation) {
         const link = document.createElement('img');
         link.className = 'icon';
-        link.src = require('../images/link.svg');
+        link.src = require('./images/link.svg');
         link.addEventListener('click', () => {
             const input = document.createElement('input');
             input.value = splitTest.getVariationUrl(variation.name);
@@ -51,7 +51,7 @@ export const uiFactory = (
 
         const open = document.createElement('img');
         open.className = 'icon';
-        open.src = require('../images/open.svg');
+        open.src = require('./images/open.svg');
         open.addEventListener('click', (event) => {
             event.preventDefault();
             setCurrentTestVariation(splitTest.name, variation.name);
@@ -132,7 +132,7 @@ export const uiFactory = (
         }
 
         const style = document.createElement('style');
-        style.innerHTML = require('../styles/ui.css');
+        style.innerHTML = require('./styles/ui.css');
 
         const header = document.createElement('div');
         header.className = 'header';

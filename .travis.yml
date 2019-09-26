@@ -1,13 +1,13 @@
 language: node_js
 # Keep empty to use version from .nvmrc
-node_js:
+node_js: null
 
 cache:
   directories:
     - node_modules
 
 install:
-  - npm install
+  - npm ci
 
 script:
   - npm run lint

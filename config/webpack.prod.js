@@ -1,10 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  devtool: 'cheap-source-map',
+  devtool: 'source-map',
   mode: 'production',
   entry: {
     skift: './lib/index.js'
@@ -35,13 +35,8 @@ module.exports = {
       loader: 'file-loader',
     }]
   },
-  plugins: [
-    new UglifyJsPlugin({
-      parallel: true,
-      cache: true,
-    }),
-    new webpack.DefinePlugin({
-      'process.env.PRODUCTION': true,
-    }),
-  ],
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+  },
 };

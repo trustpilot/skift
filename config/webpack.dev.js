@@ -39,9 +39,6 @@ module.exports = {
     }]
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env.PRODUCTION': false,
-    }),
     new HtmlWebpackPlugin({
       template: 'examples/index.html',
     })

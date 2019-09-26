@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "sourceMap": false,
-    "lib": ["es2015", "dom"],
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "target": "ES5",
     "module": "commonjs",
     "declaration": true,
-    "declarationDir": "types",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "outDir": "lib"

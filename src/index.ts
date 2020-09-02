@@ -12,6 +12,7 @@ import {
 } from './main';
 import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
+import { UserSessionPersister } from './userSessionPersister';
 
 const ui = uiFactory(
     testsObservable,
@@ -47,6 +48,7 @@ export {
     reset,
     ui,
     SplitTest,
+    UserSessionPersister,
 };
 
 export default {

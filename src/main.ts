@@ -30,6 +30,9 @@ export function config(userConfig: Partial<Config> = {}) {
     if (userConfig.onVariationChange) {
         _config.onVariationChange = userConfig.onVariationChange;
     }
+    if (userConfig.sessionPersister) {
+        _config.sessionPersister = userConfig.sessionPersister;
+    }
 }
 
 /**

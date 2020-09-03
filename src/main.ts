@@ -31,9 +31,9 @@ export function config(userConfig: Partial<Config> = {}) {
         _config.onVariationChange = userConfig.onVariationChange;
     }
     if (userConfig.sessionPersister) {
-        const userSession = _config.sessionPersister.loadUserSession() || '';
+        const session = _config.sessionPersister.loadUserSession() || '';
         _config.sessionPersister = userConfig.sessionPersister;
-        _config.sessionPersister.saveUserSession(userSession, _config.userSessionDaysToLive);
+        _config.sessionPersister.saveUserSession(session, _config.userSessionDaysToLive);
     }
 }
 

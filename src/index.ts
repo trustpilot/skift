@@ -1,3 +1,5 @@
+import { CookiePersister } from './cookiePersister';
+import { InMemoryPersister } from './inMemoryPersister';
 import {
     config,
     create,
@@ -12,7 +14,7 @@ import {
 } from './main';
 import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
-import { UserSessionPersister, InMemoryPersister, CookiePersister } from './userSessionPersister';
+import { UserSessionPersister } from './userSessionPersister';
 
 const ui = uiFactory(
     testsObservable,

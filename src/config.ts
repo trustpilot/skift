@@ -1,7 +1,8 @@
 import { Condition } from './condition';
+import { CookiePersister } from './cookiePersister';
 import { removeAbTestParameter } from './query';
 import { ConsoleTracking, Tracking } from './tracking';
-import { CookiePersister, UserSessionPersister } from './userSessionPersister';
+import { UserSessionPersister } from './userSessionPersister';
 
 export interface Config {
     cookieName: string;

@@ -18,11 +18,16 @@ export const uiFactory = (
     getUserAgentInfo: () => UserAgentInfo,
     setCurrentTestVariation: (testName: string, variation: string) => void,
 ) => {
+    function renderButton(svgContent: string, onClick: () => void) {
+        const button = document.createElement('button');
+        button.className = 'icon';
+        button.innerHTML = svgContent;
+        button.addEventListener('click', onClick);
+        return button;
+    }
+
     function renderLink(splitTest: SplitTest, variation: InternalVariation) {
-        const link = document.createElement('img');
-        link.className = 'icon';
-        link.src = require('./images/link.svg');
-        link.addEventListener('click', () => {
+        return renderButton(require('./images/link.svg'), () => {
             const input = document.createElement('input');
             input.value = splitTest.getVariationUrl(variation.name);
             document.body.appendChild(input);
@@ -30,11 +35,12 @@ export const uiFactory = (
             document.execCommand('copy');
             document.body.removeChild(input);
         });
-
-        return link;
     }
 
-    function renderSelectedVaraition(splitTest: SplitTest, variation: InternalVariation) {
+    function renderSelectedVaraition(
+        splitTest: SplitTest,
+        variation: InternalVariation,
+    ) {
         const item = document.createElement('li');
         item.className = 'selected';
         item.textContent = variation.name;
@@ -45,15 +51,13 @@ export const uiFactory = (
         return item;
     }
 
-    function renderUnselectedVariation(splitTest: SplitTest, variation: InternalVariation) {
+    function renderUnselectedVariation(
+        splitTest: SplitTest,
+        variation: InternalVariation,
+    ) {
         const item = document.createElement('li');
         item.textContent = variation.name;
-
-        const open = document.createElement('img');
-        open.className = 'icon';
-        open.src = require('./images/open.svg');
-        open.addEventListener('click', (event) => {
-            event.preventDefault();
+        const open = renderButton(require('./images/open.svg'), () => {
             setCurrentTestVariation(splitTest.name, variation.name);
         });
 
@@ -67,22 +71,30 @@ export const uiFactory = (
 
     async function renderTest(splitTest: SplitTest) {
         if (await splitTest.isInitialized()) {
-            const currentVariation = splitTest.getVariation(getCurrentTestVariation(splitTest.name));
+            const currentVariation = splitTest.getVariation(
+                getCurrentTestVariation(splitTest.name),
+            );
 
             const data: { [key: string]: any } = {
                 Test: splitTest.name,
-                Variation: `${currentVariation.name} (${getVariationPercentage(currentVariation)})`,
+                Variation: `${currentVariation.name} (${getVariationPercentage(
+                    currentVariation,
+                )})`,
             };
 
             const test = document.createElement('div');
             test.className = 'test';
             test.innerHTML = `
-                ${Object.keys(data).map((key) => `
+                ${Object.keys(data)
+                    .map(
+                        (key) => `
                     <div>
                         <span class="data-label">${key}</span>
                         <span class="data-value">${data[key]}</span>
                     </div>
-                `).join('')}
+                `,
+                    )
+                    .join('')}
             `;
 
             const variations = document.createElement('div');
@@ -95,9 +107,13 @@ export const uiFactory = (
             const list = document.createElement('ul');
             splitTest.variations.forEach((variation) => {
                 if (currentVariation.name === variation.name) {
-                    return list.appendChild(renderSelectedVaraition(splitTest, variation));
+                    return list.appendChild(
+                        renderSelectedVaraition(splitTest, variation),
+                    );
                 } else {
-                    return list.appendChild(renderUnselectedVariation(splitTest, variation));
+                    return list.appendChild(
+                        renderUnselectedVariation(splitTest, variation),
+                    );
                 }
             });
 
@@ -145,14 +161,16 @@ export const uiFactory = (
             while (testList.hasChildNodes()) {
                 testList.removeChild(testList.lastChild as Node);
             }
-            const test = await list.map(renderTest).reduce((promise, futureElement) => {
-                return promise.then((elements) => {
-                    return futureElement.then((element) => {
-                        elements.push(...element);
-                        return elements;
+            const test = await list
+                .map(renderTest)
+                .reduce((promise, futureElement) => {
+                    return promise.then((elements) => {
+                        return futureElement.then((element) => {
+                            elements.push(...element);
+                            return elements;
+                        });
                     });
-                });
-            }, Promise.resolve([]));
+                }, Promise.resolve([]));
             test.forEach((x) => testList.appendChild(x));
         });
 

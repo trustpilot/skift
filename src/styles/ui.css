@@ -102,6 +102,14 @@
   margin: 0 4px;
   cursor: pointer;
   color: #0c59f2;
+  border: none;
+  background-color: transparent;
+}
+
+.icon > svg {
+  height: inherit;
+  width: inherit;
+  fill: currentColor;
 }
 
 .skift .icon:nth-child(2) {

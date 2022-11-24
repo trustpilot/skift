@@ -1,3 +1,10 @@
+## [4.3.1](https://github.com/trustpilot/skift/compare/v4.3.0...v4.3.1) (2022-11-24)
+
+
+### Bug Fixes
+
+* ui buttons ([acd74d4](https://github.com/trustpilot/skift/commit/acd74d4504465308eb30d13543ddc7c82291dd72))
+
 # [4.3.0](https://github.com/trustpilot/skift/compare/v4.2.9...v4.3.0) (2020-09-03)
 
 

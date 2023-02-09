@@ -35,7 +35,7 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/jest": "^24.0.18",
-    "@types/node": "^12.7.8",
+    "@types/node": "^12.20.55",
     "ajv": "^6.10.2",
     "copyfiles": "^2.1.1",
     "css-loader": "^3.2.0",

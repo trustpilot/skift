@@ -27,13 +27,12 @@ export const uiFactory = (
     }
 
     function renderLink(splitTest: SplitTest, variation: InternalVariation) {
-        return renderButton(require('./images/link.svg'), () => {
-            const input = document.createElement('input');
-            input.value = splitTest.getVariationUrl(variation.name);
-            document.body.appendChild(input);
-            input.select();
+        return renderButton("currently active", () => {
+            const button = document.createElement('button');
+            button.value = splitTest.getVariationUrl(variation.name);
+            document.body.appendChild(button);
             document.execCommand('copy');
-            document.body.removeChild(input);
+            document.body.removeChild(button);
         });
     }
 
@@ -57,14 +56,14 @@ export const uiFactory = (
     ) {
         const item = document.createElement('li');
         item.textContent = variation.name;
-        const open = renderButton(require('./images/open.svg'), () => {
+        const open = renderButton("change to this variant", () => {
             setCurrentTestVariation(splitTest.name, variation.name);
         });
 
-        const link = renderLink(splitTest, variation);
+        // const link = renderLink(splitTest, variation);
 
         item.appendChild(open);
-        item.appendChild(link);
+        // item.appendChild(link);
 
         return item;
     }
@@ -109,11 +108,11 @@ export const uiFactory = (
                 if (currentVariation.name === variation.name) {
                     return list.appendChild(
                         renderSelectedVaraition(splitTest, variation),
-                    );
+                    ).className = "ab-test-variants";
                 } else {
                     return list.appendChild(
                         renderUnselectedVariation(splitTest, variation),
-                    );
+                    ).className = "ab-test-variants";
                 }
             });
 
@@ -121,20 +120,24 @@ export const uiFactory = (
             variations.appendChild(list);
 
             return [test, variations];
-        } else {
-            const canRun = await splitTest.shouldRun(getUserAgentInfo());
-            const test = document.createElement('div');
-            test.className = 'test';
-            test.innerHTML = `
-                <div>Test <span class="data-value">${splitTest.name}</span> is not initialized</div>
-                <div>
-                    <span class="data-label">Can run</span>
-                    <span class="data-value">${canRun}</span>
-                </div>
-            `;
+        } 
+        // ** Unsure what this does, when uncommented, renders a list of the same test multiple times, saying "not initialised" - perhaps the tests get mounted multiple times? **
+        // else {
+        //     const canRun = await splitTest.shouldRun(getUserAgentInfo());
+        //     const test = document.createElement('div');
+        //     test.className = 'test';
+        //     test.innerHTML = `
+        //         <div>Test <span class="data-value">${splitTest.name}</span> is not initialized</div>
+        //         <div>
+        //             <span class="data-label">Can run</span>
+        //             <span class="data-value">${canRun}</span>
+        //         </div>
+        //     `;
 
-            return [test];
-        }
+        //     console.log(test)
+
+        //     return [test];
+        // }
     }
 
     function showSplitTestUi() {
@@ -166,12 +169,16 @@ export const uiFactory = (
                 .reduce((promise, futureElement) => {
                     return promise.then((elements) => {
                         return futureElement.then((element) => {
-                            elements.push(...element);
+                            if (element && elements) {
+                                elements.push(...element);
+                            }
                             return elements;
                         });
                     });
                 }, Promise.resolve([]));
+            if (test) {
             test.forEach((x) => testList.appendChild(x));
+            }
         });
 
         const button = document.createElement('button');

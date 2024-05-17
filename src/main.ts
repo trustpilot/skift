@@ -8,6 +8,7 @@ import _getUserAgentInfo from './userAgentInfo';
 import userSession, { UserSession } from './userSession';
 
 const userAgentInfo = _getUserAgentInfo();
+let configLoaded = false;
 export const tests: SplitTest[] = [];
 export const testsObservable: BehavioralSubject<SplitTest[]> = new BehavioralSubject(tests);
 
@@ -33,8 +34,12 @@ export function config(userConfig: Partial<Config> = {}) {
     if (userConfig.sessionPersister) {
         const session = _config.sessionPersister.loadUserSession() || '';
         _config.sessionPersister = userConfig.sessionPersister;
-        _config.sessionPersister.saveUserSession(session, _config.userSessionDaysToLive);
+        _config.sessionPersister.saveUserSession(
+            session,
+            _config.userSessionDaysToLive
+        );
     }
+    configLoaded = true;
 }
 
 /**
@@ -123,7 +128,18 @@ export function reset(): void {
     _config.onVariationChange();
 }
 
+const waitUntil = (condition: () => any, checkInterval = 100) => {
+    return new Promise<void>((resolve) => {
+        let interval = setInterval(() => {
+            if (!condition()) return;
+            clearInterval(interval);
+            resolve();
+        }, checkInterval);
+    });
+};
+
 export async function shouldShowUI() {
+    await waitUntil(() => configLoaded);
     const promises = [
         _config.globalCondition(userAgentInfo),
         _config.uiCondition(userAgentInfo),

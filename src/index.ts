@@ -14,7 +14,7 @@ import {
 import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
 import { CookiePersister } from './userSessionPersister';
-import type { UserSessionPersister } from './userSessionPersister';
+import { UserSessionPersister } from './userSessionPersister';
 
 const ui = uiFactory(
     testsObservable,

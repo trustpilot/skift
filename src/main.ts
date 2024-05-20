@@ -36,7 +36,7 @@ export function config(userConfig: Partial<Config> = {}) {
         _config.sessionPersister = userConfig.sessionPersister;
         _config.sessionPersister.saveUserSession(
             session,
-            _config.userSessionDaysToLive
+            _config.userSessionDaysToLive,
         );
     }
     configLoaded = true;
@@ -130,8 +130,10 @@ export function reset(): void {
 
 const waitUntil = (condition: () => any, checkInterval = 100) => {
     return new Promise<void>((resolve) => {
-        let interval = setInterval(() => {
-            if (!condition()) return;
+        const interval = setInterval(() => {
+            if (!condition()) {
+                return;
+            }
             clearInterval(interval);
             resolve();
         }, checkInterval);

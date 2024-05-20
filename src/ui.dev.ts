@@ -27,7 +27,7 @@ export const uiFactory = (
     }
 
     function renderLink(splitTest: SplitTest, variation: InternalVariation) {
-        return renderButton("currently active", () => {
+        return renderButton('currently active', () => {
             const button = document.createElement('button');
             button.value = splitTest.getVariationUrl(variation.name);
             document.body.appendChild(button);
@@ -56,7 +56,7 @@ export const uiFactory = (
     ) {
         const item = document.createElement('li');
         item.textContent = variation.name;
-        const open = renderButton("change to this variant", () => {
+        const open = renderButton('change to this variant', () => {
             setCurrentTestVariation(splitTest.name, variation.name);
         });
 
@@ -88,8 +88,8 @@ export const uiFactory = (
                     .map(
                         (key) => `
                     <div>
-                        <span class="data-label">${key}</span>
-                        <span class="data-value">${data[key]}</span>
+                        <span class='data-label'>${key}</span>
+                        <span class='data-value'>${data[key]}</span>
                     </div>
                 `,
                     )
@@ -108,11 +108,11 @@ export const uiFactory = (
                 if (currentVariation.name === variation.name) {
                     return list.appendChild(
                         renderSelectedVaraition(splitTest, variation),
-                    ).className = "ab-test-variants";
+                    ).className = 'ab-test-variants';
                 } else {
                     return list.appendChild(
                         renderUnselectedVariation(splitTest, variation),
-                    ).className = "ab-test-variants";
+                    ).className = 'ab-test-variants';
                 }
             });
 
@@ -120,17 +120,21 @@ export const uiFactory = (
             variations.appendChild(list);
 
             return [test, variations];
-        } 
-        // ** Unsure what this does, when uncommented, renders a list of the same test multiple times, saying "not initialised" - perhaps the tests get mounted multiple times? **
+        }
+        /* Unsure what this does, when uncommented,
+            renders a list of the same test multiple times,
+            saying 'not initialised'
+             - perhaps the tests get mounted multiple times? */
+
         // else {
         //     const canRun = await splitTest.shouldRun(getUserAgentInfo());
         //     const test = document.createElement('div');
         //     test.className = 'test';
         //     test.innerHTML = `
-        //         <div>Test <span class="data-value">${splitTest.name}</span> is not initialized</div>
+        //         <div>Test <span class='data-value'>${splitTest.name}</span> is not initialized</div>
         //         <div>
-        //             <span class="data-label">Can run</span>
-        //             <span class="data-value">${canRun}</span>
+        //             <span class='data-label'>Can run</span>
+        //             <span class='data-value'>${canRun}</span>
         //         </div>
         //     `;
 

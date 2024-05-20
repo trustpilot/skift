@@ -1,5 +1,13 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import config from '../src/config';
 import skift from '../src/index';
+
+/**
+ * @jest-environment jsdom
+ */
 
 describe('Config', () => {
     it('should get default configuration', () => {

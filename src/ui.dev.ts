@@ -103,11 +103,11 @@ export const uiFactory = (
                 if (currentVariation.name === variation.name) {
                     return list.appendChild(
                         renderSelectedVaraition(splitTest, variation),
-                    )
+                    );
                 } else {
                     return list.appendChild(
                         renderUnselectedVariation(splitTest, variation),
-                    )
+                    );
                 }
             });
 

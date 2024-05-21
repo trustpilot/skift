@@ -59,12 +59,7 @@ export const uiFactory = (
         const open = renderButton('change to this variant', () => {
             setCurrentTestVariation(splitTest.name, variation.name);
         });
-
-        // const link = renderLink(splitTest, variation);
-
         item.appendChild(open);
-        // item.appendChild(link);
-
         return item;
     }
 
@@ -121,27 +116,6 @@ export const uiFactory = (
 
             return [test, variations];
         }
-        /* Unsure what this does, when uncommented,
-            renders a list of the same test multiple times,
-            saying 'not initialised'
-             - perhaps the tests get mounted multiple times? */
-
-        // else {
-        //     const canRun = await splitTest.shouldRun(getUserAgentInfo());
-        //     const test = document.createElement('div');
-        //     test.className = 'test';
-        //     test.innerHTML = `
-        //         <div>Test <span class='data-value'>${splitTest.name}</span> is not initialized</div>
-        //         <div>
-        //             <span class='data-label'>Can run</span>
-        //             <span class='data-value'>${canRun}</span>
-        //         </div>
-        //     `;
-
-        //     console.log(test)
-
-        //     return [test];
-        // }
     }
 
     function showSplitTestUi() {

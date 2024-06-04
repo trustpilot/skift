@@ -25,9 +25,6 @@ describe('Query', () => {
 
     describe('#getAbTestParameter', () => {
         it('should return null if there is no query', () => {
-            const location = {
-                search: '',
-            };
             const abtest = query.getAbTestParameter(location.search);
             expect(abtest).toBeNull();
         });

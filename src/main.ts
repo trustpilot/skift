@@ -8,7 +8,6 @@ import _getUserAgentInfo from './userAgentInfo';
 import userSession, { UserSession } from './userSession';
 
 const userAgentInfo = _getUserAgentInfo();
-let configLoaded = false;
 export const tests: SplitTest[] = [];
 export const testsObservable: BehavioralSubject<SplitTest[]> = new BehavioralSubject(tests);
 
@@ -39,7 +38,6 @@ export function config(userConfig: Partial<Config> = {}) {
             _config.userSessionDaysToLive,
         );
     }
-    configLoaded = true;
 }
 
 /**
@@ -128,20 +126,32 @@ export function reset(): void {
     _config.onVariationChange();
 }
 
-const waitUntil = (condition: () => any, checkInterval = 100) => {
-    return new Promise<void>((resolve) => {
+//auto resolves the promise after 2 seconds if the condition is not met - stops a hanging promise
+const waitUntil = (condition: () => any, checkInterval = 100, timeout = 2000) => {
+    return new Promise<void>((resolve, reject) => {
+        const startTime = Date.now();
         const interval = setInterval(() => {
-            if (!condition()) {
-                return;
+            if (condition()) {
+                clearInterval(interval);
+                clearTimeout(safetyTimeout);
+                resolve();
+            } else if (Date.now() - startTime >= timeout) {
+                clearInterval(interval);
+                clearTimeout(safetyTimeout);
+                reject(new Error("Timeout"));
             }
-            clearInterval(interval);
-            resolve();
         }, checkInterval);
+
+        const safetyTimeout = setTimeout(() => {
+            clearInterval(interval);
+            reject(new Error("Timeout"));
+        }, timeout);
     });
 };
 
 export async function shouldShowUI() {
-    await waitUntil(() => configLoaded);
+    // cookie name is provided from split test package user config. Ensures it's loaded before calling the shouldShowUI function
+    await waitUntil(() => _config.cookieName === "trustpilotABTest").catch(()=>{});
     const promises = [
         _config.globalCondition(userAgentInfo),
         _config.uiCondition(userAgentInfo),

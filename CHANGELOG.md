@@ -1,3 +1,15 @@
+# [4.4.0](https://github.com/trustpilot/skift/compare/v4.3.1...v4.4.0) (2024-06-04)
+
+
+### Bug Fixes
+
+* remove configLoaded in favour of using cookie name / clean up svgs ([febad26](https://github.com/trustpilot/skift/commit/febad263268bcfd851d4a6d579a1e09a60ecbe7c))
+
+
+### Features
+
+* fix abtestui overlay ([f0abdf2](https://github.com/trustpilot/skift/commit/f0abdf242a6a958cd24e70afe596bd00920877d8))
+
 ## [4.3.1](https://github.com/trustpilot/skift/compare/v4.3.0...v4.3.1) (2022-11-24)
 
 

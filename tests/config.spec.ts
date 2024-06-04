@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import config from '../src/config';
 import skift from '../src/index';
 

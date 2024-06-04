@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import skift from '../src/index';
 import { SplitTest } from '../src/splitTest';
 

@@ -29,7 +29,7 @@ module.exports = {
      }, {
       test: /\.css$/,
       use: [{
-        loader: 'css-to-string-loader'
+        loader: 'to-string-loader'
       }, {
         loader: 'css-loader'
       }]

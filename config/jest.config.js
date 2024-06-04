@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+  testEnvironment: "jsdom",
   collectCoverage: true,
   preset: 'ts-jest',
   rootDir: path.resolve(__dirname, '..'),

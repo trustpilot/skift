@@ -7,13 +7,12 @@ describe('Top-level api', () => {
         expect(skift).toBeDefined();
     });
 
-    it('should be impossible to create an empty test', (done) => {
+    it('should be impossible to create an empty test', () => {
         skift.create('Awesome test!').setup()
             .then(() => expect('not').toBe('here'))
             .catch((err) => {
                 expect(skift.getTest('Awesome test!')).toBeDefined();
                 expect(skift.getTest('Awesome test!') instanceof SplitTest).toBe(true);
-                done();
             });
     });
 
@@ -25,7 +24,7 @@ describe('Top-level api', () => {
         expect(test.getVariation('Variation A')).toBeDefined();
     });
 
-    it('should be possible to setup a test with two variations and retrieve it by name', async (done) => {
+    it('should be possible to setup a test with two variations and retrieve it by name', async () => {
         const test = skift
             .create('Another awesome test!')
             .addVariation({ name: 'Variation C' })
@@ -34,7 +33,6 @@ describe('Top-level api', () => {
         expect(await test.setup()).toBe(true);
         expect(skift.getTest('Another awesome test!')).toBeDefined();
         expect(test === skift.getTest('Another awesome test!')).toBeTruthy();
-        done();
     });
 
     it('should be possible to show the UI', () => {
@@ -52,27 +50,25 @@ describe('Top-level api', () => {
     });
 
     describe('when setting a condition', () => {
-        it('allows for a promise', async (done) => {
+        it('allows for a promise', async () => {
             expect(await skift
                 .create('testing conditions')
                 .setCondition(() => Promise.resolve(true))
                 .addVariation({ name: 'A'})
                 .setup()).toBe(true);
-            done();
         });
 
-        it('allows for a boolean', async (done) => {
+        it('allows for a boolean', async () => {
             expect(await skift
                 .create('testing conditions')
                 .setCondition(() => true)
                 .addVariation({ name: 'A'})
                 .setup()).toBe(true);
-            done();
         });
     });
 
     describe('when checking for initialization', () => {
-        it('resolves to true when setup is called, completes, and was successful', async (done) => {
+        it('resolves to true when setup is called, completes, and was successful', async () => {
             const test = skift
                 .create('testing conditions')
                 .setCondition(() => true)
@@ -83,10 +79,9 @@ describe('Top-level api', () => {
 
             await setupPromise;
             expect(await initializedPromise).toBe(true);
-            done();
         });
 
-        it('resolves to false when setup is called, completes, and was canceled', async (done) => {
+        it('resolves to false when setup is called, completes, and was canceled', async () => {
             const test = skift
                 .create('testing conditions')
                 .setCondition(() => false)
@@ -97,10 +92,9 @@ describe('Top-level api', () => {
 
             await setupPromise;
             expect(await initializedPromise).toBe(false);
-            done();
         });
 
-        it('resolves to false when setup is never called', async (done) => {
+        it('resolves to false when setup is never called', async () => {
             const test = skift
                 .create('testing conditions')
                 .setCondition(() => false)
@@ -109,7 +103,6 @@ describe('Top-level api', () => {
             const initializedPromise = test.isInitialized();
 
             expect(await initializedPromise).toBe(false);
-            done();
         });
     });
 });

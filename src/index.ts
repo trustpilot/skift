@@ -13,7 +13,8 @@ import {
 } from './main';
 import { SplitTest } from './splitTest';
 import { uiFactory } from './ui';
-import { CookiePersister, UserSessionPersister } from './userSessionPersister';
+import { CookiePersister } from './userSessionPersister';
+import type { UserSessionPersister } from './userSessionPersister';
 
 const ui = uiFactory(
     testsObservable,

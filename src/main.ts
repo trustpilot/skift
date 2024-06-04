@@ -33,7 +33,10 @@ export function config(userConfig: Partial<Config> = {}) {
     if (userConfig.sessionPersister) {
         const session = _config.sessionPersister.loadUserSession() || '';
         _config.sessionPersister = userConfig.sessionPersister;
-        _config.sessionPersister.saveUserSession(session, _config.userSessionDaysToLive);
+        _config.sessionPersister.saveUserSession(
+            session,
+            _config.userSessionDaysToLive,
+        );
     }
 }
 
@@ -123,7 +126,33 @@ export function reset(): void {
     _config.onVariationChange();
 }
 
+// auto resolves the promise after 2 seconds if the condition is not met - stops a hanging promise
+const waitUntil = (condition: () => any, checkInterval = 100, timeout = 2000) => {
+    return new Promise<void>((resolve, reject) => {
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+            if (condition()) {
+                clearInterval(interval);
+                clearTimeout(safetyTimeout);
+                resolve();
+            } else if (Date.now() - startTime >= timeout) {
+                clearInterval(interval);
+                clearTimeout(safetyTimeout);
+                resolve();
+            }
+        }, checkInterval);
+
+        const safetyTimeout = setTimeout(() => {
+            clearInterval(interval);
+            resolve();
+        }, timeout);
+    });
+};
+
 export async function shouldShowUI() {
+    // cookie name is provided from split test package user config.
+    // Ensures it's loaded before calling the shouldShowUI function
+    await waitUntil(() => _config.cookieName === 'trustpilotABTest');
     const promises = [
         _config.globalCondition(userAgentInfo),
         _config.uiCondition(userAgentInfo),

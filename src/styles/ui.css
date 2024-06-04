@@ -11,6 +11,8 @@
   transition: all .5s ease-out;
   opacity: 1;
   border-radius: 3px;
+  overflow: auto;
+  font-size: 12px;
 }
 
 .skift li.selected {
@@ -34,10 +36,6 @@
 .skift.hideme {
   bottom: -550px;
   opacity: 0;
-}
-
-.skift .tests {
-  overflow-y: auto;
 }
 
 .skift .variations {
@@ -95,11 +93,7 @@
 }
 
 .skift .icon {
-  height: 16px;
-  width: 16px;
   display: inline-block;
-  vertical-align: middle;
-  margin: 0 4px;
   cursor: pointer;
   color: #0c59f2;
   border: none;

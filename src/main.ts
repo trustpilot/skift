@@ -126,7 +126,7 @@ export function reset(): void {
     _config.onVariationChange();
 }
 
-//auto resolves the promise after 2 seconds if the condition is not met - stops a hanging promise
+// auto resolves the promise after 2 seconds if the condition is not met - stops a hanging promise
 const waitUntil = (condition: () => any, checkInterval = 100, timeout = 2000) => {
     return new Promise<void>((resolve, reject) => {
         const startTime = Date.now();
@@ -138,20 +138,21 @@ const waitUntil = (condition: () => any, checkInterval = 100, timeout = 2000) =>
             } else if (Date.now() - startTime >= timeout) {
                 clearInterval(interval);
                 clearTimeout(safetyTimeout);
-                reject(new Error("Timeout"));
+                resolve();
             }
         }, checkInterval);
 
         const safetyTimeout = setTimeout(() => {
             clearInterval(interval);
-            reject(new Error("Timeout"));
+            resolve();
         }, timeout);
     });
 };
 
 export async function shouldShowUI() {
-    // cookie name is provided from split test package user config. Ensures it's loaded before calling the shouldShowUI function
-    await waitUntil(() => _config.cookieName === "trustpilotABTest").catch(()=>{});
+    // cookie name is provided from split test package user config.
+    // Ensures it's loaded before calling the shouldShowUI function
+    await waitUntil(() => _config.cookieName === 'trustpilotABTest');
     const promises = [
         _config.globalCondition(userAgentInfo),
         _config.uiCondition(userAgentInfo),
